@@ -1,0 +1,212 @@
+Order_ID,Date,Customer_ID,Channel,Items,Qty,Price_Per_Unit,GST_Percent,Total_Value,Payment_Status,Delivery_Status,Delivery_Method,Tracking_ID,Invoice_Link,Notes
+ORD-0001,2024-12-04,CUST-0024,WhatsApp,Almond 25g x25,25,150.0,0,3750.0,Paid,Delivered,Self,,001-GūD-2024-Tintu,
+ORD-0002,2024-12-05,CUST-0025,Store A,"Almond 25g x50, Peanut 25g x50",100,97.0,0,9700.0,Paid,Delivered,Self,,002-GūD-2024-HiLite,8245 received after adjusting the return chocolates amount
+ORD-0003,2024-12-17,CUST-0026,WhatsApp,Box x35,35,340.0,0,11900.0,Paid,Delivered,Self,,003-GūD-2024-Aaliyah,
+ORD-0004,2024-12-17,CUST-0027,WhatsApp,"Box x1, Almond 25g x1, Peanut 25g x1, Lemon 25g x1, Orange 25g x1",5,900.0,0,1500.0,Paid,Delivered,Self,,004-GūD-2024-Nishant,"Hamper Basket, Coffee Powder"
+ORD-0005,2024-12-17,CUST-0028,WhatsApp,Box x20,20,340.0,0,6800.0,Paid,Delivered,Self,,005-GūD-2024-Indaids,
+ORD-0006,2024-12-19,CUST-0029,WhatsApp,Box x100,100,330.0,0,33000.0,Paid,Delivered,Self,,006-GūD-2024-Biotex,
+ORD-0007,2024-12-18,CUST-0030,WhatsApp,"Almond 25g x1, Peanut 25g x1",2,150.0,0,300.0,Paid,Delivered,Self,,007-GūD-2024-Jincy,EatKochiEat
+ORD-0008,2024-12-18,CUST-0031,WhatsApp,"Box x1, Peanut 25g x1",2,375.0,0,525.0,Paid,Delivered,Self,,008-GūD-2024-Greeshma,
+ORD-0009,2024-12-22,CUST-0032,WhatsApp,Box x5,5,375.0,0,1875.0,Paid,Delivered,Self,,009-GūD-2024-Pee Jay & Sons,
+ORD-0010,2024-12-22,CUST-0033,WhatsApp,Box x10,10,300.0,0,3000.0,Pending,Pending,Self,,010-GūD-2024-Arun,
+ORD-0011,2024-12-22,CUST-0034,WhatsApp,"Box x1, Almond 25g x3, Peanut 25g x2, Lemon 25g x4, Orange 25g x3",13,337.5,0,1957.5,Partial,Shipped,Self,,011-GūD-2024-D7,Payment as per sale with 10% commission
+ORD-0012,2024-12-26,CUST-0035,WhatsApp,Box x6,6,375.0,0,2250.0,Paid,Delivered,Self,,012-GūD-2024-TealStory,
+ORD-0013,2024-12-28,CUST-0036,Store A,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,100.0,0,2000.0,Paid,Delivered,Self,,013-GūD-2024-HorgStore,
+ORD-0014,2024-12-30,CUST-0033,WhatsApp,Box x25,25,300.0,0,7500.0,Paid,Delivered,Self,,014-GūD-2024-Nihara,
+ORD-0015,2024-12-31,CUST-0037,WhatsApp,"Box x2, Almond 25g x2, Peanut 25g x2, Lemon 25g x2, Orange 25g x2",10,375.0,0,1950.0,Paid,Delivered,Self,,015-GūD-2024-Vithulya,Gift Hamper : 3000; Box & Bars : 975 + 350 courier
+ORD-0016,2024-12-31,CUST-0038,WhatsApp,Box x30,30,330.0,0,9900.0,Paid,Delivered,Self,,016-GūD-2024-Livbio,Received on 30 Jan 2025
+ORD-0017,2025-01-01,CUST-0025,Store A,"Almond 25g x70, Peanut 25g x30",100,97.0,0,9700.0,Paid,Delivered,Self,,017-GūD-2024-HiLite,Transferred from Bindu s acc on 1 March 2025
+ORD-0018,2025-01-11,CUST-0033,WhatsApp,Lemon 25g x41,41,97.0,0,3977.0,Paid,Delivered,Self,,018-GūD-2024-Nihara,
+ORD-0019,2025-01-11,CUST-0039,WhatsApp,"Almond 25g x3, Lemon 25g x3, Orange 25g x4",10,150.0,0,1500.0,Paid,Delivered,Self,,019-GūD-2024-CAN,
+ORD-0020,2025-01-17,CUST-0040,WhatsApp,Box x2,2,375.0,0,750.0,Paid,Delivered,Self,,020-GūD-2024-Madhu,Courier Paid by Gud
+ORD-0021,2024-12-25,CUST-0033,WhatsApp,"Almond 25g x50, Peanut 25g x50, Orange 25g x50",150,97.0,0,14550.0,Paid,Delivered,Self,,021-GūD-2024-Nihara,25 gms bar - Payment as per sale
+ORD-0022,2024-01-20,CUST-0036,Store A,"Almond 25g x5, Orange 25g x5",10,100.0,0,1000.0,Paid,Delivered,Self,,022-GūD-2024-HorgStore,28 march payment - 4000
+ORD-0023,2025-01-25,CUST-0041,WhatsApp,Box x30,30,360.0,0,10800.0,Paid,Delivered,Self,,024-GūD-2024-Naveen,
+ORD-0024,2025-01-25,CUST-0001,Event,"Lemon 25g x1, Orange 25g x7",8,150.0,0,1200.0,Paid,Delivered,Self,,Exhibition Sale 1,
+ORD-0025,2025-01-25,CUST-0001,Event,Box x5,5,375.0,0,1875.0,Paid,Delivered,Self,,Exhibition Sale 2,
+ORD-0026,2025-01-25,CUST-0001,Event,Box x3,3,350.0,0,1050.0,Paid,Delivered,Self,,Exhibition Sale 3,
+ORD-0027,2025-01-25,CUST-0001,Event,Box x1,1,300.0,0,300.0,Paid,Delivered,Self,,Exhibition Sale 4,
+ORD-0028,2025-01-31,CUST-0001,Store A,Orange 25g x5,5,100.0,0,500.0,Paid,Delivered,Self,,025-GūD-2024-HorgStore,28 march payment - 4000
+ORD-0029,2025-01-31,CUST-0001,WhatsApp,Box x5,5,300.0,0,1500.0,Pending,Pending,Self,,026-GūD-2024-Jai,Republic Day Gifts
+ORD-0030,2025-01-31,CUST-0001,WhatsApp,Orange 25g x1,1,150.0,0,150.0,Pending,Pending,Self,,027-GūD-2024-Sabin,Najma Gift
+ORD-0031,2025-02-05,CUST-0001,WhatsApp,"Box x5, Almond 25g x25, Peanut 25g x25, Orange 25g x25",80,300.0,0,8775.0,Paid,Delivered,Self,,028-GūD-2024-Nihara,
+ORD-0032,2025-02-05,CUST-0001,WhatsApp,"Box x10, Peanut 25g x15",25,300.0,0,4455.0,Paid,Delivered,Self,,029-GūD-2024-Nihara,Received payment on 20 May 2025
+ORD-0033,,CUST-0001,WhatsApp,"Box x4, Orange 25g x5",9,375.0,0,2250.0,Paid,Delivered,Self,,Thomas - Livbio,31 March 2025 as 4500
+ORD-0034,2025-02-05,CUST-0001,WhatsApp,Box x1,1,375.0,0,375.0,Paid,Delivered,Self,,Tranasia Cyberpark,Current A/c
+ORD-0035,2025-02-05,CUST-0001,WhatsApp,Box x1,1,340.0,0,340.0,Paid,Delivered,Self,,Tranasia Cyberpark,Current A/c
+ORD-0036,2025-02-05,CUST-0001,WhatsApp,Box x1,1,350.0,0,350.0,Paid,Delivered,Self,,Tranasia Cyberpark,Current A/c
+ORD-0037,2025-02-05,CUST-0001,WhatsApp,Orange 25g x3,3,150.0,0,450.0,Paid,Delivered,Self,,Tranasia Cyberpark,
+ORD-0038,2025-02-05,CUST-0001,WhatsApp,Orange 25g x2,2,125.0,0,250.0,Paid,Delivered,Self,,Tranasia Cyberpark,
+ORD-0039,2025-02-05,CUST-0001,WhatsApp,Box x2,2,312.5,0,625.0,Paid,Delivered,Self,,Tranasia Cyberpark,
+ORD-0040,2025-02-06,CUST-0001,WhatsApp,"Box x4, Orange 25g x5",9,350.0,0,2025.0,Paid,Delivered,Self,,Tranasia Cyberpark,
+ORD-0041,2025-02-12,CUST-0001,WhatsApp,"Box x15, Orange 25g x20",35,340.0,0,7300.0,Paid,Delivered,Self,,030-GūD-2024-PGUS,
+ORD-0042,2025-02-13,CUST-0001,WhatsApp,Box x20,20,340.0,0,6800.0,Paid,Delivered,Self,,031-GūD-2024-Indaids,Received on 17 Feb 2025
+ORD-0043,2025-02-13,CUST-0001,WhatsApp,Box x10,10,325.0,0,3250.0,Paid,Delivered,Self,,032-GūD-2024-OLE,"Rs 2275 for 7 boxes, 3 boxes used as samples"
+ORD-0044,2025-02-14,CUST-0001,WhatsApp,Box x10,10,300.0,0,3000.0,Paid,Delivered,Self,,033-GūD-2024-Nihara,
+ORD-0045,2025-02-14,CUST-0001,WhatsApp,Orange 25g x5,5,120.0,0,600.0,Paid,Delivered,Self,,034-GūD-2024-OLE,Received 2400 Rs on 19 April 2025
+ORD-0046,2025-02-14,CUST-0001,WhatsApp,Box x2,2,375.0,0,750.0,Paid,Delivered,Self,,035-GūD-2024-PrevalentAI,45754
+ORD-0047,2025-02-23,CUST-0001,WhatsApp,"Box x13, Orange 25g x15",28,340.0,0,6445.0,Paid,Delivered,Self,,The Pink Market,Pink Market Sale : Total amount gpay 13102
+ORD-0048,2025-02-23,CUST-0001,WhatsApp,Box x1,1,300.0,0,300.0,Paid,Delivered,Self,,The Pink Market,
+ORD-0049,2025-02-23,CUST-0001,WhatsApp,Box x3,3,300.0,0,900.0,Paid,Delivered,Self,,Jai - The Pink Market,
+ORD-0050,2025-02-24,CUST-0001,WhatsApp,Box x1,1,375.0,0,375.0,Paid,Delivered,Self,,039-GūD-2024-Geo,
+ORD-0051,2025-02-27,CUST-0001,WhatsApp,Box x4,4,300.0,0,1200.0,Paid,Delivered,Self,,040-GūD-2024-Santhi,
+ORD-0052,2025-02-28,CUST-0001,WhatsApp,Box x2,2,375.0,0,750.0,Paid,Delivered,Self,,041-GūD-2024-PrevalentAI,Payment received 16 March 2025 from Sowmya
+ORD-0053,2025-01-23,CUST-0036,Store A,Peanut 25g x5,5,100.0,0,500.0,Paid,Delivered,Self,,023-GūD-2024-HorgStore,28 march payment - 4000
+ORD-0054,2025-01-25,CUST-0001,Event,"Almond 25g x15, Peanut 25g x7",22,150.0,0,3300.0,Paid,Delivered,Self,,Exhibition Sale 1,
+ORD-0055,2025-01-25,CUST-0001,Event,"Almond 25g x2, Peanut 25g x4",6,100.0,0,600.0,Paid,Delivered,Self,,Exhibition Sale 2,
+ORD-0056,2025-01-25,CUST-0001,Event,Almond 25g x1,1,125.0,0,125.0,Paid,Delivered,Self,,Exhibition Sale 3,
+ORD-0057,2025-01-31,CUST-0001,Store A,"Almond 25g x10, Peanut 25g x10",20,100.0,0,2000.0,Paid,Delivered,Self,,025-GūD-2024-HorgStore,28 march payment - 4000
+ORD-0058,2025-01-31,CUST-0001,WhatsApp,Almond 25g x1,1,150.0,0,150.0,Paid,Delivered,Self,,027-GūD-2024-Sabin,Payment done by Bindu on 7 Sep 2025
+ORD-0059,2025-02-05,CUST-0001,WhatsApp,"Almond 25g x25, Peanut 25g x25",50,97.0,0,4850.0,Pending,Delivered,Self,,028-GūD-2024-Nihara,
+ORD-0060,2025-02-05,CUST-0001,WhatsApp,Peanut 25g x15,15,97.0,0,1455.0,Pending,Delivered,Self,,029-GūD-2024-Nihara,
+ORD-0061,,CUST-0001,WhatsApp,"Almond 25g x7, Peanut 25g x8",15,150.0,0,2250.0,Paid,Delivered,Self,,Thomas - Livbio,31 March 2025 as 4500
+ORD-0062,2025-02-05,CUST-0001,WhatsApp,"Almond 25g x4, Peanut 25g x3",7,150.0,0,1050.0,Paid,Delivered,Self,,Tranasia Cyberpark,
+ORD-0063,2025-02-05,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x3",8,125.0,0,1000.0,Paid,Delivered,Self,,Tranasia Cyberpark,
+ORD-0064,2025-02-06,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x5",15,125.0,0,1875.0,Paid,Delivered,Self,,Tranasia Cyberpark,
+ORD-0065,2025-02-08,CUST-0001,WhatsApp,Almond 25g x10,10,150.0,0,1500.0,Paid,Delivered,Self,,036-GūD-2024-Tintu,45733
+ORD-0066,2025-02-12,CUST-0001,WhatsApp,"Almond 25g x20, Peanut 25g x20",40,110.0,0,4400.0,Paid,Delivered,Self,,030-GūD-2024-PGUS,
+ORD-0067,2025-02-14,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5",15,120.0,0,1800.0,Paid,Delivered,Self,,034-GūD-2024-OLE,Received 2400 Rs on 19 April 2025
+ORD-0068,2025-02-14,CUST-0001,WhatsApp,"Almond 25g x50, Peanut 25g x50",100,97.0,0,9700.0,Paid,Delivered,Self,,Cot,Transferred from Bindu s account as on 4 May
+ORD-0069,2025-02-18,CUST-0001,WhatsApp,Lemon 25g x15,15,97.0,0,1455.0,Paid,Delivered,Self,,038-GūD-2024-Nihara,
+ORD-0070,2025-02-23,CUST-0001,WhatsApp,"Almond 25g x40, Peanut 25g x22, Lemon 25g x18, Orange 25g x3",83,135.0,0,11205.0,Paid,Delivered,Self,,The Pink Market,Pink Market Sale : Total amount gpay 13102
+ORD-0071,2025-02-23,CUST-0001,WhatsApp,Orange 25g x1,1,98.0,0,98.0,Paid,Delivered,Self,,Jai - The Pink Market,
+ORD-0072,2025-03-01,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,97.0,0,1940.0,Pending,Delivered,Self,,042-GūD-2024-Arun,Check with Arun
+ORD-0073,2025-03-06,CUST-0001,WhatsApp,Box x5,5,350.0,0,1750.0,Pending,Pending,Self,,043-GūD-2024-Jai,WellGenome Launch
+ORD-0074,2025-03-08,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,120.0,0,2400.0,Paid,Delivered,Self,,044-GūD-2024-OLE,Payment via bank on 8 Sep 2025
+ORD-0075,2025-03-09,CUST-0001,WhatsApp,"Box x20, Peanut 25g x5",25,350.0,0,7500.0,Paid,Delivered,Self,,045-GūD-2024-Raj,Transferred on 4 May 2025 from J&B account
+ORD-0076,2025-03-09,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,100.0,0,2000.0,Paid,Delivered,Self,,046-GūD-2024-Rochas,Payment done by Bindu on 7 Sep 2025
+ORD-0077,2025-03-14,CUST-0001,WhatsApp,"Almond 25g x25, Peanut 25g x25, Lemon 25g x25, Orange 25g x25",100,97.0,0,9700.0,Paid,Delivered,Self,,047-GūD-2024-Nihara,
+ORD-0078,2025-03-18,CUST-0001,WhatsApp,Box x10,10,300.0,0,3000.0,Paid,Delivered,Self,,048-GūD-2024-Prajun & Venkatesh,
+ORD-0079,2025-03-23,CUST-0001,WhatsApp,Box x1,1,300.0,0,300.0,Pending,Pending,Self,,049-GūD-2024-Nihara,
+ORD-0080,2025-03-27,CUST-0001,Store A,"Almond 25g x2, Lemon 25g x5, Orange 25g x5",12,100.0,0,1200.0,Paid,Delivered,Self,,050-GūD-2024-HorgStore,Received 2700 rs on 28 July including Invoice no 63
+ORD-0081,2025-03-27,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x3, Lemon 25g x2, Orange 25g x2",12,100.0,0,1200.0,Paid,Delivered,Self,,051-GūD-2024-Rochas,1200 received on 27 March
+ORD-0082,2025-04-03,CUST-0001,WhatsApp,Box x30,30,1000.0,0,30000.0,Paid,Delivered,Self,,052-GūD-2025-Soukhya,Transferred from Bindu s account as on 4 May
+ORD-0083,2025-04-06,CUST-0001,WhatsApp,"Box x6, Almond 25g x30, Peanut 25g x15, Lemon 25g x13, Orange 25g x11",75,,0,11095.0,Paid,Delivered,Self,,Sale at Nemcon,Cash 800 to be transferred
+ORD-0084,2025-04-11,CUST-0001,WhatsApp,Box x15,15,300.0,0,4500.0,Pending,Pending,Self,,Arun,
+ORD-0085,2025-04-17,CUST-0001,WhatsApp,Box x4,4,1500.0,0,6000.0,Paid,Delivered,Self,,055-GūD-2025-PrevalentAI,GIft Hampers - 2
+ORD-0086,2025-04-21,CUST-0001,Store A,"Almond 25g x50, Peanut 25g x50",100,97.0,0,9700.0,Paid,Delivered,Self,,056-GūD-2024-HiLite,Payment done by Bindu on 7 Sep 2025
+ORD-0087,2025-04-26,CUST-0001,WhatsApp,Box x5,5,1250.0,0,6250.0,Paid,Delivered,Self,,057-GūD-2025-VelvetHotels,Received 6k on 10th May 2025
+ORD-0088,2025-04-19,CUST-0001,WhatsApp,"Almond 25g x4, Peanut 25g x3, Lemon 25g x3, Orange 25g x4",14,100.0,0,1400.0,Paid,Delivered,Self,,058-GūD-2025-Rochas,1400 rs on 13 May received
+ORD-0089,2025-04-22,CUST-0001,WhatsApp,"Almond 25g x1, Peanut 25g x1, Lemon 25g x1, Orange 25g x1",4,130.0,0,520.0,Paid,Delivered,Self,,059-GūD-2025-Souparnika,
+ORD-0090,2025-05-02,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x5, Orange 25g x5",20,120.0,0,2400.0,Paid,Delivered,Self,,060-GūD-2025-OLE,Received on 14 Nov 2025
+ORD-0091,2025-05-06,CUST-0001,WhatsApp,"Almond 25g x20, Peanut 25g x20, Lemon 25g x20, Orange 25g x20",80,110.0,0,8800.0,Paid,Delivered,Self,,061-GūD-2025-WS,Payment done on 20 aug 2025
+ORD-0092,2025-05-10,CUST-0001,Store A,"Almond 25g x5, Peanut 25g x2, Lemon 25g x3, Orange 25g x5",15,100.0,0,1500.0,Paid,Delivered,Self,,063-GūD-2025-HorgStore,Received 2700 rs on 28 July
+ORD-0093,2025-05-07,CUST-0001,WhatsApp,"Almond 25g x20, Peanut 25g x10, Lemon 25g x20, Orange 25g x20",70,97.0,0,6790.0,Paid,Delivered,Self,,062-GūD-2025-Nihara,Payment done on 20th May
+ORD-0094,2025-05-11,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Lemon 25g x10, Orange 25g x10",40,100.0,0,4000.0,Paid,Delivered,Self,,064-GūD-2025-Rochas,Payment transferred by Bindu on 1 Nov 2025
+ORD-0095,2025-06-17,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,120.0,0,2400.0,Paid,Delivered,Self,,065-GūD-2025-GVQ,Transferred from Bindu s acc on 4 july 2025
+ORD-0096,2025-06-26,CUST-0001,Store A,"Almond 25g x5, Peanut 25g x1, Orange 25g x3",9,100.0,0,900.0,Paid,Delivered,Self,,066-GūD-2024-HorgStore,Made as a payment of 2900 on 9 Sep 2025
+ORD-0097,2025-06-30,CUST-0001,WhatsApp,Box x20,20,340.0,0,6800.0,Paid,Delivered,Self,,067-GūD-2024-Indaids,Payment on 8 July 2025
+ORD-0098,2025-07-01,CUST-0001,WhatsApp,"Almond 25g x6, Peanut 25g x5",11,120.0,0,1320.0,Paid,Delivered,Self,,068-GūD-2025-GVQ,Received payment on 5th July 2025
+ORD-0099,2025-07-01,CUST-0001,WhatsApp,"Almond 25g x4, Orange 25g x5",9,120.0,0,1080.0,Paid,Delivered,Self,,069-GūD-2025-OLE,Received on 11 Nov 2025
+ORD-0100,2025-07-19,CUST-0001,Store A,"Almond 25g x30, Peanut 25g x20",50,97.0,0,4081.0,Paid,Delivered,Self,,070-GūD-2024-HiLite,Payment done by Bindu on 7 Sep 2025
+ORD-0101,2025-07-21,CUST-0001,WhatsApp,Box x2,2,300.0,0,3000.0,Paid,Delivered,Self,,071-GūD-2025-PrevalentAI,Hamper - 3000 rs
+ORD-0102,2025-07-22,CUST-0001,WhatsApp,"Box x5, Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",25,330.0,0,4050.0,Paid,Delivered,Self,,072-GūD-2025-Welmont,To South Indian Bank on 21 Jan 2026
+ORD-0103,2025-07-23,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Lemon 25g x5",25,120.0,0,3000.0,Paid,Delivered,Self,,073-GūD-2025-GVQ,
+ORD-0104,2025-07-23,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Orange 25g x5",25,120.0,0,3000.0,Paid,Delivered,Self,,074-GūD-2025-GVQ,Made as a payment of 7800 on 6 Oct 2025
+ORD-0105,2025-07-29,CUST-0001,WhatsApp,Box x13,13,340.0,0,4420.0,Paid,Delivered,Self,,075-GūD-2025-Backtoearth,
+ORD-0106,2025-07-30,CUST-0001,WhatsApp,"Box x1, Almond 25g x15, Peanut 25g x15, Lemon 25g x15, Orange 25g x15",61,300.0,0,6120.0,Paid,Delivered,Self,,076-GūD-2025-Nihara,Payment received on 29 Aug 2025
+ORD-0107,2025-07-30,CUST-0001,Store A,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,100.0,0,2000.0,Paid,Delivered,Self,,077-GūD-2024-HorgStore,Made as a payment of 2900 on 9 Sep 2025
+ORD-0108,2025-08-01,CUST-0001,WhatsApp,Almond 25g x2,2,150.0,0,300.0,Paid,Delivered,Self,,078-GūD-2025-Karthick,Payment received on 8 Sep 2025
+ORD-0109,2025-08-18,CUST-0001,Store A,"Almond 25g x50, Peanut 25g x50",100,97.0,0,9700.0,Paid,Delivered,Self,,079-GūD-2025-HiLite,Payment received from Bindu on 31 Oct 2025
+ORD-0110,2025-08-20,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,100.0,0,2000.0,Pending,Pending,Self,,080-GūD-2025-Rochas,
+ORD-0111,2025-08-19,CUST-0001,Store A,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,100.0,0,2000.0,Pending,Pending,Self,,081-GūD-2024-HorgStore,
+ORD-0112,2025-08-25,CUST-0001,WhatsApp,Orange 25g x3,3,130.0,0,390.0,Paid,Delivered,Self,,Abhijith,Gpay - 25 Aug
+ORD-0113,2025-08-25,CUST-0001,WhatsApp,"Almond 25g x2, Orange 25g x1",3,130.0,0,390.0,Paid,Delivered,Self,,Surya,Gpay - 25 Aug
+ORD-0114,2025-08-25,CUST-0001,WhatsApp,Almond 25g x1,1,130.0,0,130.0,Paid,Delivered,Self,,Sreejith,Gpay - 25 Aug
+ORD-0115,2025-08-25,CUST-0001,WhatsApp,"Almond 25g x1, Peanut 25g x1",2,130.0,0,260.0,Paid,Delivered,Self,,Jayaseree,Gpay - 25 Aug
+ORD-0116,2025-08-26,CUST-0001,WhatsApp,Almond 25g x1,1,120.0,0,120.0,Paid,Delivered,Self,,Kevin,Gpay - 26 Aug
+ORD-0117,2025-08-26,CUST-0001,WhatsApp,Almond 25g x1,1,130.0,0,130.0,Paid,Delivered,Self,,Antony,Gpay - 26 Aug
+ORD-0118,2025-08-27,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Orange 25g x10",30,97.0,0,2910.0,Paid,Delivered,Self,,082-GūD-2025-Nihara,Payment received on 1 Nov 2025 as 4000 rs
+ORD-0119,2025-08-28,CUST-0001,WhatsApp,Box x2,2,,0,2000.0,Paid,Delivered,Self,,083-GūD-2025-Ajay,
+ORD-0120,2025-09-01,CUST-0001,WhatsApp,"Almond 25g x1, Peanut 25g x1",2,120.0,0,240.0,Paid,Delivered,Self,,Shephy,Gpay - 1 Sep
+ORD-0121,2025-09-01,CUST-0001,WhatsApp,Box x3,3,330.0,0,990.0,Paid,Delivered,Self,,Sarun,Gpay - 4 Sep
+ORD-0122,2025-09-02,CUST-0001,WhatsApp,Almond 25g x1,1,130.0,0,130.0,Paid,Delivered,Self,,Vineeth,Gpay - 2 Sep
+ORD-0123,2025-09-02,CUST-0001,WhatsApp,"Box x2, Almond 25g x1, Peanut 25g x1, Lemon 25g x1, Orange 25g x1",6,,0,2000.0,Pending,Pending,Self,,084-GūD-2025-Jai,
+ORD-0124,2025-09-03,CUST-0001,WhatsApp,Box x35,35,325.0,0,11375.0,Paid,Delivered,Self,,085-GūD-2025-Venugopal,Received Payment on 4 Sep 2025
+ORD-0125,2025-09-03,CUST-0001,WhatsApp,Almond 25g x50,50,100.0,0,5000.0,Pending,Pending,Self,,086-GūD-2025-Sinaj,
+ORD-0126,2025-09-03,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10",20,97.0,0,1940.0,Paid,Delivered,Self,,087-GūD-2025-Nihara,Payment received on 1 Nov 2025 as 4000 rs
+ORD-0127,2025-09-04,CUST-0001,WhatsApp,Box x60,60,,0,30000.0,Paid,Delivered,Self,,088-GūD-2025-Naveen,Received Payment on 30 Sep 2025
+ORD-0128,2025-09-12,CUST-0001,WhatsApp,"Peanut 25g x10, Lemon 25g x5, Orange 25g x5",20,120.0,0,2400.0,Paid,Delivered,Porter,,089-GūD-2025-GVQ,Porter Service
+ORD-0129,2025-09-12,CUST-0001,WhatsApp,Almond 25g x20,20,120.0,0,2400.0,Paid,Delivered,Porter,,090-GūD-2025-GVQ,Porter Service
+ORD-0130,2025-09-12,CUST-0001,WhatsApp,"Almond 25g x20, Peanut 25g x20, Orange 25g x10",50,110.0,0,5500.0,Paid,Delivered,Porter,,091-GūD-2025-WS,Porter Service
+ORD-0131,2025-09-20,CUST-0001,Event,"Box x2, Almond 25g x12, Peanut 25g x3, Lemon 25g x4, Orange 25g x4",25,130.0,0,3760.0,Paid,Delivered,Self,,092-GūD-2025-Prestige & DD Apartment Exhibition,each box sold at 375 and 350
+ORD-0132,2025-09-21,CUST-0001,Event,"Box x1, Almond 25g x11, Peanut 25g x5, Lemon 25g x4, Orange 25g x5",26,350.0,0,3620.0,Paid,Delivered,Self,,092A-GūD-2025-Prestige & DD Apartment Exhibition,2780 gpay + 840 cash
+ORD-0133,2025-09-23,CUST-0001,WhatsApp,"Box x1, Almond 25g x1, Peanut 25g x1, Lemon 25g x1, Orange 25g x1",5,340.0,0,860.0,Paid,Delivered,Self,,093-GūD-2025-Fabitha,
+ORD-0134,2025-09-29,CUST-0001,WhatsApp,Box x100,100,325.0,0,32500.0,Paid,Delivered,Self,,094-GūD-2025-Amsperry,Received Payment on 31 Oct 2025
+ORD-0135,2025-10-01,CUST-0001,WhatsApp,"Box x1, Almond 25g x1, Peanut 25g x1, Lemon 25g x1, Orange 25g x1",5,340.0,0,860.0,Paid,Delivered,Self,,095-GūD-2025-Anaz,
+ORD-0136,2025-10-07,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Lemon 25g x10",30,120.0,0,3600.0,Paid,Delivered,Self,,096-GūD-2025-GVQ,Received on 17 Nov 2025 Rs 7200
+ORD-0137,2025-10-07,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Orange 25g x10",30,120.0,0,3600.0,Paid,Delivered,Self,,096A-GūD-2025-GVQ,Received on 17 Nov 2025 Rs 7200
+ORD-0138,2025-10-07,CUST-0001,Store A,"Almond 25g x5, Peanut 25g x5, Orange 25g x5",15,100.0,0,1500.0,Partial,Shipped,Self,,097-GūD-2025-HorgStore,Received on 16 Jan 2026 as Rs 3500
+ORD-0139,2025-10-08,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Lemon 25g x10, Orange 25g x10",40,100.0,0,4000.0,Paid,Delivered,Self,,098-GūD-2025-Rochas,Recceived from Hima on 1 Nov 2025
+ORD-0140,2025-10-16,CUST-0001,WhatsApp,"Almond 25g x48, Peanut 25g x41, Lemon 25g x70, Orange 25g x85",244,113.0,0,27572.0,Paid,Delivered,Self,,099-GūD-2025-WS,Received on 3 Nov 2025 Rs. 27625
+ORD-0141,2025-10-16,CUST-0001,WhatsApp,"Box x13, Almond 25g x1, Peanut 25g x1, Lemon 25g x1, Orange 25g x1",17,,0,14000.0,Paid,Delivered,Self,,100-GūD-2025-CISB,1000* 12 hampers; 2000*1 hamper
+ORD-0142,2025-10-18,CUST-0001,WhatsApp,"Almond 25g x18, Peanut 25g x20, Lemon 25g x11, Orange 25g x18",67,97.0,0,6499.0,Paid,Delivered,Self,,101-GūD-2025-Nihara,Payment received on 1 Jan 2026 Amount : 7954
+ORD-0143,2025-10-18,CUST-0001,WhatsApp,Box x5,5,375.0,0,1875.0,Paid,Delivered,Self,,102-GūD-2025-Ajmal,Two payments received on 19 Oct 2025
+ORD-0144,2025-10-25,CUST-0001,WhatsApp,"Almond 25g x2, Peanut 25g x1, Lemon 25g x1, Orange 25g x2",6,150.0,0,900.0,Paid,Delivered,Self,,Green Health Summit,4220 gpay + cash 780
+ORD-0145,2025-10-25,CUST-0001,WhatsApp,"Almond 25g x1, Peanut 25g x1, Lemon 25g x2, Orange 25g x2",6,120.0,0,720.0,Paid,Delivered,Self,,Green Health Summit,
+ORD-0146,2025-10-25,CUST-0001,WhatsApp,"Almond 25g x11, Peanut 25g x7, Lemon 25g x3, Orange 25g x5",26,130.0,0,3380.0,Paid,Delivered,Self,,Green Health Summit,
+ORD-0147,2025-11-03,CUST-0001,WhatsApp,"Box x1, Peanut 25g x1",2,350.0,0,500.0,Paid,Delivered,Self,,103-GūD-2025-Alan,Gpay
+ORD-0148,2025-11-15,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Lemon 25g x5, Orange 25g x5",30,130.0,0,3900.0,Paid,Delivered,Self,,104-GūD-2025-Watermark,Received on 16 Dec 2025 Rs. 33900
+ORD-0149,2025-11-18,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Lemon 25g x5, Orange 25g x5",30,100.0,0,3000.0,Partial,Shipped,Self,,105-GūD-2025-Horgstore,Received on 16 Jan 2026 as Rs 3500
+ORD-0150,2025-11-18,CUST-0001,WhatsApp,"Almond 25g x5, Peanut 25g x5, Lemon 25g x5, Orange 25g x5",20,120.0,0,2400.0,Partial,Shipped,Self,,106-GūD-2025-Welmont,
+ORD-0151,2025-11-19,CUST-0001,WhatsApp,"Lemon 25g x6, Orange 25g x9",15,97.0,0,1455.0,Paid,Delivered,Self,,107-GūD-2025-Nihara,Payment received on 1 Jan 2026 Amount : 7954
+ORD-0152,2025-11-22,CUST-0001,WhatsApp,"Box x6, Peanut 25g x4",10,350.0,0,2620.0,Paid,Delivered,Self,,108-GūD-2025-Resmi,Received as three payments on 24 Nov 2025
+ORD-0153,2025-11-23,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Lemon 25g x10",30,120.0,0,3600.0,Paid,Delivered,Self,,109-GūD-2025-GVQ,Received on 11 Jan HB Current acc
+ORD-0154,2025-11-23,CUST-0001,WhatsApp,"Almond 25g x10, Peanut 25g x10, Orange 25g x10",30,120.0,0,3600.0,Paid,Delivered,Self,,109A-GūD-2025-GVQ,Received on 11 Jan HB Current acc
+ORD-0155,2025-11-26,CUST-0001,WhatsApp,Almond 25g x25,25,150.0,0,3750.0,Paid,Delivered,Self,,110-GūD-2024-Tintu,Received on 2 Dec 2025 Rs 3750
+ORD-0156,2025-11-29,CUST-0001,WhatsApp,Orange 25g x200,200,150.0,0,30000.0,Paid,Delivered,Self,,111-GūD-2025-Watermark,Received on 16 Dec 2025 Rs. 33900
+ORD-0157,2025-12-23,CUST-0001,WhatsApp,"Almond 25g x20, Peanut 25g x20",40,100.0,0,4000.0,Partial,Shipped,Self,,112-GūD-2025-Rochas,
+ORD-0158,2025-12-26,CUST-0001,WhatsApp,"Almond 25g x20, Peanut 25g x20, Lemon 25g x1",41,110.0,0,4510.0,Paid,Delivered,Self,,113-GūD-2025-WS,Received on 20 May 2026
+ORD-0159,2025-12-23,CUST-0001,WhatsApp,Box/Bar Assorted,,,0,1600.0,Partial,Shipped,Self,,114-GūD-2025-Rochas,Cocoa Powder - 1 kg
+ORD-0160,2025-12-08,CUST-0042,WhatsApp,"Almond 8g x200, Peanut 8g x100, Orange 8g x200, Lemon 8g x100",600,,0,24000.0,Paid,Delivered,Self,,Invoice-1101-GUD-2025-Elvin,Amount Received on 4 Jan 2026
+ORD-0161,2025-12-23,CUST-0043,Store A,"Orange 25g x20, Lemon 25g x13",33,100.0,5,3300.0,Paid,Delivered,Self,,Invoice-1102-GUD-2025-Rochas,Bank details shared Revised bill requested
+ORD-0162,2025-12-23,CUST-0044,WhatsApp,"Almond 25g x20, Peanut 25g x20, Orange 25g x20, Lemon 25g x20",80,97.0,5,7760.0,Paid,Delivered,Self,,Invoice-1103-GUD-2025-Nihara,Received amount 14 Feb 2026 including GST
+ORD-0163,2025-12-24,CUST-0045,BNI,"6pc Box x3, 8pc Box x3",6,350.0,5,2400.0,Paid,Delivered,Self,,Invoice-1104-GUD-2025-Vinod,
+ORD-0164,2025-12-24,CUST-0045,BNI,6pc Box x4,4,350.0,0,1400.0,Paid,Delivered,Self,,Invoice-1105-GUD-2025-Jayagopan,Amount Received on 8 Jan 2026
+ORD-0165,2025-12-26,CUST-0046,Corporate,"Orange 25g x20, Lemon 25g x19",39,110.0,0,4290.0,Paid,Delivered,Self,,Invoice-1106-GUD-2025-WS,Received on 20 May 2026
+ORD-0166,2025-12-26,CUST-0047,WhatsApp,8pc Box x10,10,450.0,0,4500.0,Paid,Delivered,Self,,Invoice-1107-GUD-2025-Sunitha,Amount received on 18 March 2026
+ORD-0167,2026-01-01,CUST-0041,WhatsApp,8pc Box x20,20,450.0,0,9000.0,Pending,Pending,Self,,Invoice-1108-GUD-2026-Naveen,Bindu to receive
+ORD-0168,2026-01-07,CUST-0044,WhatsApp,"Almond 25g x20, Peanut 25g x20, Orange 25g x20, Lemon 25g x20",80,97.0,5,7760.0,Paid,Delivered,Self,,Invoice-1109-GUD-2026-Nihara,Received amount 14 Feb 2026 including GST
+ORD-0169,2026-01-10,CUST-0048,Store A,"Almond 25g x5, Peanut 25g x5, Orange 25g x5, Lemon 25g x5",20,120.0,5,2400.0,Pending,Delivered,Self,,Invoice-1110-GUD-2026-GVQ,
+ORD-0170,2026-01-27,CUST-0049,Corporate,"6pc Box x1, 8pc Box x1",2,,5,3000.0,Paid,Delivered,Self,,Invoice-1111-GUD-2026-Prevalent,Received amount on 2 Feb 2026
+ORD-0171,2026-01-27,CUST-0050,WhatsApp,8pc Box x4,4,475.0,0,1900.0,Paid,Delivered,Self,,Invoice-1112-GUD-2026-Kannan,Amount received on 26 Jan
+ORD-0172,2026-02-12,CUST-0033,WhatsApp,"6pc Box x10, 8pc Box x10, Almond 25g x5, Peanut 25g x5",30,100.0,5,8000.0,Pending,Pending,Self,,Invoice-1113-GUD-2025-Arun,
+ORD-0173,2026-02-18,CUST-0048,Store A,"Almond 25g x10, Peanut 25g x10, Orange 25g x1, Lemon 25g x1",22,120.0,5,2640.0,Pending,Delivered,Self,,Invoice-1114-GUD-2025-GVQ,
+ORD-0174,2026-03-09,CUST-0048,Store A,"Almond 25g x20, Peanut 25g x20",40,120.0,5,4800.0,Pending,Delivered,Self,,Invoice-1115-GUD-2025-GVQ,
+ORD-0175,2026-03-16,CUST-0048,Store A,"Almond 25g x15, Peanut 25g x15, Orange 25g x10, Lemon 25g x10, Mocha 25g x5, Jackfruit 25g x5",60,120.0,5,7200.0,Pending,Delivered,Self,,Invoice-1116-GUD-2025-GVQ,
+ORD-0176,2026-03-24,CUST-0051,Corporate,Assorted,,,5,6000.0,Pending,Pending,Self,,Invoice-1117-GUD-2025-PrevalentAI,
+ORD-0177,2026-03-25,CUST-0052,Corporate,"Almond 8g x100, Peanut 8g x100",200,,5,7000.0,Paid,Delivered,Self,,Invoice-1118-GUD-2025-WellGenome,Amount received on 30 Apr 2026
+ORD-0178,2026-03-24,CUST-0053,WhatsApp,Assorted,,,5,13770.0,Paid,Delivered,Self,,Invoice-1119-GUD-2025-Recca,Exhibition Recca Fest
+ORD-0179,2026-03-21,CUST-0054,WhatsApp,"8pc Box x15, Mocha 25g x2, Jackfruit 25g x2",19,130.0,5,7645.0,Paid,Delivered,Self,,Invoice-1120-GUD-2025-Sam,Amount received on 21 March 2026
+ORD-0180,2026-03-18,CUST-0044,WhatsApp,"Almond 25g x20, Peanut 25g x15, Orange 25g x15",50,97.0,5,4850.0,Paid,Delivered,Self,,Invoice-1121-GUD-2025-Nihara,Received amount 1 Apr 2026 Including GST
+ORD-0181,2026-03-29,CUST-0055,Event,"6pc Box x2, 8pc Box x3, Almond 25g x3, Peanut 25g x1, Orange 25g x5, Lemon 25g x5, Mocha 25g x3, Sea Salt 25g x10, Jackfruit 25g x9",41,126.4,5,6600.4,Paid,Delivered,Self,,Invoice-1122-GUD-2025-Kulam Fest,Cash to be deposited for kulam 2980
+ORD-0182,2026-04-05,CUST-0056,WhatsApp,6pc Box x6,6,300.0,5,1800.0,Paid,Delivered,Self,,Invoice-1123-GUD-2026- Priyanka,Amount received on 5 April 2026
+ORD-0183,2026-04-06,CUST-0057,WhatsApp,"Almond 25g x2, Peanut 25g x2, Orange 25g x2, Lemon 25g x2, Mocha 25g x2, Sea Salt 25g x2, Jackfruit 25g x2",14,120.0,5,1680.0,Paid,Delivered,Self,,Invoice-1124-GUD-2026- Nidhish,
+ORD-0184,2026-04-13,CUST-0058,WhatsApp,"Mocha 25g x5, Sea Salt 25g x5, Jackfruit 25g x5",15,127.0,5,1905.0,Paid,Delivered,Self,,Invoice-1125-GUD-2026- Tina,Cash
+ORD-0185,2026-04-16,CUST-0044,WhatsApp,"Almond 25g x20, Peanut 25g x20, Orange 25g x20, Lemon 25g x20",80,97.0,5,7760.0,Paid,Delivered,Self,,Invoice-1126-GUD-2026-Nihara,Received on 23 May 2026
+ORD-0186,2026-04-18,CUST-0059,WhatsApp,"Almond 25g x2, Lemon 25g x4, Sea Salt 25g x2, Jackfruit 25g x2",10,142.86,5,1428.57,Paid,Delivered,Self,,Invoice-1127-GUD-2026-Hiba,Amount Received on 17 April 2026
+ORD-0187,2026-04-11,CUST-0060,Event,Assorted,,,5,14819.05,Paid,Delivered,Self,,Invoice-1128-GUD-2025-Kimchi Fest,gpay 12850; Cash 2710
+ORD-0188,2026-04-21,CUST-0061,WhatsApp,"Almond 25g x1, Orange 25g x1, Sea Salt 25g x1, Jackfruit 25g x1",4,123.81,5,495.24,Paid,Delivered,Self,,Invoice-1129-GUD-2026-Sahana,Received on 17 July 2026
+ORD-0189,2026-05-02,CUST-0048,Store A,"Almond 25g x15, Peanut 25g x15, Orange 25g x10, Lemon 25g x5, Mocha 25g x5, Sea Salt 25g x5, Jackfruit 25g x5",60,114.29,5,6857.14,Pending,Pending,Self,,Invoice-1130-GUD-2026-GVQ,
+ORD-0190,2026-05-06,CUST-0062,WhatsApp,"8pc Box x1, Mocha 25g x1, Sea Salt 25g x1, Jackfruit 25g x1",4,123.81,5,800.0,Paid,Delivered,Self,,Invoice-1131-GUD-2026-Vignesh,Payment received on 30 May 2026
+ORD-0191,2026-05-07,CUST-0063,WhatsApp,"8pc Box x2, Mocha 25g x1, Sea Salt 25g x1, Jackfruit 25g x1",5,123.81,5,1180.95,Paid,Delivered,Self,,Invoice-1132-GUD-2026-Anand,Received on 16 June
+ORD-0192,2026-05-16,CUST-0044,WhatsApp,"Almond 25g x15, Peanut 25g x20, Orange 25g x20, Lemon 25g x20",75,97.0,5,7275.0,Pending,Delivered,Self,,Invoice-1133-GUD-2026-Nihara,
+ORD-0193,2026-05-27,CUST-0033,WhatsApp,"Almond 25g x5, Peanut 25g x5, Orange 25g x2, Lemon 25g x5, Mocha 25g x5, Sea Salt 25g x2, Jackfruit 25g x5",29,100.0,5,2900.0,Pending,Delivered,Self,,Invoice-1134-GUD-2025-Arun,
+ORD-0194,2026-05-29,CUST-0064,Event,"Almond 25g x4, Orange 25g x6, Mocha 25g x3, Sea Salt 25g x1, Jackfruit 25g x2",16,142.86,5,2285.71,Pending,Delivered,Self,,Invoice-1135-GUD-2026-Nemcon,
+ORD-0195,2026-05-30,CUST-0064,Event,"Almond 25g x9, Peanut 25g x3, Orange 25g x10, Lemon 25g x3, Mocha 25g x6, Sea Salt 25g x4, Jackfruit 25g x6",41,138.44,5,5676.19,Pending,Delivered,Self,,Invoice-1136-GUD-2026-Nemcon,
+ORD-0196,2026-05-30,CUST-0045,BNI,"8pc Box x4, Almond 25g x8, Peanut 25g x7, Orange 25g x10, Lemon 25g x2, Mocha 25g x7, Sea Salt 25g x6, Jackfruit 25g x8",52,127.98,5,7904.76,Pending,Delivered,Self,,Invoice-1137-GUD-2026-BNI,
+ORD-0197,2026-05-31,CUST-0064,Event,"Almond 25g x2, Peanut 25g x6, Orange 25g x7, Lemon 25g x4, Mocha 25g x5, Sea Salt 25g x6, Jackfruit 25g x4",34,141.18,5,4800.0,Pending,Delivered,Self,,Invoice-1138-GUD-2026-Nemcon,
+ORD-0198,2026-06-03,CUST-0045,BNI,"Almond 25g x2, Orange 25g x3, Lemon 25g x3, Mocha 25g x2, Sea Salt 25g x2, Jackfruit 25g x5",17,105.32,5,1790.48,Pending,Delivered,Self,,Invoice-1139-GUD-2026-BNI,
+ORD-0199,2026-06-04,CUST-0065,Store A,"Almond 25g x5, Peanut 25g x5, Orange 25g x5, Lemon 25g x5, Mocha 25g x5, Sea Salt 25g x5, Jackfruit 25g x5",35,100.0,5,3500.0,Pending,Delivered,Self,,Invoice-1140-GUD-2026-HorgStore,
+ORD-0200,2026-06-04,CUST-0066,WhatsApp,"Almond 25g x3, Peanut 25g x2, Orange 25g x2, Mocha 25g x1, Sea Salt 25g x1, Jackfruit 25g x3",12,123.81,5,1485.71,Pending,Delivered,Self,,Invoice-1141-GUD-2026-Sreeranjini,
+ORD-0201,2026-06-05,CUST-0067,WhatsApp,"6pc Box x1, 8pc Box x1, Orange 25g x1, Lemon 25g x1, Sea Salt 25g x1, Jackfruit 25g x1",6,,5,2380.95,Pending,Delivered,Self,,Invoice-1142-GUD-2026-Raghulal,
+ORD-0202,2026-06-12,CUST-0068,WhatsApp,8pc Box x7,7,428.57,5,3000.0,Paid,Delivered,Self,,Invoice-1143-GUD-2026-Sivanandan,3000 as cash deposited on 1 july
+ORD-0203,2026-07-01,CUST-0048,Store A,"Almond 25g x10, Orange 25g x5, Lemon 25g x5, Sea Salt 25g x5, Jackfruit 25g x5",30,120.0,5,3600.0,Pending,Delivered,Self,,Invoice-1144-GUD-2026-GVQ,
+ORD-0204,,CUST-0069,WhatsApp,Assorted,,,5,,Pending,Delivered,Self,,Invoice-1145-GUD-2026-Dietado,
+ORD-0205,,CUST-0070,Corporate,Assorted,,,0,,Pending,Delivered,Self,,Invoice-1146-GUD-2026-Prevalent AI,
+ORD-0206,2026-07-25,CUST-0010,WhatsApp,"6pc Box x1, Jackfruit 25g x4",5,123.81,5,852.38,Paid,Delivered,Self,,Invoice-1147-GUD-2026-Krishnanath Venkataraman,
+ORD-0207,2026-07-27,CUST-0044,WhatsApp,"Almond 25g x20, Orange 25g x20, Sea Salt 25g x20, Jackfruit 25g x29",89,97.0,5,8633.0,Pending,Pending,Self,,Invoice-1148-GUD-2026-Nihara,Includes credit for returned items
+ORD-0208,2026-07-28,CUST-0071,WhatsApp,"Almond 25g x1, Orange 25g x1, Mocha 25g x1, Sea Salt 25g x1",4,123.81,5,495.24,Paid,Delivered,Self,,Invoice-1149-GUD-2026-salvin,need to pay for courier of 71 rs
+ORD-0209,2026-07-28,CUST-0072,WhatsApp,"Almond 25g x20, Jackfruit 25g x10",30,133.33,5,4000.0,Pending,Delivered,Self,,Invoice-1150-GUD-2026-Tintu Ravindran,need to pay for courier of 71 rs
+ORD-0210,2026-07-29,CUST-0073,WhatsApp,"Almond 25g x1, Peanut 25g x1, Orange 25g x1, Lemon 25g x1, Mocha 25g x1, Sea Salt 25g x1",6,123.81,5,742.86,Paid,Delivered,Self,,Invoice-1151-GUD-2026-Maijin,
+ORD-0211,2026-07-29,CUST-0048,Store A,"Almond 25g x10, Peanut 25g x10, Orange 25g x10, Lemon 25g x5, Mocha 25g x10, Sea Salt 25g x10, Jackfruit 25g x10",65,114.29,5,7428.57,Pending,Delivered,Self,,Invoice-1152-GUD-2026-GVQ,"Discount: 180, Total Receivable: 7620"

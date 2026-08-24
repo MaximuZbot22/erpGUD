@@ -1,0 +1,3 @@
+GR_ID,Date,Vendor_ID,PO_ID,Item_Description,Qty_Received,Qty_Damaged,Quality_Check,Accepted,Received_By,Notes
+GR-001,2024-12-10,VEND-001,PO-001,Dark Chocolate 10kg with Labels,10.0,0,Pass,Yes,Team,First batch stock in. 1250 pieces of 8g each.
+GR-002,2025-01-25,VEND-001,PO-002,Dark Chocolate 23.33kg (8g) + 20kg (25g),43.33,0,Pass,Yes,Team,Second batch. 2196 pieces 8g + 800 pieces 25g.

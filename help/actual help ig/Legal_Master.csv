@@ -1,0 +1,11 @@
+Document_ID,Document_Name,Category,Sub_Category,Current_Status,Person_Responsible,Authority,Issue_Date,Expiry_Date,Renewal_Reminder_Days,Priority,Current_Version,Drive_Link,Notes
+DOC-001,FSSAI Registration,FSSAI,Registration,Pending,Team Gudoria,FSSAI Kerala,,,30,High,1.0,,Food business operator license required for chocolate manufacturing and sales.
+DOC-002,GST Registration,GST,Registration,Approved,Team Gudoria,GST Department,2024-01-01,,30,High,1.0,,GST being charged on Gudoria invoices at 5%. Registration active.
+DOC-003,GūD Trademark,Trademark,Registration,Pending,Team Gudoria,IP India,,,90,Medium,1.0,,Brand name GūD being used since 2024. Trademark application recommended.
+DOC-004,Gudoria Trademark,Trademark,Registration,Pending,Team Gudoria,IP India,,,90,Medium,1.0,,New brand Gudoria launched 2025. Trademark application recommended.
+DOC-005,Production Facility Rental Agreement,Rental Agreement,Agreement,Pending,Team Gudoria,Landlord,,,60,Medium,1.0,,Manufacturing space rental. Terms to be formalized.
+DOC-006,Food Testing Certificate - Batch 1,Food Testing,Certificate,Pending,Team Gudoria,NABL Lab,,,30,High,1.0,,"Lab testing for shelf life, microbial analysis, ingredient compliance."
+DOC-007,Food Testing Certificate - Batch 2,Food Testing,Certificate,Pending,Team Gudoria,NABL Lab,,,30,High,1.0,,"Gudoria brand batch testing. New flavours: Mocha, Sea Salt, Jackfruit."
+DOC-008,Retailer Agreement - HorgStore,Rental Agreement,Agreement,Draft,Team Gudoria,HorgStore,,,30,Medium,1.0,,Regular retail partner. Multiple orders. Commission/terms to be formalized.
+DOC-009,Retailer Agreement - GVQ,Rental Agreement,Agreement,Draft,Team Gudoria,GVQ,,,30,Medium,1.0,,Regular retail partner. Frequent orders. Payment terms to be documented.
+DOC-010,Corporate Agreement - Nihara,Rental Agreement,Agreement,Draft,Team Gudoria,Nihara,,,30,Medium,1.0,,Largest corporate client. 20+ orders. Bulk pricing agreement needed.

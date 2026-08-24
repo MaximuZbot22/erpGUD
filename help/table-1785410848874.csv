@@ -1,0 +1,4 @@
+﻿Tab,Rows,File
+Customer\_Master,73,[Customer\_Master.csv](sandbox:///mnt/agents/output/GUDORIA_ORDERS/Customer_Master.csv)
+Orders\_Log,211,[Orders\_Log.csv](sandbox:///mnt/agents/output/GUDORIA_ORDERS/Orders_Log.csv)
+Payments\_Tracker,209,[Payments\_Tracker.csv](sandbox:///mnt/agents/output/GUDORIA_ORDERS/Payments_Tracker.csv)

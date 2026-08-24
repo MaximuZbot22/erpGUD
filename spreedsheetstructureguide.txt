@@ -1,0 +1,1823 @@
+Spreadsheet: Customers & Sales CRM
+Tab 1 — Customer Master (Main Database)
+
+This is the heart of everything. Every customer exists here exactly once.
+
+Column	Purpose
+Customer ID	Unique ID (CUST001, CUST002...)
+Business Name	Cafe/Hotel/etc.
+Contact Person	Owner/Manager
+Designation	Owner, Purchase Manager, etc.
+Customer Type	Cafe, Hotel, Minibar, Corporate, etc.
+Lead Source	Instagram, Referral, Exhibition, Website...
+Phone	Main phone
+WhatsApp	WhatsApp number
+Email	Email
+Address	Address
+City	City
+State	State
+Instagram	Their Instagram
+Website	Website
+Status	Active / Inactive / Prospect
+Date Added	First entered into system
+Notes	Anything important
+Tab 2 — Sales Pipeline
+
+This is where the sales journey is tracked.
+
+One customer can appear many times here (every deal).
+
+Column	Purpose
+Deal ID	DEAL001
+Customer ID	Links to Customer Master
+Product	Which chocolate/snack
+Current Stage	New Lead, Contacted, Sample Sent, Negotiation, Won, Lost
+Assigned To	Person responsible
+First Contact	Date
+Last Contact	Date
+Next Follow-up	Date
+Expected Order Value	Estimated
+Final Order Value	Actual
+Probability	High / Medium / Low
+Expected Closing Date	Date
+Deal Status	Open / Won / Lost
+Loss Reason	Price, No Reply, Competitor
+Notes	Discussion notes
+Tab 3 — Interaction Log
+
+Instead of editing notes repeatedly, log every interaction.
+
+Column	Purpose
+Log ID	LOG001
+Customer ID	Link
+Date	Interaction date
+Type	Call, WhatsApp, Meeting, Email
+Summary	What happened
+Action Required	Next task
+Due Date	Follow-up date
+Completed	Yes / No
+
+Imagine opening a customer six months later—you instantly see the entire conversation history.
+
+Tab 4 — Orders
+
+Once someone becomes a customer.
+
+Column	Purpose
+Order ID	ORD001
+Customer ID	Link
+Order Date	Date
+Products	Ordered items
+Quantity	Quantity
+Invoice Number	Invoice
+Order Value	₹
+Payment Status	Paid / Pending / Partial
+Delivery Status	Pending / Delivered
+Delivery Date	Date
+Invoice Link	Drive link
+Tab 5 — Follow-up Dashboard
+
+This isn't manual data.
+
+It's mostly formulas pulling from other tabs.
+
+Show only:
+
+Follow-ups due today
+Overdue follow-ups
+New leads
+Deals closing this week
+Pending payments
+New customers this month
+
+This becomes your boss's morning dashboard.
+
+Relationships
+Customer Master
+      │
+      ├──── Sales Pipeline
+      │
+      ├──── Interaction Log
+      │
+      └──── Orders
+
+Everything links back to Customer ID. Never type customer names everywhere—always reference the ID.
+
+Spreadsheet: Vendor & Procurement Management
+Tab 1 — Vendor Master (Main Database)
+
+Every vendor exists only once here.
+
+Column	Purpose
+Vendor ID	VEND001
+Company Name	Supplier name
+Contact Person	Main contact
+Designation	Sales Rep, Owner, etc.
+Vendor Category	Cocoa, Packaging, Printer, etc.
+Products/Services	What they supply
+Phone	Contact number
+WhatsApp	WhatsApp
+Email	Email
+Address	Address
+City	City
+State	State
+GST Number	If applicable
+FSSAI (if applicable)	If they are food suppliers
+Status	Active / Inactive / Blacklisted
+Date Added	First entered
+Notes	General notes
+Tab 2 — Product & Pricing
+
+A vendor may supply many products.
+
+Column	Purpose
+Item ID	ITEM001
+Vendor ID	Links to Vendor Master
+Product Name	Cocoa Beans, Pouch, Sticker, etc.
+Category	Raw Material, Packaging, Service
+MOQ	Minimum order quantity
+Unit	Kg, Pieces, Rolls
+Standard Price	Agreed price
+Last Quoted Price	Latest quote
+Quote Date	Date
+Lead Time	Delivery time
+Alternate Vendors	Backup supplier
+Remarks	Notes
+Tab 3 — Purchase Orders
+
+Track every order placed.
+
+Column	Purpose
+PO Number	PO001
+Vendor ID	Link
+Order Date	Date
+Items Ordered	Summary
+Quantity	Ordered quantity
+Expected Delivery	Date
+Actual Delivery	Date
+Order Status	Ordered / Received / Cancelled
+Received By	Staff member
+Notes	Remarks
+Tab 4 — Payments & Invoices
+
+Finance-focused tracking.
+
+Column	Purpose
+Transaction ID	PAY001
+Vendor ID	Link
+Invoice Number	Invoice reference
+Invoice Date	Date
+Invoice Amount	₹
+Paid Amount	₹
+Balance	₹
+Due Date	Date
+Payment Status	Pending / Partial / Paid
+Payment Mode	Bank, UPI, Cash
+Invoice Link	Drive link
+Tab 5 — Performance & Relationship
+
+This is something most small businesses never track, but founders always think about.
+
+Column	Purpose
+Vendor ID	Link
+Last Review Date	Date
+Quality Rating	1–5
+Communication	1–5
+Delivery Timeliness	1–5
+Pricing	1–5
+Reliability	1–5
+Response Time	Fast / Medium / Slow
+Issues Faced	Problems encountered
+Resolution	How it was solved
+Preferred Vendor	Yes / No
+Review Notes	Comments
+Tab 6 — Documents
+
+Keep all vendor paperwork in one place.
+
+Column	Purpose
+Document ID	DOC001
+Vendor ID	Link
+Document Type	Quotation, Invoice, Agreement, Certificate
+Document Date	Date
+Expiry Date	If applicable
+Google Drive Link	File location
+Notes	Remarks
+Relationship
+Vendor Master
+      │
+      ├──── Product & Pricing
+      │
+      ├──── Purchase Orders
+      │
+      ├──── Payments & Invoices
+      │
+      ├──── Performance
+      │
+      └──── Documents
+
+Spreadsheet 3 : Legal & Compliance
+Tab 1 — Legal Master (Single Source of Truth)
+
+Every legal item is entered only once here.
+
+Column	Purpose
+Document ID	Unique ID (LEG001, LEG002...)
+Document Name	FSSAI License, GST Registration, etc.
+Category	GST, FSSAI, Trademark, Rental Agreement, Food Testing, etc.
+Sub Category	Registration, Renewal, Certificate, Agreement, Report
+Current Status	Draft / Submitted / Approved / Pending / Expired
+Person Responsible	Owner, EA, CA, Lawyer
+Department	Legal / Compliance / Finance
+Authority	FSSAI, GST, MCA, Local Municipality
+Authority Contact	Officer/CA/Lawyer
+Issue Date	When issued
+Expiry Date	When it expires
+Renewal Reminder	Days before expiry (30/60/90)
+Priority	High / Medium / Low
+Current Version	V1, V2, V3
+Google Drive Folder ID	Drive Folder ID (not URL)
+Google Drive Folder Link	Clickable folder
+Latest Document Link	Current certificate/PDF
+Notes	General notes
+Tab 2 — Renewal Tracker
+
+Instead of retyping everything, this sheet pulls from Legal Master.
+
+You should only manually enter:
+
+Column	Purpose
+Document ID	Dropdown from Legal Master
+Renewal Submitted Date	Date
+Renewal Status	Pending / Approved
+Expected Approval	Date
+Renewal Cost	₹
+Payment Status	Paid / Pending
+Notes	Remarks
+
+Everything else like:
+
+Document Name
+Category
+Authority
+Expiry Date
+Responsible Person
+
+should auto-fill from Legal Master.
+
+Tab 3 — Legal Activity Log
+
+Every legal action gets logged.
+
+Column	Purpose
+Activity ID	ACT001
+Document ID	Dropdown
+Date	Activity date
+Activity Type	Submitted, Renewal, Inspection, Meeting, Payment
+Description	What happened
+Performed By	Employee
+Next Action	Next task
+Due Date	Due date
+Supporting Doc	Drive Link
+Tab 4 — Document Repository
+
+This is basically your document index.
+
+Column	Purpose
+File ID	FILE001
+Document ID	Dropdown
+File Name	Actual filename
+File Type	PDF, JPG, DOCX
+Version	V1, V2
+Uploaded By	Person
+Upload Date	Date
+Google Drive File Link	File link
+Folder Link	Parent folder
+
+Notice something?
+
+You never type
+
+"FSSAI"
+
+again.
+
+You select
+
+LEG001
+
+Everything else comes automatically.
+
+How the Sheets Talk
+Legal Master
+      │
+      ├──────────► Renewal Tracker
+      │
+      ├──────────► Activity Log
+      │
+      └──────────► Document Repository
+
+Spreadsheet 4 — Marketing & Brand Management
+Purpose
+
+Track every marketing activity, campaign, piece of content, event, and brand asset in one place. Nothing should be forgotten, and the owner should be able to see what's happening this week, this month, or this quarter at a glance.
+
+Tab 1 ⭐ Campaign Master (Source of Truth)
+
+Every campaign is created here only once.
+
+Column	Purpose
+Campaign ID	Unique ID (MKT001, MKT002...)
+Campaign Name	Summer Launch, Diwali Offer, etc.
+Campaign Type	Instagram, Physical, Exhibition, Corporate, Website, WhatsApp
+Objective	Brand Awareness, Sales, Lead Generation, Customer Retention
+Target Audience	Cafes, Hotels, Minibars, Corporate, Wedding Planners
+Start Date	Campaign start
+End Date	Campaign end
+Campaign Status	Planning, Active, Paused, Completed, Cancelled
+Priority	High, Medium, Low
+Budget	Planned budget
+Actual Spend	Actual spent amount
+Expected Outcome	Expected leads/orders
+Actual Outcome	Final result
+Owner	Responsible person
+Notes	General campaign notes
+Tab 2 — Content Planner
+
+Every post, reel, story, banner or advertisement lives here.
+
+Column	Purpose
+Content ID	CNT001
+Campaign ID	Dropdown from Campaign Master
+Platform	Instagram, Facebook, LinkedIn, Website, WhatsApp
+Content Type	Reel, Story, Carousel, Poster, Video, Blog
+Topic	Content subject
+Caption	Final caption
+CTA	Call To Action
+Hashtags	Hashtags
+Media Status	Pending, Designing, Ready
+Scheduled Date	Planned posting date
+Posted Date	Actual posting date
+Post Status	Draft, Scheduled, Posted
+Reach	Analytics
+Engagement	Analytics
+Leads Generated	Result
+Drive Folder	Artwork folder
+Tab 3 ⭐ Marketing Calendar (Visual Dashboard)
+
+Inspired by the hotel booking template.
+
+Instead of looking at rows, the owner sees a calendar.
+
+Rows:
+
+Instagram
+Facebook
+LinkedIn
+WhatsApp
+Website
+Events
+Exhibitions
+Corporate Marketing
+Physical Marketing
+
+Columns:
+
+Daily calendar (or monthly view)
+
+The sheet should automatically display campaigns from Campaign Master and Content Planner.
+
+Color Code:
+
+🟩 Posted
+
+🟦 Scheduled
+
+🟨 Designing
+
+🟥 Delayed
+
+🟪 Exhibition/Event
+
+This becomes the visual planning board.
+
+Tab 4 — Events & Exhibitions
+Column	Purpose
+Event ID	EVT001
+Campaign ID	Dropdown
+Event Name	Royal Enfield Expo
+Venue	Location
+Event Date	Date
+Start Time	Time
+End Time	Time
+Products Taken	Products
+Samples Distributed	Count
+Sales Made	₹
+Leads Collected	Count
+Follow-up Required	Yes/No
+Event Status	Planned, Completed
+Drive Folder	Photos & documents
+Notes	Remarks
+Tab 5 — Marketing Assets Library
+
+Every creative file is indexed here.
+
+Column	Purpose
+Asset ID	AST001
+Campaign ID	Dropdown
+Asset Name	Summer Poster
+Asset Type	Poster, Reel, Logo, Packaging, Banner
+Version	V1, V2
+Designer	Person
+Approval Status	Pending, Approved
+Google Drive Folder	Folder
+Latest File	Latest version
+Notes	Remarks
+Tab 6 — Marketing Kanban
+
+This is for brainstorming and workflow.
+
+Columns:
+
+💡 Ideas
+📝 Planning
+🎨 Designing
+⏳ Waiting Approval
+📅 Scheduled
+🚀 Live
+✅ Completed
+
+Each card should contain:
+
+Campaign ID
+Campaign Name
+Owner
+Priority
+Due Date
+
+
+📒 Spreadsheet 5 — Operations & Task Management
+
+Purpose:
+The company's operational brain. If something needs to be done, discussed, approved, or followed up, it belongs here.
+
+Tab 1 ⭐ Operations Master (Single Source of Truth)
+Column	Purpose
+Task ID	TASK001
+Task Name	Visit Packaging Vendor
+Category	Sales / Vendor / Legal / Production / Marketing / Finance / Admin
+Related Module	Customer / Vendor / Legal / Marketing / Production
+Related ID	CUST001 / VEND002 / LEG001
+Priority	High / Medium / Low
+Status	Not Started / In Progress / Waiting / Completed / Cancelled
+Assigned To	Owner / EA
+Created By	Person
+Created Date	Task creation
+Due Date	Deadline
+Completion Date	Auto when completed
+Estimated Time	2 hrs / 3 days
+Actual Time	Time taken
+Notes	Description
+Tab 2 — Meetings
+Column	Purpose
+Meeting ID	MT001
+Meeting Title	Vendor Discussion
+Meeting Date	Date
+Participants	People
+Related Module	Vendor / Customer / Legal
+Related ID	VEND001
+Agenda	Meeting purpose
+Key Decisions	Outcomes
+Action Items	Task IDs
+Next Meeting	Date
+Meeting Notes	Doc link later
+Tab 3 — Follow-ups
+Column	Purpose
+Follow-up ID	FUP001
+Related Module	Customer / Vendor / Production / Legal
+Related ID	Linked ID
+Follow-up Type	Call / WhatsApp / Email / Visit
+Follow-up Date	Date
+Purpose	Payment / Sample / Renewal
+Status	Pending / Completed
+Next Follow-up	Date
+Notes	Remarks
+Tab 4 — Ideas & Improvements
+Column	Purpose
+Idea ID	IDEA001
+Title	Short title
+Description	Full idea
+Category	Product / Marketing / Process / Tech
+Submitted By	Person
+Priority	High / Medium / Low
+Status	New / Under Review / Approved / Implemented
+Related Module	Optional
+Notes	Remarks
+Tab 5 — Decision Register ⭐
+
+I think this is missing, and it's incredibly valuable.
+
+Your boss sounds like someone who makes a lot of decisions verbally.
+
+Track them.
+
+Column	Purpose
+Decision ID	DEC001
+Decision	"Shift to local packaging vendor"
+Date	Decision date
+Reason	Why
+Owner	Responsible
+Related Module	Packaging
+Status	Pending / Implemented
+Notes	Remarks
+Relationships
+Operations Master
+      │
+      ├── Meetings
+      ├── Follow-ups
+      ├── Ideas
+      └── Decision Register
+📒 Spreadsheet 6 — Production & Procurement
+
+I would actually rename it.
+
+You aren't manufacturing.
+
+You're managing outsourced production.
+
+Tab 1 ⭐ Production Orders
+Column	Purpose
+Production ID	PROD001
+Vendor ID	Linked
+Product ID	Linked from Product Master (future)
+Batch Number	Batch
+Quantity Ordered	Units
+Raw Material Sent	Description
+Quantity Sent	Kg
+Date Sent	Date
+Expected Completion	Date
+Expected Return	Date
+Production Status	Sent / In Production / Ready / Received
+Notes	Remarks
+Tab 2 — Goods Received
+Column	Purpose
+Receipt ID	REC001
+Production ID	Linked
+Vendor ID	Auto
+Date Received	Date
+Quantity Received	Units
+Damaged Quantity	Units
+Quality Check	Pass / Fail
+Accepted	Yes / No
+Receiver	Person
+Notes	Remarks
+Tab 3 — Packaging Management
+
+This needs to be expanded because packaging is a major concern for Goodoria.
+
+Column	Purpose
+Packaging ID	PKG001
+Production ID	Linked
+Packaging Vendor	Vendor ID
+Packaging Type	Pouch / Box / Sticker
+Material	Paper / Plastic
+MOQ	Vendor MOQ
+Quantity Ordered	Count
+Quantity Received	Count
+Artwork Version	V1 / V2
+Status	Sampling / Ordered / Received
+Notes	Remarks
+Tab 4 — Cost Tracker
+Column	Purpose
+Cost ID	COST001
+Production ID	Linked
+Manufacturing Cost	₹
+Packaging Cost	₹
+Transport Cost	₹
+Testing Cost	₹
+Miscellaneous Cost	₹
+Total Cost	Auto
+Cost Per Unit	Auto
+Notes	Remarks
+Tab 5 — Batch Tracker ⭐
+
+I think this is another important addition.
+
+You're dealing with food, so every production batch should be traceable.
+
+Column	Purpose
+Batch Number	BATCH001
+Product	Product
+Production ID	Linked
+Manufacturing Date	Date
+Expiry Date	Date
+Shelf Life	Days
+Current Stock	Units
+Batch Status	Active / Sold / Expired
+Notes	Remarks
+Relationships
+Production Orders
+      │
+      ├── Goods Received
+      ├── Packaging
+      ├── Cost Tracker
+      └── Batch Tracker
+
+📒 Spreadsheet 7 — Production & Manufacturing
+
+Purpose: Track everything sent to manufacturing vendors and everything received back.
+
+Tab 1 ⭐ Production Master
+Column	Purpose
+Production ID	PROD001
+Vendor ID	Dropdown from Vendor Master
+Product ID	Product reference
+Batch ID	Batch number
+Production Type	New Batch / Repeat Batch / Sample
+Quantity Ordered	Units
+Raw Material Sent	Description
+Quantity Sent	Kg / Units
+Date Sent	Date
+Expected Return	Date
+Actual Return	Date
+Production Status	Sent / In Production / Ready / Received / Cancelled
+Priority	High / Medium / Low
+Notes	Remarks
+Tab 2 — Goods Received
+Column	Purpose
+Receipt ID	REC001
+Production ID	Dropdown
+Vendor ID	Auto-populated
+Date Received	Date
+Quantity Received	Units
+Damaged Quantity	Units
+Quality Check	Pass / Fail
+Accepted	Yes / No
+Receiver	Person
+Notes	Remarks
+Tab 3 — Batch Tracker
+Column	Purpose
+Batch ID	Linked
+Production ID	Linked
+Manufacturing Date	Date
+Expiry Date	Date
+Shelf Life	Days
+Batch Status	Active / Sold / Expired
+Current Stock	Units
+Notes	Remarks
+Tab 4 — Manufacturing Costs
+Column	Purpose
+Cost ID	COST001
+Production ID	Linked
+Manufacturing Cost	₹
+Transport Cost	₹
+Testing Cost	₹
+Miscellaneous	₹
+Total Cost	Auto
+Cost Per Unit	Auto
+Notes	Remarks
+📒 Spreadsheet 8 — Packaging Management
+
+Packaging deserves its own workbook because your boss talks about it constantly.
+
+Tab 1 ⭐ Packaging Master
+Column	Purpose
+Packaging ID	PKG001
+Vendor ID	Dropdown
+Packaging Name	Stand-up Pouch
+Packaging Type	Pouch / Box / Sticker / Label
+Material	Paper / Plastic / Foil
+MOQ	Minimum Order Quantity
+Unit Cost	₹
+Artwork Version	V1
+Status	Sample / Approved / Ordered / Active
+Notes	Remarks
+Tab 2 — Packaging Orders
+Column	Purpose
+Order ID	PKO001
+Packaging ID	Dropdown
+Vendor ID	Auto
+Order Date	Date
+Quantity	Units
+Expected Delivery	Date
+Actual Delivery	Date
+Status	Ordered / Received
+Notes	Remarks
+Tab 3 — Artwork & Designs
+Column	Purpose
+Artwork ID	ART001
+Packaging ID	Dropdown
+Version	V1 / V2
+Designer	Person
+Approval Status	Pending / Approved
+Drive Folder	Link
+Print Ready	Yes / No
+Notes	Remarks
+Tab 4 — Packaging Samples
+Column	Purpose
+Sample ID	SMP001
+Packaging ID	Dropdown
+Vendor ID	Auto
+Sample Requested	Date
+Sample Received	Date
+Approved	Yes / No
+Feedback	Remarks
+Notes	Remarks
+📒 Spreadsheet 9 — Finance & Payments
+
+This combines payments from customers and vendors.
+
+Tab 1 ⭐ Finance Master
+Column	Purpose
+Transaction ID	FIN001
+Transaction Type	Income / Expense
+Related Module	Customer / Vendor / Production / Packaging
+Related ID	Linked ID
+Description	Transaction description
+Amount	₹
+Payment Method	Cash / UPI / Bank
+Payment Status	Pending / Partial / Paid
+Due Date	Date
+Payment Date	Date
+Invoice Number	Invoice
+Notes	Remarks
+Tab 2 — Accounts Receivable
+
+Money customers owe you.
+
+Column	Purpose
+Receivable ID	AR001
+Customer ID	Dropdown
+Order ID	Linked
+Invoice Amount	₹
+Amount Received	₹
+Balance	₹
+Due Date	Date
+Status	Pending / Paid
+Tab 3 — Accounts Payable
+
+Money you owe vendors.
+
+Column	Purpose
+Payable ID	AP001
+Vendor ID	Dropdown
+Invoice Number	Invoice
+Amount	₹
+Paid	₹
+Balance	₹
+Due Date	Date
+Status	Pending / Paid
+Tab 4 — Cash Flow Dashboard
+Column	Purpose
+Date	Date
+Income	₹
+Expenses	₹
+Net Cash Flow	Auto
+Running Balance	Auto
+Notes	Remarks
+
+
+📒 Spreadsheet 10 — WhatsApp CRM
+Purpose
+
+This workbook is the communication engine of the company.
+
+Every WhatsApp conversation, broadcast, follow-up, template, and customer response should be traceable.
+
+The goal is:
+
+Never forget to reply.
+Never lose a lead.
+Know exactly who received what.
+Measure which campaigns actually generated sales.
+Reconnect with old customers.
+⭐ Tab 1 — WhatsApp Contact Master (Source of Truth)
+
+Every contact exists only once.
+
+Column	Purpose
+Contact ID	CUST001 / LEAD001 / VEND001
+Contact Name	Auto from Customer/Vendor Master
+Contact Type	Customer / Lead / Vendor / Partner
+WhatsApp Number	Auto
+Business Name	Auto
+Category	Cafe / Hotel / Corporate etc.
+Last Conversation	Date
+Last Broadcast Received	Campaign
+Last Follow-up	Date
+Next Follow-up	Date
+Customer Interest	High / Medium / Low
+Communication Status	Active / Cold / No Reply
+Notes	Remarks
+
+Notice something.
+
+You don't manually enter these people.
+
+They come from
+
+Customer Master
+
+Vendor Master
+
+Lead Master
+
+Tab 2 — Broadcast Campaigns
+
+Every bulk message.
+
+Column	Purpose
+Broadcast ID	WA001
+Campaign Name	August Relaunch
+Related Marketing Campaign	MKT001
+Audience Type	Customers / Leads / Vendors
+Target Audience	Hotels / Cafes
+Template Name	WhatsApp Template
+Poster Link	Drive
+Message Link	Google Doc
+Date Scheduled	Date
+Date Sent	Date
+Total Recipients	Count
+Delivered	Count
+Read	Count
+Replied	Count
+Converted	Count
+Campaign Status	Draft / Scheduled / Sent / Completed
+Notes	Remarks
+Tab 3 — Conversation Tracker
+
+Every meaningful conversation.
+
+Column	Purpose
+Conversation ID	CHAT001
+Contact ID	Dropdown
+Date	Date
+Conversation Type	Incoming / Outgoing
+Subject	Sample Request
+Summary	Conversation summary
+Customer Mood	Interested / Not Interested / Busy
+Action Required	Send Sample
+Assigned To	Owner / EA
+Status	Pending / Completed
+Notes	Remarks
+Tab 4 — Follow-up Tracker
+
+This is probably the most important tab.
+
+Column	Purpose
+Follow-up ID	FUP001
+Contact ID	Dropdown
+Related Broadcast	WA001
+Follow-up Type	Call / WhatsApp / Visit
+Reason	Payment / Sample / Order
+Due Date	Date
+Priority	High / Medium / Low
+Status	Pending / Completed
+Outcome	Positive / Negative / No Response
+Next Follow-up	Date
+Notes	Remarks
+Tab 5 — WhatsApp Templates
+
+Instead of rewriting messages.
+
+Column	Purpose
+Template ID	TMP001
+Template Name	Product Relaunch
+Category	Welcome / Follow-up / Payment Reminder
+Language	English / Hindi
+Message Text	Template
+Poster Link	Drive
+Status	Active / Archived
+Notes	Remarks
+Tab 6 — Analytics Dashboard
+
+Auto-generated.
+
+No manual typing.
+
+Shows:
+
+Total Contacts
+Active Customers
+Cold Customers
+Broadcasts Sent
+Replies
+Conversion Rate
+Pending Follow-ups
+Overdue Follow-ups
+Customers Not Contacted in 30 Days
+Customers Not Contacted in 90 Days
+Top Performing Campaign
+Relationship
+Customer Master
+        │
+Vendor Master
+        │
+Lead Master
+        │
+        ▼
+WhatsApp Contact Master
+        │
+        ├──── Broadcast Campaigns
+        ├──── Conversation Tracker
+        ├──── Follow-up Tracker
+        ├──── WhatsApp Templates
+        └──── Analytics Dashboard
+
+📒 Spreadsheet 11 — Meetings & Decisions
+Purpose
+
+Every meeting the company has should be searchable.
+
+You should never have to ask:
+
+"What did we decide three months ago about packaging?"
+
+You search.
+
+You find it.
+
+Open the meeting.
+
+Done.
+
+⭐ Tab 1 — Meeting Register (Source of Truth)
+
+Every meeting is created only once.
+
+Column	Purpose
+Meeting ID	MT001
+Meeting Title	Gujarat Packaging Discussion
+Meeting Type	Internal / Vendor / Customer / Legal / Production / Marketing
+Meeting Date	Date
+Start Time	Time
+End Time	Time
+Participants	People involved
+Organizer	Person responsible
+Related Module	Vendor / Customer / Legal / Marketing / Production
+Related ID	VEND001 / CUST002 / LEG001
+Agenda	Purpose of the meeting
+Outcome	Short summary
+Action Items Created	TASK IDs
+Decision Count	Number of decisions made
+Meeting Status	Scheduled / Completed / Cancelled
+Meeting Notes (Google Doc)	Full notes
+Recording Link	Optional
+Attachments Folder	Google Drive
+Notes	Remarks
+Tab 2 — Decision Register
+
+This is probably the most valuable tab.
+
+Every important business decision should exist here.
+
+Column	Purpose
+Decision ID	DEC001
+Meeting ID	Dropdown from Meeting Register
+Decision Title	Shift to Local Packaging
+Decision Description	Full decision
+Reason	Why this decision was taken
+Related Module	Packaging
+Related ID	Linked
+Approved By	Person
+Responsible Person	Owner
+Due Date	Implementation deadline
+Implementation Status	Pending / In Progress / Implemented
+Review Date	Decision review
+Result	Successful / Failed / Ongoing
+Notes	Remarks
+Tab 3 — Action Items
+
+Instead of searching meeting notes.
+
+Every action appears here.
+
+Column	Purpose
+Action ID	ACT001
+Meeting ID	Dropdown
+Related Task ID	TASK001
+Assigned To	Person
+Due Date	Date
+Priority	High / Medium / Low
+Status	Pending / Completed
+Completion Date	Date
+Notes	Remarks
+Relationship
+Meeting Register
+        │
+        ├──── Decision Register
+        │
+        └──── Action Items
+📒 Spreadsheet 12 — Research & Knowledge Base
+
+This is basically the company's brain.
+
+Every time you research something,
+
+it goes here.
+
+Not inside random Docs.
+
+⭐ Tab 1 — Research Master
+Column	Purpose
+Research ID	RES001
+Research Title	Functional Chocolate Benefits
+Category	Product / Competitor / Market / Packaging / Legal / Technology
+Subcategory	Cocoa / Shelf Life / Protein
+Research Type	Internal / Internet / Supplier / Customer Feedback
+Priority	High / Medium / Low
+Status	Researching / Reviewing / Approved / Archived
+Research Owner	Person
+Started Date	Date
+Completed Date	Date
+Summary	Short summary
+Recommendation	Suggested action
+Google Doc	Full research
+Supporting Files	Drive Folder
+Notes	Remarks
+Tab 2 — Competitor Database
+
+Don't just research.
+
+Build intelligence.
+
+Column	Purpose
+Competitor ID	COMP001
+Company Name	Brand
+Product Category	Chocolate / Snacks
+Website	Website
+Instagram	Instagram
+Pricing	₹
+USP	Unique Selling Point
+Strengths	Notes
+Weaknesses	Notes
+Packaging Style	Notes
+Marketing Strategy	Notes
+Observations	Remarks
+Last Reviewed	Date
+Tab 3 — Functional Food Research
+
+Specifically because your boss mentioned it.
+
+Column	Purpose
+Ingredient ID	ING001
+Ingredient	Cocoa
+Functional Benefit	Antioxidants
+Scientific Support	Strong / Medium / Weak
+Health Claims	Allowed claims
+Shelf Life Impact	Notes
+Cost Impact	High / Medium / Low
+Suppliers	Vendor IDs
+Research Link	Google Doc
+Recommendation	Should we use it?
+Tab 4 — Product Development
+
+Every product idea.
+
+Column	Purpose
+Product Idea ID	IDEA001
+Product Name	Protein Chocolate
+Inspiration	Customer / Research / Competitor
+Related Research	Research ID
+Current Stage	Idea / Prototype / Testing / Launch
+Estimated Cost	₹
+Estimated Selling Price	₹
+Priority	High / Medium / Low
+Notes	Remarks
+Tab 5 — SOP & Internal Knowledge
+
+Instead of losing company processes.
+
+Column	Purpose
+SOP ID	SOP001
+Department	Sales / Production / Marketing
+SOP Title	Vendor Onboarding
+Version	V1
+Owner	Person
+Status	Draft / Active
+Last Updated	Date
+Google Doc	SOP
+Notes	Remarks
+Relationship
+Research Master
+        │
+        ├──── Competitor Database
+        ├──── Functional Food Research
+        ├──── Product Development
+        └──── SOP & Internal Knowledge
+
+📒 Spreadsheet 13 — Asset Library
+Purpose
+
+The Asset Library is the company's centralized digital asset management system (DAM).
+
+Every important file created or received by the company should have an Asset ID and be searchable.
+
+It becomes the index to Google Drive—not a replacement for it.
+
+⭐ Tab 1 — Asset Master (Source of Truth)
+
+Every asset is registered here once.
+
+Column	Purpose
+Asset ID	AST001
+Asset Name	Goodoria Logo V2
+Asset Category	Logo / Packaging / Legal / Marketing / Research / Meeting / Product / Finance / Other
+Asset Type	Image / PDF / AI / PSD / DOC / XLS / Video / Audio / ZIP / Folder
+Related Module	Marketing / Packaging / Legal / Finance / Production / Research / Meetings
+Related Record ID	Campaign ID / Vendor ID / Product ID / Legal ID / Meeting ID
+Current Version	V1 / V2 / V3
+File Owner	Person Responsible
+Created Date	Date
+Last Updated	Date
+Approval Status	Draft / Pending / Approved / Archived
+Google Drive Folder	Folder Link
+Latest File Link	Direct File Link
+File Size	Auto / Manual
+Notes	Remarks
+Tab 2 — Brand Assets
+
+Everything related to branding.
+
+Column	Purpose
+Brand Asset ID	BAS001
+Asset ID	Linked
+Asset Name	Auto
+Brand Category	Logo / Font / Color Palette / Brand Guidelines / QR Code
+Version	V1
+Approved	Yes / No
+Used On	Website / Packaging / Posters
+Notes	Remarks
+Tab 3 — Packaging Assets
+
+Packaging-specific files.
+
+Column	Purpose
+Packaging Asset ID	PAS001
+Asset ID	Linked
+Product ID	Linked
+Packaging Type	Pouch / Box / Sticker / Label
+Vendor ID	Linked
+Artwork Version	V1
+Print Ready	Yes / No
+Die Line Available	Yes / No
+Notes	Remarks
+Tab 4 — Marketing Assets
+
+Social media and marketing creatives.
+
+Column	Purpose
+Marketing Asset ID	MAS001
+Asset ID	Linked
+Campaign ID	Linked
+Platform	Instagram / Facebook / LinkedIn / WhatsApp / Website
+Content Type	Poster / Reel / Story / Banner / Flyer
+Status	Draft / Scheduled / Published
+Publish Date	Date
+Notes	Remarks
+Tab 5 — Legal Assets
+
+Certificates and official documents.
+
+Column	Purpose
+Legal Asset ID	LAS001
+Asset ID	Linked
+Legal ID	Linked
+Document Type	GST / FSSAI / Trademark / Rental Agreement / Insurance
+Original Available	Yes / No
+Digital Copy	Yes / No
+Expiry Date	Date
+Notes	Remarks
+Tab 6 — Product Media
+
+Product photography and videos.
+
+Column	Purpose
+Media ID	MED001
+Asset ID	Linked
+Product ID	Linked
+Media Type	Photo / Video / 360° / Lifestyle
+Resolution	4K / HD
+Photographer	Person
+Approved	Yes / No
+Notes	Remarks
+Tab 7 — Vendor Documents
+
+Everything vendors send.
+
+Column	Purpose
+Vendor Document ID	VDOC001
+Asset ID	Linked
+Vendor ID	Linked
+Document Type	Quotation / Invoice / Agreement / Sample Image / Catalogue
+Received Date	Date
+Status	Active / Archived
+Notes	Remarks
+Tab 8 — Research Documents
+
+Long-form research.
+
+Column	Purpose
+Research Asset ID	RAD001
+Asset ID	Linked
+Research ID	Linked
+Source	Journal / Website / Internal
+Google Doc	Link
+Supporting Files	Drive Folder
+Notes	Remarks
+Tab 9 — Meeting Attachments
+
+Meeting-related files.
+
+Column	Purpose
+Meeting Asset ID	MAD001
+Asset ID	Linked
+Meeting ID	Linked
+Attachment Type	Minutes / Recording / Presentation / Whiteboard
+Google Doc	Link
+Notes	Remarks
+⭐ Tab 10 — Asset Usage Map
+
+One of the most important tabs.
+
+This tells you where every asset is being used.
+
+Column	Purpose
+Usage ID	USE001
+Asset ID	Linked
+Workbook	Marketing / Packaging / Legal / Research
+Tab	Campaign Master / Packaging Master
+Related Record ID	MKT001 / PKG002
+Usage Type	Reference / Attachment / Primary File
+Last Checked	Date
+Notes	Remarks
+⭐ Tab 11 — Version History
+
+Never overwrite files.
+
+Track versions.
+
+Column	Purpose
+Version ID	VER001
+Asset ID	Linked
+Version	V1 / V2 / V3
+Updated By	Person
+Update Date	Date
+Change Summary	What changed
+Previous File	Drive Link
+Current File	Drive Link
+⭐ Tab 12 — Folder Structure
+
+This is for documentation.
+
+It maps Google Drive.
+
+Column	Purpose
+Folder ID	FOL001
+Folder Name	Marketing
+Parent Folder	Goodoria Assets
+Google Drive Link	Folder Link
+Owner	Person
+Purpose	Folder description
+Relationship
+Asset Master
+      │
+      ├── Brand Assets
+      ├── Packaging Assets
+      ├── Marketing Assets
+      ├── Legal Assets
+      ├── Product Media
+      ├── Vendor Documents
+      ├── Research Documents
+      ├── Meeting Attachments
+      ├── Asset Usage Map
+      ├── Version History
+      └── Folder Structure
+
+
+
+Spreadsheet 14 — Executive Planning & Command Center ⭐⭐⭐⭐⭐
+
+This becomes your home screen every morning.
+
+You open this before every other spreadsheet.
+
+Tab 1 — Executive Dashboard ⭐⭐⭐⭐⭐
+
+This is automatically populated.
+
+Things like:
+
+Today's meetings
+Today's follow-ups
+Pending vendor payments
+Production due today
+Marketing posts due today
+Legal renewals this week
+WhatsApp follow-ups
+Research pending
+Tasks overdue
+Production delays
+
+Basically
+
+"What requires my attention today?"
+
+No manual entry.
+
+Everything comes from other sheets.
+
+Tab 2 — Daily Planner ⭐⭐⭐⭐⭐
+
+This is where you actually plan your day.
+
+Columns
+
+Time	Task	Module	Related ID	Priority	Status	Notes
+9:00	Call Packaging Vendor	Vendor	VEND004	High	Pending	Ask about MOQ
+10:30	Visit Local Packaging Factory	Packaging	PKG002	High	Pending	Monday visit
+2:00	Review Instagram Campaign	Marketing	CAM005	Medium	Pending	New reel
+5:00	Boss Meeting	Meeting	MT012	High	Scheduled	Weekly review
+
+Half of these should come automatically from calendars, tasks, and reminders.
+
+You can also add manual tasks.
+
+Tab 3 — Weekly Planner
+
+Monday
+
+Tuesday
+
+Wednesday
+
+Thursday
+
+Friday
+
+Saturday
+
+Sunday
+
+Everything pulled from
+
+Calendar
+Tasks
+Meetings
+Production
+Marketing
+Tab 4 — Monthly Planner
+
+This should look like the hotel booking calendar.
+
+Exactly the same idea.
+
+Except instead of rooms...
+
+Rows become
+
+Marketing
+
+Production
+
+Legal
+
+Finance
+
+Meetings
+
+Research
+
+Packaging
+
+Travel
+
+Exhibitions
+
+Owner
+
+EA
+
+The colors indicate
+
+Blue
+
+↓
+
+Meeting
+
+Green
+
+↓
+
+Marketing
+
+Red
+
+↓
+
+Legal
+
+Orange
+
+↓
+
+Production
+
+Purple
+
+↓
+
+Travel
+
+etc.
+
+This is what you wanted for marketing, but I actually think it belongs here.
+
+Tab 5 — CEO Focus ⭐⭐⭐⭐⭐
+
+Only
+
+5-10 items.
+
+"What moves the company?"
+
+Example
+
+50 Stores Target
+
+████░░░░░░
+
+9 / 50
+Pending Vendor Payments
+
+₹1,20,000
+Packaging Finalization
+
+65%
+Website
+
+40%
+Royal Enfield Expo
+
+18 Days Left
+
+This becomes your boss's dashboard.
+
+Tab 6 — EA Planner
+
+Specifically for you.
+
+Things like
+
+Waiting For
+
+Blocked By
+
+Need Approval
+
+Need Signature
+
+Need Call
+
+Need Visit
+
+Need Research
+
+Need Vendor
+
+Priority
+
+Tab 7 — Decision Queue
+
+This is something most businesses don't have.
+
+Every unresolved decision goes here.
+
+Example
+
+Choose Packaging Vendor
+
+↓
+
+Waiting for Samples
+Rename Company
+
+↓
+
+Waiting Rental Agreement
+Shelf Life Test
+
+↓
+
+Need Budget Approval
+
+Nothing gets forgotten.
+
+Tab 8 — Follow-up Center
+
+Not WhatsApp.
+
+Everything.
+
+Vendor
+
+Customer
+
+Government
+
+Lab
+
+Designer
+
+Packaging
+
+Printer
+
+Investor
+
+Lawyer
+
+Accountant
+
+Every follow-up in one place.
+
+Tab 9 — Timeline / Roadmap ⭐⭐⭐⭐⭐
+
+I think this is what your boss is actually asking you to build.
+
+Instead of seeing
+
+Tasks
+
+you see
+
+Projects.
+
+Example
+
+Rename Company
+
+□□□□□□□□□□
+
+↓
+
+Rental Agreement
+
+↓
+
+GST
+
+↓
+
+FSSAI
+
+↓
+
+Trademark
+
+↓
+
+Shelf Life
+
+↓
+
+Packaging
+
+↓
+
+Website
+
+↓
+
+Marketing
+
+↓
+
+Launch
+
+Each stage automatically updates based on the underlying sheets.
+
+
+
+---------------------------------------------------------------------------------------------------------------------------
+📒 Spreadsheet 0 — Core Data Registry
+⭐ Tab 1 — Global Field Registry (Phase 1)
+
+Focus: The first set of common fields that are reused throughout multiple workbooks.
+
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0001	Vendor ID	Vendors	Vendor Master	Text	✅	❌	❌	Vendor Master	Production, Packaging, Finance, WhatsApp CRM, Meetings, Research	Yes	Must exist in Vendor Master	Unique vendor identifier
+FLD0002	Vendor Name	Vendors	Vendor Master	Text	❌	❌	❌	Vendor Master	Production, Packaging, Finance, WhatsApp CRM, Meetings	Yes	Auto-filled from Vendor ID	Official vendor name
+FLD0003	Vendor Category	Vendors	Vendor Master	Dropdown	❌	❌	❌	Vendor Master	Packaging, Production, Finance	Yes	Must match Vendor Master	Cocoa, Packaging, Transport, Testing, etc.
+FLD0004	Vendor Status	Vendors	Vendor Master	Dropdown	❌	❌	❌	Vendor Master	Finance, Production	Yes	Active / Inactive / Blacklisted	Current vendor status
+FLD0005	Primary Contact	Vendors	Vendor Master	Text	❌	❌	❌	Vendor Master	WhatsApp CRM, Meetings	Yes	Auto-filled	Main contact person
+FLD0006	Phone Number	Vendors	Vendor Master	Phone	❌	❌	❌	Vendor Master	WhatsApp CRM, Meetings	Yes	Valid phone number	Vendor contact number
+FLD0007	WhatsApp Number	Vendors	Vendor Master	Phone	❌	❌	❌	Vendor Master	WhatsApp CRM	No	Valid WhatsApp number	WhatsApp communication
+FLD0008	Email	Vendors	Vendor Master	Email	❌	❌	❌	Vendor Master	Meetings, Finance	No	Valid email	Vendor email
+FLD0009	GST Number	Vendors	Vendor Master	Text	❌	❌	❌	Vendor Master	Finance, Legal	No	GST format	Vendor GST
+FLD0010	Vendor Address	Vendors	Vendor Master	Text	❌	❌	❌	Vendor Master	Meetings	No	Auto-filled	Registered address
+Customer (Second most reused entity)
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0011	Customer ID	Customers	Customer Master	Text	✅	❌	❌	Customer Master	Finance, Marketing, WhatsApp CRM, Meetings	Yes	Must exist	Unique customer identifier
+FLD0012	Customer Name	Customers	Customer Master	Text	❌	❌	❌	Customer Master	Finance, WhatsApp CRM, Meetings	Yes	Auto-filled	Customer name
+FLD0013	Customer Type	Customers	Customer Master	Dropdown	❌	❌	❌	Customer Master	Marketing, Finance	Yes	Cafe / Hotel / Corporate / Wedding	Business category
+FLD0014	Contact Person	Customers	Customer Master	Text	❌	❌	❌	Customer Master	Meetings, CRM	Yes	Auto-filled	Primary contact
+FLD0015	Customer Phone	Customers	Customer Master	Phone	❌	❌	❌	Customer Master	WhatsApp CRM	Yes	Valid phone	Contact number
+FLD0016	Customer WhatsApp	Customers	Customer Master	Phone	❌	❌	❌	Customer Master	WhatsApp CRM	No	Valid WhatsApp	WhatsApp number
+FLD0017	Customer Email	Customers	Customer Master	Email	❌	❌	❌	Customer Master	Meetings	No	Valid email	Customer email
+FLD0018	Customer Status	Customers	Customer Master	Dropdown	❌	❌	❌	Customer Master	CRM, Finance	Yes	Active / Prospect / Inactive	Customer lifecycle
+FLD0019	Lead Source	Customers	Customer Master	Dropdown	❌	❌	❌	Customer Master	Marketing	No	Must match lookup	How they found Goodoria
+FLD0020	Assigned Owner	Customers	Customer Master	Dropdown	❌	❌	❌	Employee Registry	CRM, Meetings	Yes	Must exist	Internal owner
+Product (Shared across Marketing, Production, Packaging & Finance)
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0021	Product ID	Product Master	Product Master	Text	✅	❌	❌	Product Master	Production, Packaging, Finance, Marketing, Research	Yes	Must exist	Product identifier
+FLD0022	Product Name	Product Master	Product Master	Text	❌	❌	❌	Product Master	Production, Marketing	Yes	Auto-filled	Product name
+FLD0023	SKU	Product Master	Product Master	Text	❌	❌	❌	Product Master	Production, Finance	Yes	Unique SKU	Stock keeping unit
+FLD0024	Product Category	Product Master	Product Master	Dropdown	❌	❌	❌	Product Master	Marketing, Research	Yes	Lookup value	Chocolate / Gift Box / etc.
+FLD0025	Product Status	Product Master	Product Master	Dropdown	❌	❌	❌	Product Master	Marketing, Production	Yes	Active / Testing / Discontinued	Product lifecycle
+Campaign Fields
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0026	Campaign ID	Marketing	Campaign Master	Text	✅	❌	❌	Campaign Master	Calendar, WhatsApp CRM, Marketing Assets	Yes	Must exist	Unique marketing campaign
+FLD0027	Campaign Name	Marketing	Campaign Master	Text	❌	❌	❌	Campaign Master	Calendar, WhatsApp CRM	Yes	Auto-fill	Campaign title
+FLD0028	Campaign Type	Marketing	Campaign Master	Dropdown	❌	❌	❌	Lookup Library	Calendar, WhatsApp	Yes	Lookup	Digital / Physical / Exhibition
+FLD0029	Campaign Status	Marketing	Campaign Master	Dropdown	❌	❌	❌	Lookup Library	Calendar, Dashboard	Yes	Lookup	Planning / Running / Completed
+FLD0030	Start Date	Marketing	Campaign Master	Date	❌	❌	❌	Campaign Master	Calendar	Yes	Valid date	Campaign start
+FLD0031	End Date	Marketing	Campaign Master	Date	❌	❌	❌	Campaign Master	Calendar	Yes	End ≥ Start	Campaign end
+FLD0032	Campaign Owner	Marketing	Campaign Master	Dropdown	❌	❌	❌	Employee Registry	Dashboard	Yes	Must exist	Responsible person
+FLD0033	Related Product ID	Marketing	Campaign Master	FK	❌	✅	❌	Product Master	Marketing	No	Must exist	Product promoted
+FLD0034	Budget	Marketing	Campaign Master	Currency	❌	❌	❌	Campaign Master	Finance	No	Positive	Campaign budget
+FLD0035	Priority	Marketing	Campaign Master	Dropdown	❌	❌	❌	Lookup Library	Calendar	Yes	Lookup	High / Medium / Low
+Production Fields
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0036	Production ID	Production	Production Master	Text	✅	❌	❌	Production Master	Batch, Packaging, Finance	Yes	Must exist	Production order
+FLD0037	Batch ID	Production	Production Master	Text	❌	❌	❌	Production Master	Batch Tracker	Yes	Unique	Batch reference
+FLD0038	Vendor ID	Vendors	Vendor Master	FK	❌	✅	❌	Vendor Master	Production	Yes	Must exist	Manufacturing vendor
+FLD0039	Product ID	Product	Product Master	FK	❌	✅	❌	Product Master	Production	Yes	Must exist	Product manufactured
+FLD0040	Quantity Ordered	Production	Production Master	Number	❌	❌	Yes	Production	Yes	>0	Production quantity	
+FLD0041	Quantity Received	Production	Goods Received	Number	❌	❌	Yes	Goods Received	Finance	No	≤ Ordered	Goods received
+FLD0042	Production Status	Production	Production Master	Dropdown	❌	❌	Yes	Lookup Library	Dashboard	Yes	Lookup	Sent / In Production / Received
+FLD0043	Date Sent	Production	Production Master	Date	❌	❌	Yes	Production	Yes	Valid	Sent date	
+FLD0044	Expected Return	Production	Production Master	Date	❌	❌	Yes	Production	Yes	Valid	Expected completion	
+FLD0045	Actual Return	Production	Goods Received	Date	❌	❌	Yes	Goods Received	Dashboard	No	Valid	Actual completion
+Task Fields
+
+These are extremely important because every module creates tasks.
+
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0046	Task ID	Operations	Task Master	Text	✅	❌	❌	Task Master	Meetings, CRM, Legal, Marketing	Yes	Must exist	Unique task
+FLD0047	Task Name	Operations	Task Master	Text	❌	❌	Yes	Task Master	Dashboard	Yes	Required	Task title
+FLD0048	Related Module	Operations	Task Master	Dropdown	❌	❌	Yes	Lookup Library	All	Yes	Lookup	Vendor / Marketing / Finance
+FLD0049	Related Record ID	Operations	Task Master	FK	❌	✅	Yes	Dynamic	All	Yes	Must exist	Links task to record
+FLD0050	Assigned To	Operations	Task Master	Dropdown	❌	❌	Yes	Employee Registry	Dashboard	Yes	Must exist	Responsible employee
+FLD0051	Due Date	Operations	Task Master	Date	❌	❌	Yes	Task Master	Calendar	Yes	Valid	Deadline
+FLD0052	Task Status	Operations	Task Master	Dropdown	❌	❌	Yes	Lookup Library	Dashboard	Yes	Lookup	Pending / In Progress / Done
+FLD0053	Priority	Operations	Task Master	Dropdown	❌	❌	Yes	Lookup Library	Dashboard	Yes	Lookup	High / Medium / Low
+FLD0054	Completion Date	Operations	Task Master	Date	❌	❌	Yes	Task Master	Reports	No	≥ Due Date	Finished date
+FLD0055	Created By	Operations	Task Master	Dropdown	❌	❌	No	Employee Registry	Reports	Yes	Must exist	Task creator
+Finance Fields
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0056	Payment ID	Finance	Finance Master	Text	✅	❌	❌	Finance Master	Finance Reports	Yes	Unique	Payment transaction ID
+FLD0057	Transaction Type	Finance	Finance Master	Dropdown	❌	❌	Yes	Lookup Library	Finance	Yes	Income / Expense	Transaction type
+FLD0058	Customer ID	Customers	Customer Master	FK	❌	✅	❌	Customer Master	Finance	No	Must exist	Paying customer
+FLD0059	Vendor ID	Vendors	Vendor Master	FK	❌	✅	❌	Vendor Master	Finance	No	Must exist	Vendor being paid
+FLD0060	Production ID	Production	Production Master	FK	❌	✅	❌	Production Master	Finance	No	Must exist	Related production
+FLD0061	Related Module	Finance	Finance Master	Dropdown	❌	❌	Yes	Lookup Library	Finance	Yes	Lookup	Customer / Vendor / Production
+FLD0062	Related Record ID	Finance	Finance Master	FK	❌	✅	Yes	Dynamic	Finance	Yes	Must exist	Linked business record
+FLD0063	Invoice Number	Finance	Finance Master	Text	❌	❌	Yes	Finance	No	Unique	Invoice reference	
+FLD0064	Amount	Finance	Finance Master	Currency	❌	❌	Yes	Finance	Yes	>0	Transaction amount	
+FLD0065	Payment Status	Finance	Finance Master	Dropdown	❌	❌	Yes	Lookup Library	Dashboard	Yes	Pending / Paid / Partial	Payment state
+FLD0066	Due Date	Finance	Finance Master	Date	❌	❌	Yes	Finance	Yes	Valid	Due date	
+FLD0067	Payment Date	Finance	Finance Master	Date	❌	❌	Yes	Finance	No	Valid	Actual payment	
+FLD0068	Payment Method	Finance	Finance Master	Dropdown	❌	❌	Yes	Lookup Library	Finance	Yes	Cash / Bank / UPI	Method used
+Legal Fields
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0069	Legal ID	Legal	Legal Master	Text	✅	❌	❌	Legal Master	Legal	Yes	Unique	Document identifier
+FLD0070	Document Name	Legal	Legal Master	Text	❌	❌	Yes	Legal	Yes	Required	Certificate name	
+FLD0071	Document Category	Legal	Legal Master	Dropdown	❌	❌	Yes	Lookup Library	Legal	Yes	Lookup	GST / FSSAI / Trademark
+FLD0072	Authority	Legal	Legal Master	Text	❌	❌	Yes	Legal	Yes	Required	Issuing authority	
+FLD0073	Responsible Person	Legal	Legal Master	FK	❌	✅	Yes	Employee Registry	Legal	Yes	Must exist	Internal owner
+FLD0074	Issue Date	Legal	Legal Master	Date	❌	❌	Yes	Legal	Yes	Valid	Issue date	
+FLD0075	Expiry Date	Legal	Legal Master	Date	❌	❌	Yes	Legal	No	≥ Issue Date	Expiry	
+FLD0076	Renewal Reminder	Legal	Legal Master	Date	❌	❌	Yes	Legal	No	Before expiry	Reminder date	
+FLD0077	Document Status	Legal	Legal Master	Dropdown	❌	❌	Yes	Lookup Library	Dashboard	Yes	Pending / Active / Expired	Current state
+Meetings Fields
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0078	Meeting ID	Meetings	Meeting Register	Text	✅	❌	❌	Meeting Register	Decisions	Yes	Unique	Meeting identifier
+FLD0079	Meeting Title	Meetings	Meeting Register	Text	❌	❌	Yes	Meetings	Yes	Required	Meeting title	
+FLD0080	Meeting Type	Meetings	Meeting Register	Dropdown	❌	❌	Yes	Lookup Library	Meetings	Yes	Lookup	Internal / Vendor / Customer
+FLD0081	Related Module	Meetings	Meeting Register	Dropdown	❌	❌	Yes	Lookup Library	Meetings	Yes	Lookup	Vendor / Customer / Legal
+FLD0082	Related Record ID	Meetings	Meeting Register	FK	❌	✅	Yes	Dynamic	Meetings	Yes	Must exist	Linked record
+FLD0083	Meeting Date	Meetings	Meeting Register	Date	❌	❌	Yes	Meetings	Yes	Valid	Date	
+FLD0084	Decision ID	Meetings	Decision Register	FK	❌	✅	Yes	Decision Register	Decisions	No	Must exist	Linked decision
+FLD0085	Task ID	Operations	Task Master	FK	❌	✅	❌	Task Master	Meetings	No	Must exist	Action item generated
+Research Fields
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0086	Research ID	Research	Research Master	Text	✅	❌	❌	Research Master	Research	Yes	Unique	Research record
+FLD0087	Research Title	Research	Research Master	Text	❌	❌	Yes	Research	Yes	Required	Research topic	
+FLD0088	Research Category	Research	Research Master	Dropdown	❌	❌	Yes	Lookup Library	Research	Yes	Lookup	Product / Competitor / Market
+FLD0089	Product ID	Product	Product Master	FK	❌	✅	❌	Product Master	Research	No	Must exist	Product studied
+FLD0090	Vendor ID	Vendors	Vendor Master	FK	❌	✅	❌	Vendor Master	Research	No	Must exist	Supplier studied
+FLD0091	Research Status	Research	Research Master	Dropdown	❌	❌	Yes	Lookup Library	Research	Yes	Draft / Approved	Current state
+FLD0092	Recommendation	Research	Research Master	Long Text	❌	❌	Yes	Research	No	Optional	Suggested action	
+WhatsApp CRM Fields
+Field ID	Field Name	Owned By Workbook	Owned By Tab	Data Type	PK	FK	Editable Outside Owner	Lookup Source	Used In	Required	Validation Rule	Description
+FLD0093	Conversation ID	WhatsApp CRM	Conversation Master	Text	✅	❌	❌	CRM Master	CRM	Yes	Unique	Conversation identifier
+FLD0094	Contact Type	WhatsApp CRM	Contact Master	Dropdown	❌	❌	Yes	Lookup Library	CRM	Yes	Customer / Vendor / Lead	Contact classification
+FLD0095	Contact ID	Dynamic	Customer/Vendor Master	FK	❌	✅	❌	Customer/Vendor Master	CRM	Yes	Must exist	Linked contact
+FLD0096	Campaign ID	Marketing	Campaign Master	FK	❌	✅	❌	Campaign Master	CRM	No	Must exist	Broadcast campaign
+FLD0097	Follow-up ID	CRM	Follow-up Tracker	FK	❌	✅	Yes	Follow-up Tracker	CRM	No	Must exist	Linked follow-up
+FLD0098	Conversation Status	CRM	Conversation Master	Dropdown	❌	❌	Yes	Lookup Library	CRM	Yes	Open / Closed / Pending	Current status
+FLD0099	Next Follow-up	CRM	Follow-up Tracker	Date	❌	❌	Yes	CRM	No	Valid	Next contact date	
+FLD0100	Response Type	CRM	Conversation Master	Dropdown	❌	❌	Yes	Lookup Library	CRM	No	Interested / No Reply / Ordered	Customer response
+
+
+
+
+
+Spreadsheet 0 → Tab 2 — Relationship Registry (Phase 1)
+Relationship ID	Master Entity	Owner Workbook	Owner Tab	Primary Key	Referenced By	Relationship Type	Auto Populate	Editable Outside Owner	Validation Rule	Description
+REL001	Vendor	Vendors	Vendor Master	Vendor ID	Production, Packaging, Finance, WhatsApp CRM, Meetings, Research	One-to-Many	Yes	No	Vendor ID must exist in Vendor Master	Vendor information originates only once and is referenced everywhere else.
+REL002	Customer	Customers & Leads	Customer Master	Customer ID	Finance, Marketing, WhatsApp CRM, Meetings	One-to-Many	Yes	No	Customer ID must exist in Customer Master	Customer details are owned by Customer Master and reused by all modules.
+REL003	Product	Product Master	Product Master	Product ID	Production, Packaging, Marketing, Finance, Research	One-to-Many	Yes	No	Product ID must exist in Product Master	Product definitions remain centralized while operational data lives elsewhere.
+REL004	Campaign	Marketing	Campaign Master	Campaign ID	Marketing Calendar, WhatsApp CRM, Marketing Assets	One-to-Many	Yes	No	Campaign ID must exist in Campaign Master	Marketing modules should only reference existing campaigns.
+REL005	Production	Production	Production Master	Production ID	Goods Received, Batch Tracker, Packaging, Finance	One-to-Many	Yes	No	Production ID must exist in Production Master	Every manufacturing activity belongs to one production order.
+
+Spreadsheet 0 → Tab 2 — Relationship Registry (Phase 2)
+Relationship ID	Master Entity	Owner Workbook	Owner Tab	Primary Key	Referenced By	Relationship Type	Auto Populate	Editable Outside Owner	Validation Rule	Description
+REL006	Task	Operations & Task Management	Task Master	Task ID	Meetings, Marketing, Production, Finance, Legal, CRM	One-to-Many	Yes	No	Task ID must exist in Task Master	Every action in the company should originate from one task.
+REL007	Meeting	Meetings & Decisions	Meeting Register	Meeting ID	Decisions, Tasks, Research	One-to-Many	Yes	No	Meeting ID must exist in Meeting Register	Decisions and action items belong to a meeting.
+REL008	Decision	Meetings & Decisions	Decision Register	Decision ID	Tasks	One-to-Many	Yes	No	Decision ID must exist	Every implementation task should trace back to a business decision.
+REL009	Legal Document	Legal Documents	Legal Master	Legal ID	Finance, Meetings, Assets	One-to-Many	Yes	No	Legal ID must exist	Licenses and compliance documents remain centralized.
+REL010	Research	Research & Knowledge Base	Research Master	Research ID	Product Development, Marketing, Meetings	One-to-Many	Yes	No	Research ID must exist	Product and marketing decisions should reference research.
+Phase 3
+
+Now we move to entities that are referenced everywhere.
+
+Relationship ID	Master Entity	Owner Workbook	Owner Tab	Primary Key	Referenced By	Relationship Type	Auto Populate	Editable Outside Owner	Validation Rule	Description
+REL011	WhatsApp Contact	WhatsApp CRM	Contact Master	Contact ID	Broadcasts, Follow-ups	One-to-Many	Yes	No	Contact ID must exist	Communication history stays linked to one contact.
+REL012	Broadcast Campaign	WhatsApp CRM	Broadcast Master	Broadcast ID	Follow-ups, Analytics	One-to-Many	Yes	No	Broadcast ID must exist	Responses belong to one broadcast campaign.
+REL013	Packaging	Packaging	Packaging Master	Packaging ID	Production, Finance	One-to-Many	Yes	No	Packaging ID must exist	Packaging specifications stay centralized.
+REL014	Finance Transaction	Finance	Finance Master	Payment ID	Reports, Dashboard	One-to-Many	Yes	No	Payment ID must exist	Financial transactions originate only in Finance.
+REL015	Asset	Asset Library	Asset Master	Asset ID	Marketing, Packaging, Legal, Research, Meetings	One-to-Many	Yes	No	Asset ID must exist	Every document, logo, artwork, and certificate is tracked through one asset record.
+
+
+📒 Spreadsheet 0
+⭐ Tab 3 — Entity Dependency Map
+Purpose
+
+This tab answers one question:
+
+"If I edit this record, what else is affected?"
+
+Whenever a core record changes, this map tells the ERP (or you) which workbooks must refresh, revalidate, or update.
+
+Dependency ID	Master Entity	Owner Workbook	Owner Tab	Primary Key	Dependent Workbook(s)	Dependent Tab(s)	Update Type	Impact Level	Auto Refresh	Validation Required	Notes
+DEP001	Vendor	Vendors	Vendor Master	Vendor ID	Production, Packaging, Finance, WhatsApp CRM, Meetings, Research	Production Master, Packaging Master, Finance Master, Contact Master, Meeting Register, Research Master	Read Only Lookup	🔴 Critical	Yes	Yes	Vendor profile is shared company-wide.
+DEP002	Customer	Customers	Customer Master	Customer ID	Finance, Marketing, WhatsApp CRM, Meetings	Finance Master, Campaign Master, Contact Master, Meeting Register	Read Only Lookup	🔴 Critical	Yes	Yes	Customer identity must stay consistent everywhere.
+DEP003	Product	Product Master	Product Master	Product ID	Production, Packaging, Marketing, Finance, Research	Production Master, Packaging Master, Campaign Master, Finance Master, Research Master	Read Only Lookup	🔴 Critical	Yes	Yes	Product changes affect manufacturing and sales.
+DEP004	Campaign	Marketing	Campaign Master	Campaign ID	Marketing Calendar, WhatsApp CRM, Marketing Assets	Calendar, Broadcasts, Asset Master	Read Only Lookup	🟠 High	Yes	Yes	Calendar and broadcasts must stay synchronized.
+DEP005	Production	Production	Production Master	Production ID	Batch Tracker, Goods Received, Packaging, Finance	Batch Tracker, Goods Received, Packaging Orders, Finance Master	Read Only Lookup	🔴 Critical	Yes	Yes	Production is the parent of manufacturing records.
+DEP006	Task	Operations	Task Master	Task ID	Meetings, Marketing, Production, Legal	Action Items, Campaign Master, Production Master, Legal Master	Status Sync	🟠 High	Yes	Yes	Tasks drive operational execution.
+DEP007	Meeting	Meetings	Meeting Register	Meeting ID	Decision Register, Action Items	Decisions, Actions	Parent → Child	🟡 Medium	Yes	Yes	Decisions belong to meetings.
+DEP008	Decision	Meetings	Decision Register	Decision ID	Task Master	Task Master	Parent → Child	🟡 Medium	Yes	Yes	Every implementation task should reference a decision where applicable.
+DEP009	Legal Document	Legal	Legal Master	Legal ID	Finance, Meetings	Finance Master, Meeting Register	Read Only Lookup	🟠 High	Yes	Yes	Compliance records must remain accurate.
+DEP010	Research	Research	Research Master	Research ID	Product Development, Marketing	Product Development, Campaign Master	Reference	🟢 Low	Yes	No	Research supports decision-making but doesn't block operations.
+DEP011	WhatsApp Contact	WhatsApp CRM	Contact Master	Contact ID	Broadcasts, Follow-ups	Broadcasts, Follow-up Tracker	Read Only Lookup	🟠 High	Yes	Yes	Contact information should never diverge from the master record.
+DEP012	Packaging	Packaging	Packaging Master	Packaging ID	Production, Finance	Production Master, Finance Master	Read Only Lookup	🟠 High	Yes	Yes	Packaging affects manufacturing costs and execution.
+DEP013	Finance Transaction	Finance	Finance Master	Payment ID	Dashboard, Reports	Cash Flow, Reports	Aggregation	🟡 Medium	Yes	No	Financial summaries update automatically.
+DEP014	Asset	Asset Library	Asset Master	Asset ID	Marketing, Packaging, Legal, Research, Meetings	All linked tabs	Reference	🟠 High	Yes	No	Files are referenced across multiple modules.
+The bottom of this sheet should have one more section.
+⭐ Global Dependency Rules
+
+These aren't individual records—they're rules that apply to the entire system.
+
+Rule ID	Rule	Applies To	Action if Broken
+GDR001	Every Primary Key must be unique.	All Modules	Reject entry
+GDR002	Foreign Keys must already exist in their owner workbook.	All Modules	Highlight red
+GDR003	Master-owned fields cannot be edited outside the owner workbook.	All Modules	Lock cell / Highlight
+GDR004	Changing a Primary Key is prohibited.	All Modules	Reject change
+GDR005	Deleting a master record requires checking dependent records first.	All Modules	Warn user
+GDR006	Related dropdown values must come from the Lookup Registry.	All Modules	Reject manual values
+GDR007	Status values must match the approved lookup list.	All Modules	Highlight yellow
+GDR008	Date fields must follow logical order (e.g., End Date ≥ Start Date).	All Modules	Highlight red
+GDR009	IDs are never typed manually if an existing record can be selected.	All Modules	Force dropdown
+GDR010	Every record must have an owner module.	All Modules	Reject incomplete records
+One improvement I'd make
+
+I would add one final column to the Dependency Map:
+
+Sync Direction
+Read Only
+Read + Write
+Derived
+Manual
+
+For example:
+
+Vendor Name → Read Only (always comes from Vendor Master)
+Production Status → Read + Write (updated within Production)
+Dashboard Totals → Derived (calculated)
+Meeting Notes → Manual (entered directly)
+
+That one column will make ERP development much easier because you'll know whether a field is authoritative, calculated, or simply referenced. It removes ambiguity about where updates are allowed to originate.

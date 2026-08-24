@@ -1,0 +1,75 @@
+Task_ID,Task_Name,Related_Module,Related_ID,Assigned_To,Created_By,Created_Date,Due_Date,Completion_Date,Priority,Status,Notes
+TASK-0001,Follow up with Abin Abraham - 6pc box out of stock,Orders,CUST-0001,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,From BNI Confluence 2026 follow-ups
+TASK-0002,"Follow up with Tarique Abbas - brochure sent, no response",Marketing,CUST-0002,Team Gudoria,System,2026-07-30,2026-08-06,,Medium,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0003,Connect Shibu E P to gift hamper vendors,Supply Chain,CUST-0003,Team Gudoria,System,2026-07-30,2026-08-06,,Low,Not Started,From BNI Confluence 2026 follow-ups
+TASK-0004,Follow up with Anoop - woodwork hampers on WhatsApp,Orders,CUST-0004,Team Gudoria,System,2026-07-30,2026-08-06,,Medium,In Progress,From BNI Confluence 2026 follow-ups
+TASK-0005,Follow up with Rejath Johny - Baijus Markose connection,Marketing,CUST-0005,Team Gudoria,System,2026-07-30,2026-08-06,,Low,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0006,Explore tourism collaboration with Subin Jacob,Marketing,CUST-0006,Team Gudoria,System,2026-07-30,2026-08-06,,Low,Not Started,From BNI Confluence 2026 follow-ups
+TASK-0007,Follow up with Unnikrishna Pillai - corporate gifting contact,Orders,CUST-0007,Team Gudoria,System,2026-07-30,2026-08-06,,Medium,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0008,Follow up with Nisha Patil - corporate gifting numbers,Orders,CUST-0008,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,From BNI Confluence 2026 follow-ups
+TASK-0009,Follow up with Muhammad Shareef - no response since 24/7,Orders,CUST-0009,Team Gudoria,System,2026-07-30,2026-08-06,,Low,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0010,Deliver order to Krishnanath Venkataraman - 6pc + jackfruit,Orders,CUST-0010,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,From BNI Confluence 2026 follow-ups
+TASK-0011,Follow up with Thasneema Shareef - resort collaboration,Marketing,CUST-0011,Team Gudoria,System,2026-07-30,2026-08-06,,Medium,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0012,Follow up with Siddharth Salokhe - supplements/medical shops,Orders,CUST-0012,Team Gudoria,System,2026-07-30,2026-08-06,,Low,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0013,Schedule 1-1 with Vishnu Parayil - chocolate collaboration,Marketing,CUST-0013,Team Gudoria,System,2026-07-30,2026-08-06,,Medium,Not Started,From BNI Confluence 2026 follow-ups
+TASK-0014,Follow up with Reshmi Rajendranath - 3 each flavour order,Orders,CUST-0014,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,From BNI Confluence 2026 follow-ups
+TASK-0015,Follow up with Brijin Raj - hampers requirement,Orders,CUST-0015,Team Gudoria,System,2026-07-30,2026-08-06,,Medium,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0016,Follow up with Cherian Ninan - corporate gifting & skin oil,Orders,CUST-0016,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,From BNI Confluence 2026 follow-ups
+TASK-0017,Follow up with Bilal Iqbal - bakery brochure check,Marketing,CUST-0017,Team Gudoria,System,2026-07-30,2026-08-06,,Medium,In Progress,From BNI Confluence 2026 follow-ups
+TASK-0018,Follow up with Geo George - brochure sent,Marketing,CUST-0018,Team Gudoria,System,2026-07-30,2026-08-06,,Low,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0019,Follow up with Chinthu Jose - brochure sent,Marketing,CUST-0019,Team Gudoria,System,2026-07-30,2026-08-06,,Low,Waiting,From BNI Confluence 2026 follow-ups
+TASK-0020,Collect payment for 010-GūD-2024-Arun - 3000.0,Finance,ORD-0010,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0021,Collect payment for 011-GūD-2024-D7 - 1957.5,Finance,ORD-0011,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Payment as per sale with 10% commission
+TASK-0022,Collect payment for 026-GūD-2024-Jai - 1500.0,Finance,ORD-0029,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Republic Day Gifts
+TASK-0023,Collect payment for 027-GūD-2024-Sabin - 150.0,Finance,ORD-0030,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Najma Gift
+TASK-0024,Collect payment for 028-GūD-2024-Nihara - 4850.0,Finance,ORD-0059,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0025,Collect payment for 029-GūD-2024-Nihara - 1455.0,Finance,ORD-0060,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0026,Collect payment for 042-GūD-2024-Arun - 1940.0,Finance,ORD-0072,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Check with Arun
+TASK-0027,Collect payment for 043-GūD-2024-Jai - 1750.0,Finance,ORD-0073,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,WellGenome Launch
+TASK-0028,Collect payment for 049-GūD-2024-Nihara - 300.0,Finance,ORD-0079,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0029,Collect payment for Arun - 4500.0,Finance,ORD-0084,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0030,Collect payment for 080-GūD-2025-Rochas - 2000.0,Finance,ORD-0110,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0031,Collect payment for 081-GūD-2024-HorgStore - 2000.0,Finance,ORD-0111,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0032,Collect payment for 084-GūD-2025-Jai - 2000.0,Finance,ORD-0123,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0033,Collect payment for 086-GūD-2025-Sinaj - 5000.0,Finance,ORD-0125,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0034,Collect payment for 097-GūD-2025-HorgStore - 1500.0,Finance,ORD-0138,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Received on 16 Jan 2026 as Rs 3500
+TASK-0035,Collect payment for 105-GūD-2025-Horgstore - 3000.0,Finance,ORD-0149,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Received on 16 Jan 2026 as Rs 3500
+TASK-0036,Collect payment for 106-GūD-2025-Welmont - 2400.0,Finance,ORD-0150,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0037,Collect payment for 112-GūD-2025-Rochas - 4000.0,Finance,ORD-0157,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0038,Collect payment for 114-GūD-2025-Rochas - 1600.0,Finance,ORD-0159,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Cocoa Powder - 1 kg
+TASK-0039,Collect payment for Invoice-1108-GUD-2026-Naveen - 9000.0,Finance,ORD-0167,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Bindu to receive
+TASK-0040,Collect payment for Invoice-1110-GUD-2026-GVQ - 2400.0,Finance,ORD-0169,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0041,Collect payment for Invoice-1113-GUD-2025-Arun - 8000.0,Finance,ORD-0172,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0042,Collect payment for Invoice-1114-GUD-2025-GVQ - 2640.0,Finance,ORD-0173,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0043,Collect payment for Invoice-1115-GUD-2025-GVQ - 4800.0,Finance,ORD-0174,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0044,Collect payment for Invoice-1116-GUD-2025-GVQ - 7200.0,Finance,ORD-0175,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0045,Collect payment for Invoice-1117-GUD-2025-PrevalentAI - 6000.0,Finance,ORD-0176,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0046,Collect payment for Invoice-1130-GUD-2026-GVQ - 6857.14,Finance,ORD-0189,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0047,Collect payment for Invoice-1133-GUD-2026-Nihara - 7275.0,Finance,ORD-0192,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0048,Collect payment for Invoice-1134-GUD-2025-Arun - 2900.0,Finance,ORD-0193,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0049,Collect payment for Invoice-1135-GUD-2026-Nemcon - 2285.71,Finance,ORD-0194,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0050,Collect payment for Invoice-1136-GUD-2026-Nemcon - 5676.19,Finance,ORD-0195,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0051,Collect payment for Invoice-1137-GUD-2026-BNI - 7904.76,Finance,ORD-0196,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0052,Collect payment for Invoice-1138-GUD-2026-Nemcon - 4800.0,Finance,ORD-0197,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0053,Collect payment for Invoice-1139-GUD-2026-BNI - 1790.48,Finance,ORD-0198,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0054,Collect payment for Invoice-1140-GUD-2026-HorgStore - 3500.0,Finance,ORD-0199,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0055,Collect payment for Invoice-1141-GUD-2026-Sreeranjini - 1485.71,Finance,ORD-0200,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0056,Collect payment for Invoice-1142-GUD-2026-Raghulal - 2380.95,Finance,ORD-0201,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0057,Collect payment for Invoice-1144-GUD-2026-GVQ - 3600.0,Finance,ORD-0203,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0058,Collect payment for Invoice-1145-GUD-2026-Dietado - ,Finance,ORD-0204,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0059,Collect payment for Invoice-1146-GUD-2026-Prevalent AI - ,Finance,ORD-0205,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,
+TASK-0060,Collect payment for Invoice-1148-GUD-2026-Nihara - 8633.0,Finance,ORD-0207,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,Includes credit for returned items
+TASK-0061,Collect payment for Invoice-1150-GUD-2026-Tintu Ravindran - 4000.0,Finance,ORD-0209,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,need to pay for courier of 71 rs
+TASK-0062,Collect payment for Invoice-1152-GUD-2026-GVQ - 7428.57,Finance,ORD-0211,Team Gudoria,System,2026-07-30,2026-08-06,,High,In Progress,"Discount: 180, Total Receivable: 7620"
+TASK-0063,Reorder Orange Sunset 25g - out of stock,Supply Chain,,Team Gudoria,System,2026-07-30,2026-08-13,,High,Not Started,From stock analysis
+TASK-0064,Reorder Sun-Kissed Lemon 25g - out of stock,Supply Chain,,Team Gudoria,System,2026-07-30,2026-08-13,,High,Not Started,From stock analysis
+TASK-0065,Place PO for Almond Noir 8g - low stock (346 pcs),Supply Chain,,Team Gudoria,System,2026-07-30,2026-08-13,,Medium,Not Started,From stock analysis
+TASK-0066,Place PO for Peanut Royale 8g - low stock (450 pcs),Supply Chain,,Team Gudoria,System,2026-07-30,2026-08-13,,Medium,Not Started,From stock analysis
+TASK-0067,Follow up on Packaging PO-003 delivery,Supply Chain,PO-003,Team Gudoria,System,2026-07-30,2026-08-13,,Medium,In Progress,From stock analysis
+TASK-0068,Apply for FSSAI Registration,Legal,DOC-001,Team Gudoria,System,2026-07-30,2026-08-30,,High,Not Started,Legal compliance task
+TASK-0069,File GūD Trademark Application,Legal,DOC-003,Team Gudoria,System,2026-07-30,2026-08-30,,Medium,Not Started,Legal compliance task
+TASK-0070,File Gudoria Trademark Application,Legal,DOC-004,Team Gudoria,System,2026-07-30,2026-08-30,,Medium,Not Started,Legal compliance task
+TASK-0071,Get Food Testing Certificate Batch 1,Legal,DOC-006,Team Gudoria,System,2026-07-30,2026-08-30,,High,Not Started,Legal compliance task
+TASK-0072,Get Food Testing Certificate Batch 2,Legal,DOC-007,Team Gudoria,System,2026-07-30,2026-08-30,,High,Not Started,Legal compliance task
+TASK-0073,Draft Retailer Agreement - HorgStore,Legal,DOC-008,Team Gudoria,System,2026-07-30,2026-08-30,,Medium,Not Started,Legal compliance task
+TASK-0074,Draft Corporate Agreement - Nihara,Legal,DOC-010,Team Gudoria,System,2026-07-30,2026-08-30,,Medium,Not Started,Legal compliance task

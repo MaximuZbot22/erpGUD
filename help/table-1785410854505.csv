@@ -1,0 +1,4 @@
+﻿Tab,Rows,File
+Campaigns,10,[Campaigns.csv](sandbox:///mnt/agents/output/GUDORIA_MARKETING/Campaigns.csv)
+Content\_Planner,0,[Content\_Planner.csv](sandbox:///mnt/agents/output/GUDORIA_MARKETING/Content_Planner.csv)
+Events\_Log,10,[Events\_Log.csv](sandbox:///mnt/agents/output/GUDORIA_MARKETING/Events_Log.csv)

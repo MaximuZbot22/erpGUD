@@ -1,0 +1,7 @@
+﻿Sheet,What's Missing
+**ORDERS**,"Customer addresses, cities, Instagram handles, websites"
+**SUPPLY\_CHAIN**,"Vendor phone/email/GST/FSSAI, actual PO dates, GRN details"
+**MARKETING**,Social media content (Content\_Planner is empty)
+**FINANCE**,"Salary, rent, utility expenses; actual bank opening balance"
+**LEGAL**,"Actual document issue dates, expiry dates, Drive links"
+**TASKS**,"Assign tasks to specific team members (not just ""Team Gudoria"")"

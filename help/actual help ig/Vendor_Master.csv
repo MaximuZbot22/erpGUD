@@ -1,0 +1,5 @@
+Vendor_ID,Company_Name,Contact_Person,Designation,Category,Products_Services,Phone,WhatsApp,Email,Address,City,State,GST_Number,FSSAI,Status,Date_Added,Notes
+VEND-001,Chocolate Manufacturer,,,Cocoa,"Dark chocolate 10kg batches, labeled",,,,,,,,,Active,2024-12-01,Paid 23000 for 10kg including label. Cost 2200-2500/kg.
+VEND-002,Packaging Supplier,,,Packaging,"Boxes, labels, hamper packaging",,,,,,,,,Active,2024-12-01,Box price 70.5 per box. Various packaging for hampers.
+VEND-003,Transport Partner,,,Transport,"Local delivery, Porter, courier",,,,,Kochi,Kerala,,,Active,2024-12-01,"10% transportation cost. Uses Porter, Dunzo, BlueDart, Delhivery."
+VEND-004,Printer,,,Printer,"Labels, brochures, marketing materials",,,,,,,,,Active,2024-12-01,Brochures sent to multiple BNI leads.

@@ -1,0 +1,115 @@
+# ============================================================
+# Goodoria ERP Configuration
+# Google Workspace Environment Variables
+# ============================================================
+
+# ----------------------------
+# GOOGLE CLOUD
+# ----------------------------
+GOOGLE_CLOUD_PROJECT_ID=
+GOOGLE_SERVICE_ACCOUNT_EMAIL=
+GOOGLE_PRIVATE_KEY=
+GOOGLE_DRIVE_ROOT_FOLDER=
+GOOGLE_SHARED_DRIVE_ID=
+
+# ============================================================
+# GOOGLE SHEETS
+# ============================================================
+
+# Spreadsheet 0 - Core Registry / ERP Metadata
+GSHEET_CORE_REGISTRY=  https://docs.google.com/spreadsheets/d/1I4Huc-ZlYNNswU4VGorQWsP_Jezn395TG-vigKh0u98/edit?gid=0#gid=0
+
+# Spreadsheet 1 - Customers & Sales CRM
+GSHEET_CUSTOMERS= https://docs.google.com/spreadsheets/d/1-eZny-waJha14T2lQh73-wL_JwJZDWK1IM3aOfYdJfk/edit?gid=0#gid=0
+
+# Spreadsheet 2 - Vendors
+GSHEET_VENDORS= https://docs.google.com/spreadsheets/d/1IS2otq4ZrBzl8QTS7NlHmz2XDqQvtnLtsrQek9oLaVY/edit?gid=2088220963#gid=2088220963
+
+# Spreadsheet 3 - Legal & Compliance
+GSHEET_LEGAL= https://docs.google.com/spreadsheets/d/1Uq3OXfJ83ybK9w00QyqCxfAv0rzh8cq9p9FnqitN7LI/edit?gid=0#gid=0
+
+# Spreadsheet 4 - Marketing & Brand Management
+GSHEET_MARKETING= https://docs.google.com/spreadsheets/d/1qgumQuK1zbCdP8TQN5koIQkRjRWy3d1spVudn0vx5-c/edit?gid=463000963#gid=463000963
+
+# Spreadsheet 5 - Operations & Task Management
+GSHEET_OPERATIONS= https://docs.google.com/spreadsheets/d/16EuynjVZ8Otw18rQAIqSeyhnv9-AeSALF5ld_HDZUf8/edit?gid=0#gid=0
+
+# Spreadsheet 6 - Production & Procurement
+GSHEET_PROCUREMENT= https://docs.google.com/spreadsheets/d/1vRxo7einssDvEdtiK_F_iJkXxu5GNqh3mrNoy63qMgg/edit?gid=0#gid=0
+
+# Spreadsheet 7 - Production & Manufacturing
+GSHEET_PRODUCTION= https://docs.google.com/spreadsheets/d/1dAqlGqKyI0qE8wTA-sQKTXsBKZQG8gkJ6u4_lNy4I28/edit?gid=0#gid=0
+
+# Spreadsheet 8 - Packaging Management
+GSHEET_PACKAGING= https://docs.google.com/spreadsheets/d/1fdqN1lMLvqUcKu_iucnRDqym9g4gMkVq65o0XysYIO0/edit?gid=0#gid=0
+
+# Spreadsheet 9 - Finance & Payments
+GSHEET_FINANCE= https://docs.google.com/spreadsheets/d/10W7ZQIOn0FfO1nGDI87XssDUSprPpK6tMVRvOgkMp9I/edit?gid=0#gid=0
+
+# Spreadsheet 10 - WhatsApp CRM
+GSHEET_WHATSAPP= https://docs.google.com/spreadsheets/d/1_g02Up6_X7ETxvtcu4xcBme31vtzLOtTSZEVz7QuChQ/edit?gid=0#gid=0
+
+# Spreadsheet 11 - Meetings & Decisions
+GSHEET_MEETINGS= https://docs.google.com/spreadsheets/d/1ixqD4rH-t6msVtUZ_HpLR_ISBAVmjTdirb3QSYfuAoo/edit?gid=60250485#gid=60250485
+
+# Spreadsheet 12 - Research & Knowledge Base
+GSHEET_RESEARCH= https://docs.google.com/spreadsheets/d/10A-ZTyXzjOUgcdRrmnh9A_58V9WI07AGZkPGh6X8DT4/edit?gid=690933609#gid=690933609
+
+# Spreadsheet 13 - Asset Library
+GSHEET_ASSETS= https://docs.google.com/spreadsheets/d/1BAFWvPU1FzV0ZQGh5hzU7aIAlQTxl4Vi4ttedxF_Qt0/edit?gid=1276398893#gid=1276398893
+
+# Spreadsheet 13 - Executive Command Center
+GSHEET_ExecutiveCommandCenter= https://docs.google.com/spreadsheets/d/1ZLLF1qNVuRowXaaOYTRGZZRmzD9FnhtH0OdCZnnEvxI/edit?gid=4#gid=4
+
+# ============================================================
+# GOOGLE DRIVE FOLDERS
+# ============================================================
+
+DRIVE_CUSTOMERS=
+DRIVE_VENDORS=
+DRIVE_LEGAL=
+DRIVE_MARKETING=
+DRIVE_OPERATIONS=
+DRIVE_PRODUCTION=
+DRIVE_PACKAGING=
+DRIVE_FINANCE=
+DRIVE_WHATSAPP=
+DRIVE_MEETINGS=
+DRIVE_RESEARCH=
+DRIVE_ASSETS=
+
+# ============================================================
+# GOOGLE DOCS
+# ============================================================
+
+GDOC_MEETING_TEMPLATE=
+GDOC_RESEARCH_TEMPLATE=
+GDOC_LEGAL_TEMPLATE=
+GDOC_SOP_TEMPLATE=
+
+# ============================================================
+# GOOGLE FORMS (Future)
+# ============================================================
+
+GFORM_LEAD_CAPTURE=
+GFORM_VENDOR_ONBOARDING=
+GFORM_INTERNAL_TASK=
+GFORM_FEEDBACK=
+
+# ============================================================
+# GOOGLE CALENDAR
+# ============================================================
+
+GCALENDAR_MARKETING=
+GCALENDAR_COMPANY=
+GCALENDAR_PRODUCTION=
+GCALENDAR_MEETINGS=
+
+# ============================================================
+# FUTURE ERP SETTINGS
+# ============================================================
+
+ERP_COMPANY_NAME=Goodoria Food Innovations
+ERP_TIMEZONE=Asia/Kolkata
+ERP_DEFAULT_CURRENCY=INR
+ERP_DEFAULT_LANGUAGE=en-IN

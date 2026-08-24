@@ -1,0 +1,5 @@
+﻿Tab,Rows,File
+Vendor\_Master,4,[Vendor\_Master.csv](sandbox:///mnt/agents/output/GUDORIA_SUPPLY_CHAIN/Vendor_Master.csv)
+Purchase\_Orders,3,[Purchase\_Orders.csv](sandbox:///mnt/agents/output/GUDORIA_SUPPLY_CHAIN/Purchase_Orders.csv)
+Goods\_Received,2,[Goods\_Received.csv](sandbox:///mnt/agents/output/GUDORIA_SUPPLY_CHAIN/Goods_Received.csv)
+Live\_Stock,24,[Live\_Stock.csv](sandbox:///mnt/agents/output/GUDORIA_SUPPLY_CHAIN/Live_Stock.csv)

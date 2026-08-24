@@ -1,0 +1,11 @@
+Event_ID,Campaign_ID,Event_Name,Venue,Event_Date,Products_Taken,Samples_Distributed,Sales_Made,Leads_Collected,Follow_Up_Required,Status,Drive_Link,Notes
+EVT-001,CAMP-001,BNI Confluence 2026,Kochi,2026-07-24,"Sample boxes, 25g bars",50,,24,Yes,Completed,,24 leads. Krishnanath ordered. Abin wants 6pc box.
+EVT-002,CAMP-002,Recca Fest,Kochi,2026-03-08,Assorted 25g bars,25,13770,25,Yes,Completed,,25 customers. GPay + Cash. Sea Salt popular for parties.
+EVT-003,CAMP-003,Kochi OnFleak Exhibition,Kochi,2026-01-18,"6pc Box, 8pc Box, 25g bars, 8g pieces",100,27470,,No,Completed,,Major sales event. 8g pieces sold individually.
+EVT-004,CAMP-004,Green Health Summit,Kochi,2025-10-31,25g bars all flavours,15,5000,,No,Completed,,3 transactions. 4220 gpay + 780 cash.
+EVT-005,CAMP-005,Prestige & DD Apartment Exhibition,Kochi,2025-09-07,Boxes + 25g bars,20,7380,,No,Completed,,2-day event. Discounted pricing. Cash deposited from Bindu account.
+EVT-006,CAMP-006,Pink Market Pop-up,Kochi,2025-08-29,Boxes + 25g bars,8,18948,,No,Completed,,"Gpay 13102, J&B 1920, cash 3926. Total 18948."
+EVT-007,CAMP-007,Transasia Cyberpark Tasting,"Transasia Cyberpark, Kochi",2025-02-05,"Sample boxes, 25g bars",10,5000,,No,Completed,,5-6 Feb. Multiple small transactions. Current A/c.
+EVT-008,CAMP-008,Kimchi Fest,Kochi,2026-04-12,Assorted products,10,15560,,No,Completed,,Gpay 12850 + Cash 2710.
+EVT-009,CAMP-009,Kulam Fest,Kochi,2026-03-21,Boxes + 25g bars,5,6600,,No,Completed,,Cash to be deposited 2980.
+EVT-010,CAMP-010,Nemcon Day 1,Kochi,2026-03-20,25g bars all flavours,10,11095,3,Yes,Completed,,"Cash 800 to be transferred. Actor Vijay Babu, Chef Nalan sampled."
