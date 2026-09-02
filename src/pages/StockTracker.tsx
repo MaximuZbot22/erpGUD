@@ -48,6 +48,13 @@ const FLAVOR_CONFIG: { key: keyof FlavorData; name: string; shortName: string; c
   { key: 'peanuts', name: 'Peanut Royale 25g', shortName: 'Peanuts', color: 'text-stone-300', bg: 'bg-stone-900/40', border: 'border-stone-700/50' }
 ];
 
+const parseSafeInt = (val: any): number => {
+  if (val === null || val === undefined) return 0;
+  const cleaned = String(val).replace(/[^0-9-]/g, '');
+  const parsed = parseInt(cleaned, 10);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 // Initial Seed Batches matching the user's exact Google Sheet structure
 const SEED_BATCHES: StockBatch[] = [
   {
@@ -188,22 +195,22 @@ export const StockTracker: React.FC = () => {
             dateReceived: row[0],
             batchId: bId,
             totalIn: {
-              almond: parseInt(row[2] || '0', 10),
-              orange: parseInt(row[6] || '0', 10),
-              jackfruit: parseInt(row[10] || '0', 10),
-              lemon: parseInt(row[14] || '0', 10),
-              mocha: parseInt(row[18] || '0', 10),
-              seaSalt: parseInt(row[22] || '0', 10),
-              peanuts: parseInt(row[26] || '0', 10)
+              almond: parseSafeInt(row[2]),
+              orange: parseSafeInt(row[6]),
+              jackfruit: parseSafeInt(row[10]),
+              lemon: parseSafeInt(row[14]),
+              mocha: parseSafeInt(row[18]),
+              seaSalt: parseSafeInt(row[22]),
+              peanuts: parseSafeInt(row[26])
             },
             damagedIn: {
-              almond: parseInt(row[3] || '0', 10),
-              orange: parseInt(row[7] || '0', 10),
-              jackfruit: parseInt(row[11] || '0', 10),
-              lemon: parseInt(row[15] || '0', 10),
-              mocha: parseInt(row[19] || '0', 10),
-              seaSalt: parseInt(row[23] || '0', 10),
-              peanuts: parseInt(row[27] || '0', 10)
+              almond: parseSafeInt(row[3]),
+              orange: parseSafeInt(row[7]),
+              jackfruit: parseSafeInt(row[11]),
+              lemon: parseSafeInt(row[15]),
+              mocha: parseSafeInt(row[19]),
+              seaSalt: parseSafeInt(row[23]),
+              peanuts: parseSafeInt(row[27])
             }
           });
         });
@@ -227,13 +234,13 @@ export const StockTracker: React.FC = () => {
               batchId: row[2].trim(),
               stockType: (row[3] === 'Damaged' ? 'Damaged' : 'Good') as 'Good' | 'Damaged',
               flavors: {
-                almond: parseInt(row[4] || '0', 10),
-                orange: parseInt(row[5] || '0', 10),
-                jackfruit: parseInt(row[6] || '0', 10),
-                lemon: parseInt(row[7] || '0', 10),
-                mocha: parseInt(row[8] || '0', 10),
-                seaSalt: parseInt(row[9] || '0', 10),
-                peanuts: parseInt(row[10] || '0', 10)
+                almond: parseSafeInt(row[4]),
+                orange: parseSafeInt(row[5]),
+                jackfruit: parseSafeInt(row[6]),
+                lemon: parseSafeInt(row[7]),
+                mocha: parseSafeInt(row[8]),
+                seaSalt: parseSafeInt(row[9]),
+                peanuts: parseSafeInt(row[10])
               }
             });
           });
@@ -275,34 +282,48 @@ export const StockTracker: React.FC = () => {
       });
 
       const goodRemaining: FlavorData = {
-        almond: Math.max(0, b.totalIn.almond - b.damagedIn.almond - goodDeductions.almond),
-        orange: Math.max(0, b.totalIn.orange - b.damagedIn.orange - goodDeductions.orange),
-        jackfruit: Math.max(0, b.totalIn.jackfruit - b.damagedIn.jackfruit - goodDeductions.jackfruit),
-        lemon: Math.max(0, b.totalIn.lemon - b.damagedIn.lemon - goodDeductions.lemon),
-        mocha: Math.max(0, b.totalIn.mocha - b.damagedIn.mocha - goodDeductions.mocha),
-        seaSalt: Math.max(0, b.totalIn.seaSalt - b.damagedIn.seaSalt - goodDeductions.seaSalt),
-        peanuts: Math.max(0, b.totalIn.peanuts - b.damagedIn.peanuts - goodDeductions.peanuts)
+        almond: Math.max(0, parseSafeInt(b.totalIn.almond) - parseSafeInt(b.damagedIn.almond) - parseSafeInt(goodDeductions.almond)),
+        orange: Math.max(0, parseSafeInt(b.totalIn.orange) - parseSafeInt(b.damagedIn.orange) - parseSafeInt(goodDeductions.orange)),
+        jackfruit: Math.max(0, parseSafeInt(b.totalIn.jackfruit) - parseSafeInt(b.damagedIn.jackfruit) - parseSafeInt(goodDeductions.jackfruit)),
+        lemon: Math.max(0, parseSafeInt(b.totalIn.lemon) - parseSafeInt(b.damagedIn.lemon) - parseSafeInt(goodDeductions.lemon)),
+        mocha: Math.max(0, parseSafeInt(b.totalIn.mocha) - parseSafeInt(b.damagedIn.mocha) - parseSafeInt(goodDeductions.mocha)),
+        seaSalt: Math.max(0, parseSafeInt(b.totalIn.seaSalt) - parseSafeInt(b.damagedIn.seaSalt) - parseSafeInt(goodDeductions.seaSalt)),
+        peanuts: Math.max(0, parseSafeInt(b.totalIn.peanuts) - parseSafeInt(b.damagedIn.peanuts) - parseSafeInt(goodDeductions.peanuts))
       };
 
       const damagedRemaining: FlavorData = {
-        almond: Math.max(0, b.damagedIn.almond - damagedDeductions.almond),
-        orange: Math.max(0, b.damagedIn.orange - damagedDeductions.orange),
-        jackfruit: Math.max(0, b.damagedIn.jackfruit - damagedDeductions.jackfruit),
-        lemon: Math.max(0, b.damagedIn.lemon - damagedDeductions.lemon),
-        mocha: Math.max(0, b.damagedIn.mocha - damagedDeductions.mocha),
-        seaSalt: Math.max(0, b.damagedIn.seaSalt - damagedDeductions.seaSalt),
-        peanuts: Math.max(0, b.damagedIn.peanuts - damagedDeductions.peanuts)
+        almond: Math.max(0, parseSafeInt(b.damagedIn.almond) - parseSafeInt(damagedDeductions.almond)),
+        orange: Math.max(0, parseSafeInt(b.damagedIn.orange) - parseSafeInt(damagedDeductions.orange)),
+        jackfruit: Math.max(0, parseSafeInt(b.damagedIn.jackfruit) - parseSafeInt(damagedDeductions.jackfruit)),
+        lemon: Math.max(0, parseSafeInt(b.damagedIn.lemon) - parseSafeInt(damagedDeductions.lemon)),
+        mocha: Math.max(0, parseSafeInt(b.damagedIn.mocha) - parseSafeInt(damagedDeductions.mocha)),
+        seaSalt: Math.max(0, parseSafeInt(b.damagedIn.seaSalt) - parseSafeInt(damagedDeductions.seaSalt)),
+        peanuts: Math.max(0, parseSafeInt(b.damagedIn.peanuts) - parseSafeInt(damagedDeductions.peanuts))
       };
 
       const totalGoodLeft = Object.values(goodRemaining).reduce((a, b) => a + b, 0);
       const totalDamagedLeft = Object.values(damagedRemaining).reduce((a, b) => a + b, 0);
+
+      // 3-Month (90 Days) Shelf Life Math
+      const recvMs = new Date(b.dateReceived).getTime();
+      const expiryMs = isNaN(recvMs) ? Date.now() + (90 * 86400000) : recvMs + (90 * 86400000);
+      const expiryDateStr = new Date(expiryMs).toISOString().split('T')[0];
+      const daysRemaining = Math.ceil((expiryMs - Date.now()) / 86400000);
+
+      let shelfLifeStatus: 'FRESH' | 'EXPIRING_SOON' | 'CRITICAL' | 'EXPIRED' = 'FRESH';
+      if (daysRemaining <= 0) shelfLifeStatus = 'EXPIRED';
+      else if (daysRemaining <= 14) shelfLifeStatus = 'CRITICAL';
+      else if (daysRemaining <= 30) shelfLifeStatus = 'EXPIRING_SOON';
 
       return {
         ...b,
         goodRemaining,
         damagedRemaining,
         totalGoodLeft,
-        totalDamagedLeft
+        totalDamagedLeft,
+        expiryDate: expiryDateStr,
+        daysRemaining,
+        shelfLifeStatus
       };
     });
   }, [batches, movements]);
@@ -520,7 +541,23 @@ export const StockTracker: React.FC = () => {
       return;
     }
 
-    // Standard Single-Batch Dispatch
+    // Standard Single-Batch Dispatch Validation
+    const targetBatch = batchBalances.find(b => b.batchId.toLowerCase() === selectedBatch.toLowerCase());
+    if (targetBatch && newMovementForm.stockType === 'Good') {
+      const deficits: string[] = [];
+      FLAVOR_CONFIG.forEach(f => {
+        const req = newMovementForm.flavors[f.key] || 0;
+        const avail = targetBatch.goodRemaining[f.key] || 0;
+        if (req > avail) {
+          deficits.push(`${f.name}: requested ${req}, available ${avail}`);
+        }
+      });
+      if (deficits.length > 0) {
+        alert(`Cannot dispatch batch ${selectedBatch}.\nInsufficient Good Stock:\n` + deficits.join('\n') + '\n\nPlease select AUTO-FIFO or adjust requested quantities.');
+        return;
+      }
+    }
+
     const newMov: StockMovement = {
       id: `MOV-${Date.now().toString().slice(-4)}`,
       date: newMovementForm.date,
@@ -915,6 +952,7 @@ export const StockTracker: React.FC = () => {
               <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
                 <th className="py-3 px-4">Date Received</th>
                 <th className="py-3 px-4">Batch ID</th>
+                <th className="py-3 px-4 text-center">Expiry (3 Mo)</th>
                 <th className="py-3 px-4 text-center">Almond</th>
                 <th className="py-3 px-4 text-center">Orange</th>
                 <th className="py-3 px-4 text-center">Jackfruit</th>
@@ -927,7 +965,7 @@ export const StockTracker: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {paginatedBatches.map(b => {
+              {paginatedBatches.map((b: any) => {
                 const isFifoOldest = fifoOldestBatch?.batchId === b.batchId;
                 return (
                   <tr key={b.batchId} className={`hover:bg-slate-850/60 transition ${isFifoOldest ? 'bg-rose-950/20' : ''}`}>
@@ -943,6 +981,20 @@ export const StockTracker: React.FC = () => {
                           </span>
                         )}
                       </div>
+                    </td>
+                    <td className="py-3 px-4 text-center whitespace-nowrap">
+                      <div className="font-mono text-[11px] text-slate-300">{b.expiryDate}</div>
+                      <span className={`inline-block px-2 py-0.5 text-[9px] font-bold rounded-full mt-0.5 border ${
+                        b.shelfLifeStatus === 'EXPIRED' ? 'bg-rose-950 text-rose-400 border-rose-800' :
+                        b.shelfLifeStatus === 'CRITICAL' ? 'bg-amber-950 text-amber-400 border-amber-800 animate-pulse' :
+                        b.shelfLifeStatus === 'EXPIRING_SOON' ? 'bg-yellow-950 text-yellow-400 border-yellow-800' :
+                        'bg-emerald-950 text-emerald-400 border-emerald-800'
+                      }`}>
+                        {b.shelfLifeStatus === 'EXPIRED' ? '❌ EXPIRED' :
+                         b.shelfLifeStatus === 'CRITICAL' ? `🔴 ${b.daysRemaining}d Left` :
+                         b.shelfLifeStatus === 'EXPIRING_SOON' ? `🟡 ${b.daysRemaining}d Left` :
+                         `🟢 ${b.daysRemaining}d Left`}
+                      </span>
                     </td>
 
                     {FLAVOR_CONFIG.map(f => {

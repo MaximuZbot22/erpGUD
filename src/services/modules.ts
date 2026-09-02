@@ -68,6 +68,36 @@ export const MODULE_REGISTRY: BusinessModule[] = [
     status: 'active',
     category: 'sales-customers'
   },
+  {
+    id: 'quotations',
+    name: 'Quotation Studio',
+    path: '/quotations',
+    iconName: 'FileText',
+    requiredPermission: 'sales:read',
+    description: 'Commercial quotation creation, versioning, and 1-click Sales Order conversion.',
+    status: 'active',
+    category: 'sales-customers'
+  },
+  {
+    id: 'sales-orders',
+    name: 'Sales Orders',
+    path: '/sales-orders',
+    iconName: 'ShoppingBag',
+    requiredPermission: 'sales:read',
+    description: 'Committed sales order register, customer PO # lookup, and fulfillment dispatch triggers.',
+    status: 'active',
+    category: 'sales-customers'
+  },
+  {
+    id: 'hampers',
+    name: 'Hamper BOM Studio',
+    path: '/hampers',
+    iconName: 'Gift',
+    requiredPermission: 'sales:read',
+    description: 'Corporate gifting hampers, dynamic BOM builder, landed cost rollups, and margin analytics.',
+    status: 'active',
+    category: 'sales-customers'
+  },
 
   // ═══════════════════════════════════════
   // 🏭 SUPPLY CHAIN & STOCK (Sheet 2)
@@ -81,6 +111,46 @@ export const MODULE_REGISTRY: BusinessModule[] = [
     description: 'Live chocolate inventory, batch clearance engine, FIFO alerts, and 2-way Google Sheet sync.',
     status: 'active',
     category: 'supply-chain'
+  },
+  {
+    id: 'delivery',
+    name: 'Delivery Operations',
+    path: '/delivery',
+    iconName: 'Truck',
+    requiredPermission: 'production:read',
+    description: 'Fulfillment dispatch tracking linked to Sales Orders with stock deduction triggers.',
+    status: 'active',
+    category: 'supply-chain'
+  },
+  {
+    id: 'procurement-manager',
+    name: 'Procurement (Scaria)',
+    path: '/procurement-manager',
+    iconName: 'Factory',
+    requiredPermission: 'procurement:read',
+    description: 'Scaria Purchase Orders, Goods Receipt Notes (GRN), and defect/shortage reconciliation.',
+    status: 'active',
+    category: 'supply-chain'
+  },
+  {
+    id: 'returns',
+    name: 'Customer Returns',
+    path: '/returns',
+    iconName: 'RotateCcw',
+    requiredPermission: 'customers:read',
+    description: 'Customer return logging, QC disposition (Restock/Damaged/Sample), and credit notes.',
+    status: 'active',
+    category: 'sales-customers'
+  },
+  {
+    id: 'notes',
+    name: 'Credit & Debit Notes',
+    path: '/notes',
+    iconName: 'CreditCard',
+    requiredPermission: 'finance:read',
+    description: 'Financial credit notes, GST adjustments, and customer/supplier balance updates.',
+    status: 'active',
+    category: 'business-intel'
   },
   {
     id: 'supply-chain',

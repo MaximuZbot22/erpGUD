@@ -12,7 +12,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
-import { UserProfile, UserRole, ROLE_PERMISSIONS } from '../types/auth';
+import { UserProfile, UserRole, Permission, ROLE_PERMISSIONS } from '../types/auth';
 import { auditLogService } from '../services/audit';
 
 interface AuthContextType {
@@ -24,6 +24,7 @@ interface AuthContextType {
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName: string, role: UserRole) => Promise<void>;
   signInAnonymouslyUser: (role: UserRole) => Promise<void>;
+  hasPermission: (permission: Permission) => boolean;
   signOutUser: () => Promise<void>;
   changeUserRole: (uid: string, newRole: UserRole) => Promise<void>;
 }
@@ -372,6 +373,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const hasPermission = (permission: Permission): boolean => {
+    if (!profile) return false;
+    if (profile.role === 'Owner') return true;
+    return profile.permissions ? profile.permissions.includes(permission) : false;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -383,6 +390,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signInWithEmail,
         signUpWithEmail,
         signInAnonymouslyUser,
+        hasPermission,
         signOutUser,
         changeUserRole,
       }}

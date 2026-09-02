@@ -1,0 +1,122 @@
+import React, { useRef } from 'react';
+import { Printer, ArrowLeft, PackageCheck } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { TajHamperProject } from '../../pages/HamperStudio';
+import { GudLogo } from '../Sidebar';
+
+interface DeliveryNoteProps {
+  project: TajHamperProject;
+  onBack: () => void;
+}
+
+export const HamperDeliveryNoteDocument: React.FC<DeliveryNoteProps> = ({ project, onBack }) => {
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const totalItemsCount = project.lineItems.reduce((acc, i) => acc + i.qty, 0);
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto space-y-6">
+      {/* Top Controls Bar */}
+      <div className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800 print:hidden">
+        <Button onClick={onBack} variant="outline" className="text-slate-300 border-slate-700 text-xs">
+          <ArrowLeft className="w-4 h-4 mr-1" /> Back to Project Workstation
+        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
+            <Printer className="w-4 h-4 mr-1" /> Print Delivery Note (Challan) PDF
+          </Button>
+        </div>
+      </div>
+
+      {/* Printable A4 Delivery Note Sheet */}
+      <div ref={printRef} className="bg-white text-slate-900 p-10 rounded-xl shadow-2xl space-y-8 font-sans border border-slate-200 text-sm print:p-0 print:shadow-none print:border-none print:rounded-none">
+        {/* Header */}
+        <div className="flex justify-between items-start border-b border-slate-200 pb-6">
+          <div>
+            <div className="flex items-center gap-2 text-emerald-800 font-bold text-2xl">
+              <GudLogo size={36} /> GUDORIA FOOD INNOVATIONS
+            </div>
+            <p className="text-xs text-slate-700 font-bold mt-1">Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038</p>
+            <p className="text-xs text-slate-500">Ph: 09544809992 • Email: gudchocolates@gmail.com</p>
+          </div>
+          <div className="text-right">
+            <h2 className="text-xl font-bold text-blue-900 uppercase tracking-wide">Hamper Delivery Note</h2>
+            <div className="text-xs font-mono text-slate-600 mt-1">Challan #: DEL-NOTE-{project.id}</div>
+            <div className="text-xs text-slate-500">Dispatch Date: {new Date().toISOString().split('T')[0]}</div>
+          </div>
+        </div>
+
+        {/* Delivery Details */}
+        <div className="grid grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+          <div>
+            <div className="text-slate-400 uppercase font-bold text-[10px]">DELIVERED TO (CLIENT):</div>
+            <div className="text-base font-bold text-slate-900 mt-1">{project.clientName}</div>
+            <div className="text-slate-600">Corporate Delivery Address / Site</div>
+          </div>
+          <div>
+            <div className="text-slate-400 uppercase font-bold text-[10px]">SHIPMENT DETAILS:</div>
+            <div className="text-base font-bold text-blue-900 mt-1">{project.projectName}</div>
+            <div className="text-slate-600">Total Packaged Units: <strong>{totalItemsCount} items / components</strong></div>
+          </div>
+        </div>
+
+        {/* Itemized Delivery Packing List */}
+        <div className="space-y-2">
+          <h3 className="font-bold text-slate-800 uppercase tracking-wider text-xs flex items-center gap-2">
+            <PackageCheck className="w-4 h-4 text-blue-600" /> Dispatched Packing List & Component Verification
+          </h3>
+          <table className="w-full text-left border-collapse border border-slate-200 text-xs">
+            <thead>
+              <tr className="bg-blue-50 border-b border-slate-200 text-blue-950 font-bold">
+                <th className="p-3 border-r border-slate-200">#</th>
+                <th className="p-3 border-r border-slate-200">Category</th>
+                <th className="p-3 border-r border-slate-200">Item Description</th>
+                <th className="p-3 border-r border-slate-200 text-center">Dispatched Qty</th>
+                <th className="p-3 text-center">Verification Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 text-slate-800">
+              {project.lineItems.map((item, idx) => (
+                <tr key={item.id} className="hover:bg-slate-50">
+                  <td className="p-3 border-r border-slate-200 text-center font-mono">{idx + 1}</td>
+                  <td className="p-3 border-r border-slate-200 font-semibold text-blue-900">{item.category}</td>
+                  <td className="p-3 border-r border-slate-200">{item.description}</td>
+                  <td className="p-3 border-r border-slate-200 text-center font-bold text-base font-mono">{item.qty}</td>
+                  <td className="p-3 text-center font-semibold text-emerald-700">✓ Packed & Verified</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Non-Financial Declaration */}
+        <div className="bg-slate-100 p-3 rounded text-[11px] text-slate-600 border border-slate-200">
+          <strong>Non-Financial Delivery Note:</strong> This document serves as proof of physical handover of packaged hamper goods. Tax invoice will be issued separately or attached.
+        </div>
+
+        {/* Handover & Receiver Signature Box */}
+        <div className="border-t border-slate-200 pt-8">
+          <div className="grid grid-cols-2 gap-10 text-xs">
+            <div className="border border-slate-300 p-4 rounded-lg bg-slate-50/50 space-y-2">
+              <div className="font-bold text-slate-800">DISPATCHED BY (GUDORIA LOGISTICS):</div>
+              <div className="py-2">
+                <img src="/images/brand/founder_signature.jpg" alt="Founder Signature" className="h-12 max-w-[150px] object-contain" />
+              </div>
+              <div className="text-[10px] text-slate-700 font-semibold border-t border-dashed border-slate-300 pt-1">Logistics Executive / Authorized Signatory</div>
+            </div>
+            <div className="border border-blue-300 p-4 rounded-lg bg-blue-50/30 space-y-4">
+              <div className="font-bold text-blue-950">RECEIVED IN GOOD CONDITION BY (CLIENT RECEIVER):</div>
+              <div className="text-[10px] text-slate-500">"I acknowledge receipt of all above packaged hamper items intact."</div>
+              <div className="border-b border-dashed border-blue-400 pt-4"></div>
+              <div className="text-[10px] text-slate-500">Receiver Signature, Name, Phone & Date</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

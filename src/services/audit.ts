@@ -28,6 +28,15 @@ class AuditLogService {
     if (details !== undefined) entry.details = details;
     if (targetId !== undefined) entry.targetId = targetId;
 
+    // Save copy to localStorage audit log cache for offline/fast UI retrieval
+    try {
+      const existingLogs = JSON.parse(localStorage.getItem('gud_audit_logs_cache') || '[]');
+      existingLogs.unshift({ ...entry, id: `LOG-LOCAL-${Date.now()}` });
+      localStorage.setItem('gud_audit_logs_cache', JSON.stringify(existingLogs.slice(0, 100)));
+    } catch {
+      // Ignore local storage error
+    }
+
     // 1. Console Log for development tracing
     console.log(`[AUDIT LOG] [${category.toUpperCase()}] ${action} by ${entry.actorEmail} (ID: ${entry.actorId})`, { details, targetId });
 
@@ -36,8 +45,27 @@ class AuditLogService {
       await addDoc(collection(db, this.collectionName), entry);
     } catch (error) {
       console.warn('Failed to write audit log to Firestore:', error);
-      // Fallback: local storage logger or silent fail in production
     }
+  }
+
+  /**
+   * Enhanced logger accepting before and after data snapshots for financial/stock edits
+   */
+  async logDataMutation(
+    actor: { uid: string; email: string; displayName: string },
+    action: string,
+    category: AuditLogEntry['category'],
+    targetId: string,
+    beforeState?: any,
+    afterState?: any,
+    notes?: string
+  ): Promise<void> {
+    const details = JSON.stringify({
+      notes: notes || action,
+      before: beforeState || null,
+      after: afterState || null
+    });
+    await this.logActivity(actor, action, category, details, targetId);
   }
 
   /**

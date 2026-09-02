@@ -1423,7 +1423,9 @@ CIN: U72200KL2015PTC039279
             <div className="flex justify-between items-start border-b border-slate-200 pb-4 mb-4">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight text-slate-900">Invoice</h1>
-                <p className="text-slate-500 font-medium">Gudoria Food Innovations</p>
+                <p className="text-slate-800 font-bold text-sm">Gudoria Food Innovations Private Limited</p>
+                <p className="text-slate-500 text-[11px]">Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038</p>
+                <p className="text-slate-500 text-[11px]">Ph: +91 95448 09992 | Email: gudchocolates@gmail.com</p>
               </div>
               <div className="text-right flex items-center justify-end">
                 <div className="p-1.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-800">
@@ -1557,8 +1559,11 @@ CIN: U72200KL2015PTC039279
                 <div className="mt-1">GST NO: <span className="font-semibold font-mono text-slate-700">32AANCA8181G1ZK</span></div>
                 <div>CIN: <span className="font-semibold font-mono text-slate-700">U72200KL2015PTC039279</span></div>
               </div>
-              <div className="text-right flex flex-col justify-end">
-                <div className="text-sm font-bold text-amber-900 italic">Thank you!</div>
+              <div className="text-right flex flex-col items-end justify-end space-y-1">
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">For Gudoria Food Innovations Pvt Ltd</div>
+                <img src="/images/brand/founder_signature.jpg" alt="Founder Signature" className="h-12 max-w-[140px] object-contain my-1" />
+                <div className="text-[10px] font-semibold text-slate-700">Authorized Signatory</div>
+                <div className="text-[9px] text-slate-400">Founder & Operations</div>
               </div>
             </div>
           </div>

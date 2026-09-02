@@ -13,6 +13,13 @@ import { DocumentsPage } from './pages/DocumentsPage';
 import { InvoiceGenerator } from './pages/InvoiceGenerator';
 import { StockTracker } from './pages/StockTracker';
 import { ModuleView } from './pages/ModuleView';
+import { QuotationStudio } from './pages/QuotationStudio';
+import { SalesOrderManager } from './pages/SalesOrderManager';
+import { DeliveryManager } from './pages/DeliveryManager';
+import { ProcurementManager } from './pages/ProcurementManager';
+import { ReturnsManager } from './pages/ReturnsManager';
+import { NotesManager } from './pages/NotesManager';
+import { HamperStudio } from './pages/HamperStudio';
 import { GudLogo } from './components/Sidebar';
 import { Loader2 } from 'lucide-react';
 
@@ -116,6 +123,27 @@ const AppContent: React.FC = () => {
 
       case '/stock-checker':
         return <StockTracker />;
+
+      case '/quotations':
+        return <QuotationStudio onNavigate={navigate} />;
+
+      case '/sales-orders':
+        return <SalesOrderManager onNavigate={navigate} />;
+
+      case '/delivery':
+        return <DeliveryManager />;
+
+      case '/procurement-manager':
+        return <ProcurementManager />;
+
+      case '/returns':
+        return <ReturnsManager onNavigate={navigate} />;
+
+      case '/notes':
+        return <NotesManager />;
+
+      case '/hampers':
+        return <HamperStudio />;
 
       default:
         const moduleId = currentPath.substring(1);
