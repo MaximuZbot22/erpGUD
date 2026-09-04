@@ -461,23 +461,46 @@ export const ProcurementManager: React.FC = () => {
     alert(`✅ Goods Receipt ${newGrn.grnNumber} registered!\nBatch ${newGrn.batchIdAssigned} has been automatically ingested into Stock Tracker.`);
   };
 
-  // PDF Export
+  // PDF Export (Offscreen Clean Clone pattern to eliminate modal clipping)
   const handleDownloadPdf = async () => {
     if (!poPrintRef.current || !selectedPo) return;
+    let tempContainer: HTMLDivElement | null = null;
     try {
       const html2pdf = (await import('html2pdf.js')).default;
-      const element = poPrintRef.current;
+      
+      // Clone element into offscreen container to avoid scrollbar/modal clipping
+      const clone = poPrintRef.current.cloneNode(true) as HTMLDivElement;
+      clone.style.width = '794px';
+      clone.style.maxWidth = '794px';
+      clone.style.margin = '0';
+      clone.style.boxSizing = 'border-box';
+      clone.style.background = '#ffffff';
+
+      tempContainer = document.createElement('div');
+      tempContainer.style.position = 'fixed';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '0';
+      tempContainer.style.width = '794px';
+      tempContainer.style.zIndex = '-99999';
+      tempContainer.appendChild(clone);
+      document.body.appendChild(tempContainer);
+
       const opt = {
         margin: [8, 8, 8, 8] as [number, number, number, number],
         filename: `${selectedPo.poNumber}_${selectedPo.supplierName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 800 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
-      await html2pdf().set(opt as any).from(element).save();
+
+      await html2pdf().set(opt as any).from(clone).save();
     } catch (err) {
       console.error('PDF Generation Error:', err);
       window.print();
+    } finally {
+      if (tempContainer && document.body.contains(tempContainer)) {
+        document.body.removeChild(tempContainer);
+      }
     }
   };
 
@@ -1239,7 +1262,8 @@ _Please confirm acceptance and target dispatch date._`;
             <div className="p-2 bg-slate-950 overflow-x-auto rounded border border-slate-800">
               <div 
                 ref={poPrintRef}
-                className="w-[210mm] min-h-[285mm] bg-white text-slate-900 p-8 mx-auto font-sans text-xs shadow-2xl relative border-t-4 border-amber-900"
+                id="printable-document"
+                className="w-full max-w-[794px] min-h-[285mm] bg-white text-slate-900 p-6 sm:p-8 mx-auto font-sans text-xs shadow-lg relative border-t-4 border-amber-900"
                 style={{ color: '#0f172a' }}
               >
                 {/* Executive Professional B2B Header */}

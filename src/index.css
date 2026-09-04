@@ -65,48 +65,50 @@
   box-shadow: 0 12px 24px -10px rgba(64, 141, 109, 0.15);
 }
 
-/* Print CSS Isolation for Invoice Studio */
+/* ════════════════════════════════════════════════════════════════ */
+/* 🖨️ UNIVERSAL BULLETPROOF PRINT CSS (NO TRUNCATION OR CROPPING) */
+/* ════════════════════════════════════════════════════════════════ */
 @media print {
   @page {
-    margin: 0;
-    size: auto;
+    margin: 10mm;
+    size: A4 portrait;
   }
 
-  body {
+  html, body {
     background: #ffffff !important;
     color: #000000 !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
   }
 
-  aside, header, nav, button, .print-hide, .lg\:col-span-5 {
+  /* Hide all background UI, sidebars, headers, modals backdrops & buttons */
+  aside, header, nav, button, .print-hide, .print\:hidden, [role="backdrop"] {
     display: none !important;
     visibility: hidden !important;
   }
 
-  .grid {
-    display: block !important;
-  }
-
-  .lg\:col-span-7 {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  #printable-invoice-container {
+  /* Force printable targets to display at 100% full width */
+  #printable-document, #printable-invoice-container, .printable-area {
     display: block !important;
     position: relative !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 !important;
-    padding: 24px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
     background: #ffffff !important;
     color: #000000 !important;
+    visibility: visible !important;
+    overflow: visible !important;
+  }
+
+  /* Ensure text inside printable document is visible */
+  #printable-document *, #printable-invoice-container *, .printable-area * {
+    visibility: visible !important;
   }
 }
