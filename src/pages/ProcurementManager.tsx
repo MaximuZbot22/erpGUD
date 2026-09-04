@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { 
   Factory, Plus, FileText, CheckCircle2, ShieldCheck, Download, Printer, 
   Trash2, Copy, Sparkles, Boxes, Truck, RefreshCw, Eye, Building2,
-  Calendar, Check, ShieldAlert, Award, FileSpreadsheet, Send, FileCheck, Layers
+  Calendar, Check, ShieldAlert, Award, FileSpreadsheet, Send, FileCheck, Layers,
+  ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -20,7 +21,7 @@ export interface POItem {
   qty: number;
   unit: string;
   rate: number;
-  gstRate: number; // e.g., 18 or 5 or 12
+  gstRate: number; // e.g., 5 or 18 or 0
   total: number;
 }
 
@@ -36,8 +37,11 @@ export interface SupplierPO {
   supplierEmail: string;
   supplierGstin: string;
   paymentTerms: string;
+  showPaymentTerms: boolean;
   shippingAddress: string;
   specialInstructions: string;
+  showSla: boolean;
+  showPricing: boolean;
   items: POItem[];
   subtotal: number;
   gstTotal: number;
@@ -75,8 +79,11 @@ interface POFormState {
   supplierEmail: string;
   supplierGstin: string;
   paymentTerms: string;
+  showPaymentTerms: boolean;
   shippingAddress: string;
   specialInstructions: string;
+  showSla: boolean;
+  showPricing: boolean;
   founderSignatureName: string;
   items: POItem[];
 }
@@ -188,9 +195,12 @@ export const ProcurementManager: React.FC = () => {
     supplierEmail: PRESET_SUPPLIERS[0].email,
     supplierGstin: PRESET_SUPPLIERS[0].gstin,
     paymentTerms: '50% Advance, 50% on Delivery',
+    showPaymentTerms: true,
     shippingAddress: 'Gudoria Food Innovations(P) Ltd, Pranavarn Tower, 50/549C, B-Block Office, B4 First Floor, Petta, Poonithura, Ernakulam-682038',
     specialInstructions: '1. Temperature-controlled transit required (18°C–22°C).\n2. Minimum 6 months remaining shelf life upon receipt.\n3. Defective/damaged packaging will be rejected at GRN inspection.',
-    founderSignatureName: 'Founder / Managing Director',
+    showSla: true,
+    showPricing: true,
+    founderSignatureName: 'Himabindu / Founder & Managing Director',
     items: [
       {
         id: `item-${Date.now()}-1`,
@@ -235,35 +245,51 @@ export const ProcurementManager: React.FC = () => {
     }
   };
 
-  // Add Item Presets
-  const handleLoad25gPack = () => {
+  // Cumulative Line Item Adders (Appends to existing items!)
+  const handleAdd25gPack = () => {
     const newItems: POItem[] = PRESET_25G_FLAVORS.map((p, idx) => ({
       ...p,
-      id: `item-${Date.now()}-${idx}`,
+      id: `item-${Date.now()}-25g-${idx}`,
       qty: 100,
       total: 100 * p.rate
     }));
-    setPoForm(prev => ({ ...prev, items: newItems }));
+    setPoForm(prev => ({ ...prev, items: [...prev.items, ...newItems] }));
   };
 
-  const handleLoad8gPack = () => {
+  const handleAdd8gPack = () => {
     const newItems: POItem[] = PRESET_8G_FLAVORS.map((p, idx) => ({
       ...p,
-      id: `item-${Date.now()}-${idx}`,
+      id: `item-${Date.now()}-8g-${idx}`,
       qty: 250,
       total: 250 * p.rate
     }));
-    setPoForm(prev => ({ ...prev, items: newItems }));
+    setPoForm(prev => ({ ...prev, items: [...prev.items, ...newItems] }));
   };
 
-  const handleLoadHamperPack = () => {
+  const handleAddAll11Flavors = () => {
+    const items25g: POItem[] = PRESET_25G_FLAVORS.map((p, idx) => ({
+      ...p,
+      id: `item-${Date.now()}-25g-${idx}`,
+      qty: 100,
+      total: 100 * p.rate
+    }));
+    const items8g: POItem[] = PRESET_8G_FLAVORS.map((p, idx) => ({
+      ...p,
+      id: `item-${Date.now()}-8g-${idx}`,
+      qty: 250,
+      total: 250 * p.rate
+    }));
+    setPoForm(prev => ({ ...prev, items: [...prev.items, ...items25g, ...items8g] }));
+  };
+
+  const handleAddHamperPack = () => {
     const newItems: POItem[] = PRESET_HAMPER_PACKAGING.map((p, idx) => ({
       ...p,
-      id: `item-${Date.now()}-${idx}`,
+      id: `item-${Date.now()}-hamper-${idx}`,
       qty: 50,
       total: 50 * p.rate
     }));
-    setPoForm(prev => ({ ...prev, items: newItems }));
+    setPoForm(prev => ({ ...prev, items: [...prev.items, ...newItems] }));
   };
 
   const handleAddCustomRow = () => {
@@ -271,21 +297,23 @@ export const ProcurementManager: React.FC = () => {
       id: `item-${Date.now()}`,
       category: 'Custom',
       description: 'Custom Item / Service',
-      hsnCode: '9988',
+      hsnCode: '1806',
       qty: 1,
       unit: 'Pcs',
       rate: 1000,
-      gstRate: 18,
+      gstRate: 5,
       total: 1000
     };
     setPoForm(prev => ({ ...prev, items: [...prev.items, newItem] }));
   };
 
-  const handleRemoveItem = (id: string) => {
-    if (poForm.items.length <= 1) {
-      alert('A Purchase Order must have at least one line item.');
-      return;
+  const handleClearItems = () => {
+    if (confirm('Clear all line items from this PO?')) {
+      setPoForm(prev => ({ ...prev, items: [] }));
     }
+  };
+
+  const handleRemoveItem = (id: string) => {
     setPoForm(prev => ({ ...prev, items: prev.items.filter(i => i.id !== id) }));
   };
 
@@ -334,8 +362,11 @@ export const ProcurementManager: React.FC = () => {
       supplierEmail: poForm.supplierEmail,
       supplierGstin: poForm.supplierGstin,
       paymentTerms: poForm.paymentTerms,
+      showPaymentTerms: poForm.showPaymentTerms,
       shippingAddress: poForm.shippingAddress,
       specialInstructions: poForm.specialInstructions,
+      showSla: poForm.showSla,
+      showPricing: poForm.showPricing,
       items: poForm.items,
       subtotal: calculatedSubtotal,
       gstTotal: calculatedGstTotal,
@@ -437,7 +468,7 @@ export const ProcurementManager: React.FC = () => {
       const html2pdf = (await import('html2pdf.js')).default;
       const element = poPrintRef.current;
       const opt = {
-        margin: [10, 10, 10, 10] as [number, number, number, number],
+        margin: [8, 8, 8, 8] as [number, number, number, number],
         filename: `${selectedPo.poNumber}_${selectedPo.supplierName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false },
@@ -453,6 +484,10 @@ export const ProcurementManager: React.FC = () => {
   // Copy Transmittal
   const handleCopyTransmittal = () => {
     if (!selectedPo) return;
+    const priceText = selectedPo.showPricing 
+      ? `\n*Subtotal:* ₹${selectedPo.subtotal.toLocaleString('en-IN')}\n*GST:* ₹${selectedPo.gstTotal.toLocaleString('en-IN')}\n*TOTAL PO VALUE:* ₹${selectedPo.grandTotal.toLocaleString('en-IN')}`
+      : `\n*(Quantity-Only Purchase Order)*`;
+
     const text = `📦 *GUDORIA FOOD INNOVATIONS PRIVATE LIMITED*
 *PURCHASE ORDER: ${selectedPo.poNumber}*
 Date: ${selectedPo.date}
@@ -460,16 +495,12 @@ Vendor: ${selectedPo.supplierName}
 Expected Delivery: ${selectedPo.expectedDelivery}
 
 *ORDER SUMMARY:*
-${selectedPo.items.map((i, idx) => `${idx + 1}. ${i.description} — Qty: ${i.qty} ${i.unit} @ ₹${i.rate}/unit = ₹${i.total.toLocaleString('en-IN')}`).join('\n')}
+${selectedPo.items.map((i, idx) => `${idx + 1}. ${i.description} — Qty: ${i.qty} ${i.unit}${selectedPo.showPricing ? ` @ ₹${i.rate}/unit = ₹${i.total.toLocaleString('en-IN')}` : ''}`).join('\n')}
+${priceText}
 
-*Subtotal:* ₹${selectedPo.subtotal.toLocaleString('en-IN')}
-*GST (18%):* ₹${selectedPo.gstTotal.toLocaleString('en-IN')}
-*TOTAL PO VALUE:* ₹${selectedPo.grandTotal.toLocaleString('en-IN')}
+${selectedPo.showPaymentTerms ? `*Payment Terms:* ${selectedPo.paymentTerms}\n` : ''}*Delivery Location:* ${selectedPo.shippingAddress}
 
-*Payment Terms:* ${selectedPo.paymentTerms}
-*Delivery Location:* ${selectedPo.shippingAddress}
-
-Authorized Signatory: Gudoria Founder & MD
+Authorized Signatory: Himabindu (Founder & MD)
 _Please confirm acceptance and target dispatch date._`;
 
     navigator.clipboard.writeText(text);
@@ -488,7 +519,7 @@ _Please confirm acceptance and target dispatch date._`;
             <Factory className="w-7 h-7 text-amber-500" /> Supplier Procurement & Scaria PO Studio
           </h1>
           <p className="text-slate-400 text-xs mt-1">
-            Issue formal Purchase Orders to Scaria (25g & 8g flavors), packaging vendors, and hamper suppliers with Founder Signature & PDF export.
+            Issue formal Purchase Orders to Scaria (Cochin Cocoa Products), packaging vendors, and hamper suppliers with Founder Signature & PDF export.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -505,10 +536,16 @@ _Please confirm acceptance and target dispatch date._`;
                 supplierEmail: PRESET_SUPPLIERS[0].email,
                 supplierGstin: PRESET_SUPPLIERS[0].gstin,
                 paymentTerms: '50% Advance, 50% on Delivery',
+                showPaymentTerms: true,
                 shippingAddress: 'Gudoria Food Innovations(P) Ltd, Pranavarn Tower, 50/549C, B-Block Office, B4 First Floor, Petta, Poonithura, Ernakulam-682038',
-                specialInstructions: '1. Temperature-controlled cold chain transit required (18°C–22°C).\n2. Minimum 6 months remaining shelf life upon receipt.\n3. Packaging defects or moisture compromise will result in GRN rejection.',
-                founderSignatureName: 'Founder / Managing Director',
-                items: PRESET_25G_FLAVORS.map((p, idx) => ({ ...p, id: `item-${Date.now()}-${idx}`, qty: 100, total: 100 * p.rate }))
+                specialInstructions: '1. Temperature-controlled transit required (18°C–22°C).\n2. Minimum 6 months remaining shelf life upon receipt.\n3. Defective/damaged packaging will be rejected at GRN inspection.',
+                showSla: true,
+                showPricing: true,
+                founderSignatureName: 'Himabindu / Founder & Managing Director',
+                items: [
+                  ...PRESET_25G_FLAVORS.map((p, idx) => ({ ...p, id: `item-${Date.now()}-25g-${idx}`, qty: 100, total: 100 * p.rate })),
+                  ...PRESET_8G_FLAVORS.map((p, idx) => ({ ...p, id: `item-${Date.now()}-8g-${idx}`, qty: 250, total: 250 * p.rate }))
+                ]
               });
               setIsPoModalOpen(true);
             }} 
@@ -527,33 +564,28 @@ _Please confirm acceptance and target dispatch date._`;
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-100">Multi-Case PO Engine (Scaria, 25g/8g Flavors & Hampers)</h4>
+              <h4 className="text-sm font-bold text-slate-100">Multi-Case PO Engine (Scaria, 25g & 8g Flavors & Hampers)</h4>
               <p className="text-xs text-slate-400 mt-0.5">
-                Generate tailored POs for Scaria chocolate factory (7 x 25g flavors, 4 x 8g mini flavors), packaging, or hamper accessories.
+                Combine 7 x 25g flavors and 4 x 8g mini flavors in a single order, or create quantity-only POs for Scaria.
               </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button 
               size="sm" 
-              onClick={() => { handleLoad25gPack(); setIsPoModalOpen(true); }} 
-              className="bg-amber-950/80 hover:bg-amber-900 border border-amber-800/80 text-amber-300 text-xs"
+              onClick={() => {
+                setPoForm(prev => ({
+                  ...prev,
+                  items: [
+                    ...PRESET_25G_FLAVORS.map((p, idx) => ({ ...p, id: `item-${Date.now()}-25g-${idx}`, qty: 100, total: 100 * p.rate })),
+                    ...PRESET_8G_FLAVORS.map((p, idx) => ({ ...p, id: `item-${Date.now()}-8g-${idx}`, qty: 250, total: 250 * p.rate }))
+                  ]
+                }));
+                setIsPoModalOpen(true);
+              }} 
+              className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow"
             >
-              🍫 Scaria 7 x 25g Pack
-            </Button>
-            <Button 
-              size="sm" 
-              onClick={() => { handleLoad8gPack(); setIsPoModalOpen(true); }} 
-              className="bg-amber-950/80 hover:bg-amber-900 border border-amber-800/80 text-amber-300 text-xs"
-            >
-              🍬 Scaria 4 x 8g Minis
-            </Button>
-            <Button 
-              size="sm" 
-              onClick={() => { handleLoadHamperPack(); setIsPoModalOpen(true); }} 
-              className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs"
-            >
-              🎁 Hamper & Packaging
+              ✨ Load All 11 Flavors (7 x 25g + 4 x 8g)
             </Button>
           </div>
         </div>
@@ -586,7 +618,7 @@ _Please confirm acceptance and target dispatch date._`;
           <Card className="bg-slate-900 border-slate-800 p-8 text-center text-slate-400">
             <Factory className="w-12 h-12 text-slate-600 mx-auto mb-3" />
             <p className="font-semibold text-slate-300">No Purchase Orders Found</p>
-            <p className="text-xs text-slate-500 mt-1">Create a new PO for Scaria or packaging suppliers to track procurement.</p>
+            <p className="text-xs text-slate-500 mt-1">Create a new PO for Scaria (Cochin Cocoa Products) or packaging suppliers.</p>
             <Button onClick={() => setIsPoModalOpen(true)} className="mt-4 bg-amber-600 hover:bg-amber-500 text-white text-xs">
               <Plus className="w-4 h-4 mr-1" /> + Create Purchase Order
             </Button>
@@ -624,24 +656,34 @@ _Please confirm acceptance and target dispatch date._`;
                     <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
                       Line Items ({po.items.length}):
                     </div>
-                    {po.items.slice(0, 3).map((item, idx) => (
+                    {po.items.slice(0, 4).map((item, idx) => (
                       <div key={idx} className="flex justify-between text-slate-200">
-                        <span className="truncate max-w-[200px]">• {item.description}</span>
-                        <span className="font-mono text-slate-400">{item.qty} {item.unit} @ ₹{item.rate}</span>
+                        <span className="truncate max-w-[220px]">• {item.description}</span>
+                        <span className="font-mono text-slate-400">{item.qty} {item.unit} {po.showPricing ? `@ ₹${item.rate}` : ''}</span>
                       </div>
                     ))}
-                    {po.items.length > 3 && (
+                    {po.items.length > 4 && (
                       <div className="text-[10px] text-amber-400 italic">
-                        + {po.items.length - 3} more line items...
+                        + {po.items.length - 4} more line items...
                       </div>
                     )}
                   </div>
 
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-400">Payment: <strong className="text-slate-200">{po.paymentTerms}</strong></span>
+                    <span className="text-slate-400">
+                      {po.showPaymentTerms ? <>Payment: <strong className="text-slate-200">{po.paymentTerms}</strong></> : <span className="italic">Payment Terms Omitted</span>}
+                    </span>
                     <div className="text-right">
-                      <span className="text-slate-400 block text-[10px]">Total PO Value (incl. GST)</span>
-                      <span className="text-base font-bold font-mono text-amber-400">₹{po.grandTotal.toLocaleString('en-IN')}</span>
+                      {po.showPricing ? (
+                        <>
+                          <span className="text-slate-400 block text-[10px]">Total PO Value (incl. GST)</span>
+                          <span className="text-base font-bold font-mono text-amber-400">₹{po.grandTotal.toLocaleString('en-IN')}</span>
+                        </>
+                      ) : (
+                        <span className="text-xs font-semibold text-cyan-400 bg-cyan-950/60 px-2 py-1 rounded border border-cyan-800/60">
+                          Quantity-Only PO
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -768,13 +810,60 @@ _Please confirm acceptance and target dispatch date._`;
             </div>
           </div>
 
+          {/* PO Display & Formatting Controls */}
+          <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-3">
+            <h4 className="font-bold text-amber-400 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              ⚙️ PO Display Options & Toggles
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label className="flex items-center gap-2 cursor-pointer bg-slate-900 p-2.5 rounded border border-slate-800 hover:border-slate-700">
+                <input 
+                  type="checkbox" 
+                  checked={poForm.showPricing}
+                  onChange={e => setPoForm({ ...poForm, showPricing: e.target.checked })}
+                  className="rounded accent-amber-500 w-4 h-4"
+                />
+                <div>
+                  <span className="font-bold text-slate-200 block text-xs">Include Rates & Amounts</span>
+                  <span className="text-[10px] text-slate-400 block">Uncheck for Quantity-Only PO</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer bg-slate-900 p-2.5 rounded border border-slate-800 hover:border-slate-700">
+                <input 
+                  type="checkbox" 
+                  checked={poForm.showPaymentTerms}
+                  onChange={e => setPoForm({ ...poForm, showPaymentTerms: e.target.checked })}
+                  className="rounded accent-amber-500 w-4 h-4"
+                />
+                <div>
+                  <span className="font-bold text-slate-200 block text-xs">Show Payment Terms</span>
+                  <span className="text-[10px] text-slate-400 block">Print terms box on PDF</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer bg-slate-900 p-2.5 rounded border border-slate-800 hover:border-slate-700">
+                <input 
+                  type="checkbox" 
+                  checked={poForm.showSla}
+                  onChange={e => setPoForm({ ...poForm, showSla: e.target.checked })}
+                  className="rounded accent-amber-500 w-4 h-4"
+                />
+                <div>
+                  <span className="font-bold text-slate-200 block text-xs">Mandatory Transit SLA</span>
+                  <span className="text-[10px] text-slate-400 block">Cold chain & quality rules</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
           {/* Vendor Details */}
           <div className="space-y-3 bg-slate-950 p-4 rounded-lg border border-slate-800">
             <div className="flex justify-between items-center">
               <h4 className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                 <Building2 className="w-4 h-4 text-amber-400" /> Supplier / Vendor Profile
               </h4>
-              <span className="text-[11px] text-slate-400">Quick Select Preset Vendor:</span>
+              <span className="text-[11px] text-slate-400">Quick Select Vendor:</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -827,20 +916,33 @@ _Please confirm acceptance and target dispatch date._`;
             </div>
           </div>
 
-          {/* Quick Preset Buttons for Line Items */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-800 pt-3">
-            <h4 className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-              <Layers className="w-4 h-4 text-amber-400" /> Line Items & Quantities
-            </h4>
+          {/* Quick Preset Buttons for Line Items (Cumulative Adders) */}
+          <div className="space-y-2 border-t border-slate-800 pt-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h4 className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-amber-400" /> Line Items & Quantities ({poForm.items.length})
+              </h4>
+              <button 
+                type="button" 
+                onClick={handleClearItems}
+                className="text-xs text-rose-400 hover:text-rose-300 underline"
+              >
+                Clear Table
+              </button>
+            </div>
+
             <div className="flex flex-wrap items-center gap-2">
-              <Button size="sm" onClick={handleLoad25gPack} className="bg-amber-950 border border-amber-800 text-amber-300 text-[11px] py-1">
-                + Load 7 x 25g Flavors
+              <Button size="sm" onClick={handleAdd25gPack} className="bg-amber-950 border border-amber-800 text-amber-300 text-[11px] py-1">
+                + Add 7 x 25g Flavors
               </Button>
-              <Button size="sm" onClick={handleLoad8gPack} className="bg-amber-950 border border-amber-800 text-amber-300 text-[11px] py-1">
-                + Load 4 x 8g Minis
+              <Button size="sm" onClick={handleAdd8gPack} className="bg-amber-950 border border-amber-800 text-amber-300 text-[11px] py-1">
+                + Add 4 x 8g Minis
               </Button>
-              <Button size="sm" onClick={handleLoadHamperPack} className="bg-slate-800 border border-slate-700 text-slate-200 text-[11px] py-1">
-                + Load Hamper Items
+              <Button size="sm" onClick={handleAddAll11Flavors} className="bg-amber-600 text-white font-bold text-[11px] py-1">
+                + Add All 11 Flavors
+              </Button>
+              <Button size="sm" onClick={handleAddHamperPack} className="bg-slate-800 border border-slate-700 text-slate-200 text-[11px] py-1">
+                + Add Hamper Items
               </Button>
               <Button size="sm" onClick={handleAddCustomRow} className="bg-emerald-950 border border-emerald-800 text-emerald-300 text-[11px] py-1">
                 + Add Custom Row
@@ -855,12 +957,16 @@ _Please confirm acceptance and target dispatch date._`;
                 <tr className="bg-slate-950 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase">
                   <th className="p-2.5">Category</th>
                   <th className="p-2.5">Item Description</th>
-                  <th className="p-2.5">HSN Code</th>
+                  <th className="p-2.5">HSN (Optional)</th>
                   <th className="p-2.5 w-24">Qty</th>
                   <th className="p-2.5 w-20">Unit</th>
-                  <th className="p-2.5 w-28">Rate (₹)</th>
-                  <th className="p-2.5 w-20">GST %</th>
-                  <th className="p-2.5 text-right">Total (₹)</th>
+                  {poForm.showPricing && (
+                    <>
+                      <th className="p-2.5 w-28">Rate (₹)</th>
+                      <th className="p-2.5 w-20">GST %</th>
+                      <th className="p-2.5 text-right">Total (₹)</th>
+                    </>
+                  )}
                   <th className="p-2.5 text-center w-12">Action</th>
                 </tr>
               </thead>
@@ -895,6 +1001,7 @@ _Please confirm acceptance and target dispatch date._`;
                         value={item.hsnCode}
                         onChange={e => handleItemChange(item.id, 'hsnCode', e.target.value)}
                         className="w-20 bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs font-mono"
+                        placeholder="Optional"
                       />
                     </td>
                     <td className="p-2">
@@ -913,29 +1020,33 @@ _Please confirm acceptance and target dispatch date._`;
                         className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs"
                       />
                     </td>
-                    <td className="p-2">
-                      <input 
-                        type="number" 
-                        value={item.rate}
-                        onChange={e => handleItemChange(item.id, 'rate', Number(e.target.value))}
-                        className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-100 font-mono text-xs"
-                      />
-                    </td>
-                    <td className="p-2">
-                      <select 
-                        value={item.gstRate}
-                        onChange={e => handleItemChange(item.id, 'gstRate', Number(e.target.value))}
-                        className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs font-mono"
-                      >
-                        <option value={18}>18%</option>
-                        <option value={12}>12%</option>
-                        <option value={5}>5%</option>
-                        <option value={0}>0%</option>
-                      </select>
-                    </td>
-                    <td className="p-2 text-right font-mono font-bold text-amber-400 text-xs">
-                      ₹{item.total.toLocaleString('en-IN')}
-                    </td>
+                    {poForm.showPricing && (
+                      <>
+                        <td className="p-2">
+                          <input 
+                            type="number" 
+                            value={item.rate}
+                            onChange={e => handleItemChange(item.id, 'rate', Number(e.target.value))}
+                            className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-100 font-mono text-xs"
+                          />
+                        </td>
+                        <td className="p-2">
+                          <select 
+                            value={item.gstRate}
+                            onChange={e => handleItemChange(item.id, 'gstRate', Number(e.target.value))}
+                            className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs font-mono"
+                          >
+                            <option value={5}>5%</option>
+                            <option value={18}>18%</option>
+                            <option value={12}>12%</option>
+                            <option value={0}>0%</option>
+                          </select>
+                        </td>
+                        <td className="p-2 text-right font-mono font-bold text-amber-400 text-xs">
+                          ₹{item.total.toLocaleString('en-IN')}
+                        </td>
+                      </>
+                    )}
                     <td className="p-2 text-center">
                       <button 
                         type="button" 
@@ -954,18 +1065,14 @@ _Please confirm acceptance and target dispatch date._`;
           {/* Payment Terms & Instructions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Payment Terms</label>
-              <select 
+              <label className="block text-slate-400 font-semibold mb-1">Payment Terms (Fully Editable)</label>
+              <input 
+                type="text" 
                 value={poForm.paymentTerms}
                 onChange={e => setPoForm({ ...poForm, paymentTerms: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100"
-              >
-                <option value="50% Advance, 50% on Delivery">50% Advance, 50% on Delivery</option>
-                <option value="100% Advance">100% Advance</option>
-                <option value="Net 15 Days">Net 15 Days</option>
-                <option value="Net 30 Days">Net 30 Days</option>
-                <option value="Cash on Delivery (COD)">Cash on Delivery (COD)</option>
-              </select>
+                placeholder="e.g. 50% Advance, 50% on Delivery or Net 30 Days..."
+              />
             </div>
             <div>
               <label className="block text-slate-400 font-semibold mb-1">Founder Signatory Name</label>
@@ -978,24 +1085,34 @@ _Please confirm acceptance and target dispatch date._`;
             </div>
           </div>
 
-          <div>
-            <label className="block text-slate-400 font-semibold mb-1">Special Transit & Quality Instructions</label>
-            <textarea 
-              rows={3}
-              value={poForm.specialInstructions}
-              onChange={e => setPoForm({ ...poForm, specialInstructions: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 text-xs font-mono"
-            />
-          </div>
+          {poForm.showSla && (
+            <div>
+              <label className="block text-slate-400 font-semibold mb-1">Mandatory Transit & Quality Instructions</label>
+              <textarea 
+                rows={3}
+                value={poForm.specialInstructions}
+                onChange={e => setPoForm({ ...poForm, specialInstructions: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 text-xs font-mono"
+              />
+            </div>
+          )}
 
           {/* Total Summary Bar */}
           <div className="bg-amber-950/40 border border-amber-800/80 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
-              <div className="text-xs text-slate-400 uppercase font-semibold">Subtotal: ₹{calculatedSubtotal.toLocaleString('en-IN')} + GST: ₹{calculatedGstTotal.toLocaleString('en-IN')}</div>
-              <div className="text-lg font-bold text-amber-400 font-mono mt-0.5">
-                GRAND TOTAL: ₹{calculatedGrandTotal.toLocaleString('en-IN')}
-              </div>
-              <div className="text-[11px] text-slate-300 italic">{numberToWordsINR(calculatedGrandTotal)}</div>
+              {poForm.showPricing ? (
+                <>
+                  <div className="text-xs text-slate-400 uppercase font-semibold">Subtotal: ₹{calculatedSubtotal.toLocaleString('en-IN')} + GST: ₹{calculatedGstTotal.toLocaleString('en-IN')}</div>
+                  <div className="text-lg font-bold text-amber-400 font-mono mt-0.5">
+                    GRAND TOTAL: ₹{calculatedGrandTotal.toLocaleString('en-IN')}
+                  </div>
+                  <div className="text-[11px] text-slate-300 italic">{numberToWordsINR(calculatedGrandTotal)}</div>
+                </>
+              ) : (
+                <div className="text-sm font-bold text-cyan-400 font-mono">
+                  QUANTITY-ONLY PURCHASE ORDER ({poForm.items.reduce((a, b) => a + b.qty, 0)} Total Units)
+                </div>
+              )}
             </div>
 
             <Button 
@@ -1071,7 +1188,7 @@ _Please confirm acceptance and target dispatch date._`;
               />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1">Expiry Date (3-Mo / 12-Mo Guarantee)</label>
+              <label className="block text-slate-400 mb-1">Expiry Date Guarantee</label>
               <input 
                 type="date" 
                 value={grnForm.expiryDate}
@@ -1122,165 +1239,200 @@ _Please confirm acceptance and target dispatch date._`;
             <div className="p-2 bg-slate-950 overflow-x-auto rounded border border-slate-800">
               <div 
                 ref={poPrintRef}
-                className="w-[210mm] min-h-[285mm] bg-white text-slate-900 p-8 mx-auto font-sans text-xs shadow-2xl relative"
+                className="w-[210mm] min-h-[285mm] bg-white text-slate-900 p-8 mx-auto font-sans text-xs shadow-2xl relative border-t-4 border-amber-900"
                 style={{ color: '#0f172a' }}
               >
-                {/* Header Section */}
-                <div className="flex justify-between items-start border-b-2 border-amber-900 pb-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-950 text-amber-400 rounded-xl">
-                      <GudLogo size={42} />
+                {/* Executive Professional B2B Header */}
+                <div className="flex justify-between items-start border-b-2 border-slate-900 pb-5 mb-6">
+                  {/* Left: Gudoria Brand Details */}
+                  <div className="flex items-start gap-3.5">
+                    <div className="p-2.5 bg-slate-950 text-amber-400 rounded-xl flex-shrink-0 shadow-md">
+                      <GudLogo size={46} />
                     </div>
                     <div>
-                      <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase">
+                      <h1 className="text-xl font-black tracking-tight text-slate-950 uppercase leading-none">
                         GUDORIA FOOD INNOVATIONS PVT LTD
                       </h1>
-                      <p className="text-[10px] text-slate-600 font-semibold">
-                        Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038
+                      <p className="text-[10px] text-slate-600 font-semibold mt-1">
+                        Pranavarn Tower, 50/549C, B-Block Office, B4 1st Floor, Petta, Poonithura, Ernakulam-682038
                       </p>
-                      <p className="text-[10px] text-slate-500 font-mono">
-                        Phone: 09544809992 | Email: gudchocolates@gmail.com | GSTIN: 32AANCA8181G1ZK
-                      </p>
+                      <div className="flex flex-wrap items-center gap-3 text-[10px] text-slate-600 font-mono mt-0.5">
+                        <span>Phone: 09544809992</span>
+                        <span>•</span>
+                        <span>Email: gudchocolates@gmail.com</span>
+                        <span>•</span>
+                        <span className="font-bold text-slate-900">GSTIN: 32AANCA8181G1ZK</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <span className="inline-block px-3 py-1 bg-amber-100 text-amber-900 text-xs font-black uppercase tracking-wider rounded border border-amber-300 mb-1">
-                      PURCHASE ORDER
-                    </span>
-                    <div className="text-sm font-mono font-bold text-amber-900">{selectedPo.poNumber}</div>
-                    <div className="text-[11px] text-slate-600 font-semibold">Date: {selectedPo.date}</div>
+                  {/* Right: Sleek PO Metadata Card */}
+                  <div className="text-right flex-shrink-0 bg-slate-900 text-white p-3 rounded-lg border border-slate-800 shadow-md">
+                    <div className="text-[10px] font-extrabold uppercase tracking-widest text-amber-400 mb-1 border-b border-slate-800 pb-1">
+                      OFFICIAL PURCHASE ORDER
+                    </div>
+                    <div className="text-sm font-mono font-bold text-white tracking-wider">{selectedPo.poNumber}</div>
+                    <div className="text-[10px] text-slate-300 font-mono mt-1">Date: <strong className="text-slate-100">{selectedPo.date}</strong></div>
+                    <div className="text-[10px] text-slate-300 font-mono">Expected: <strong className="text-amber-400">{selectedPo.expectedDelivery}</strong></div>
                   </div>
                 </div>
 
-                {/* Info Grid */}
-                <div className="grid grid-cols-2 gap-6 mb-6">
+                {/* Info Grid: Vendor Details vs Delivery Location */}
+                <div className="grid grid-cols-2 gap-5 mb-6">
                   {/* Vendor Box */}
-                  <div className="bg-slate-50 p-3.5 rounded border border-slate-200">
-                    <div className="text-[10px] font-bold uppercase text-amber-800 tracking-wider mb-1">
-                      VENDOR / SUPPLIER DETAILS:
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-300">
+                    <div className="text-[10px] font-extrabold uppercase text-amber-900 tracking-wider mb-1.5 flex items-center gap-1">
+                      <Building2 className="w-3.5 h-3.5 text-amber-700" /> VENDOR / SUPPLIER DETAILS:
                     </div>
-                    <div className="text-xs font-bold text-slate-900">{selectedPo.supplierName}</div>
-                    <div className="text-[11px] text-slate-600 mt-0.5">{selectedPo.supplierAddress}</div>
-                    <div className="text-[11px] text-slate-600">Contact: {selectedPo.supplierContact}</div>
-                    <div className="text-[11px] text-slate-600 font-mono">Phone: {selectedPo.supplierPhone}</div>
+                    <div className="text-xs font-bold text-slate-950">{selectedPo.supplierName}</div>
+                    <div className="text-[11px] text-slate-700 mt-1 leading-snug">{selectedPo.supplierAddress}</div>
+                    <div className="text-[11px] text-slate-700 mt-1">Contact: <strong>{selectedPo.supplierContact}</strong></div>
+                    <div className="text-[11px] text-slate-700 font-mono">Phone: {selectedPo.supplierPhone}</div>
                     {selectedPo.supplierGstin && (
-                      <div className="text-[11px] text-slate-800 font-mono font-semibold mt-1">
+                      <div className="text-[11px] text-slate-900 font-mono font-bold mt-1.5 pt-1 border-t border-slate-200">
                         GSTIN: {selectedPo.supplierGstin}
                       </div>
                     )}
                   </div>
 
                   {/* Ship To Box */}
-                  <div className="bg-slate-50 p-3.5 rounded border border-slate-200">
-                    <div className="text-[10px] font-bold uppercase text-amber-800 tracking-wider mb-1">
-                      DELIVERY LOCATION & TERMS:
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-300">
+                    <div className="text-[10px] font-extrabold uppercase text-amber-900 tracking-wider mb-1.5 flex items-center gap-1">
+                      <Truck className="w-3.5 h-3.5 text-amber-700" /> DELIVERY LOCATION & TERMS:
                     </div>
-                    <div className="text-[11px] text-slate-700 font-medium">{selectedPo.shippingAddress}</div>
-                    <div className="mt-2 text-[11px]">
-                      <span className="text-slate-500">Expected Delivery:</span> <strong className="text-slate-900">{selectedPo.expectedDelivery}</strong>
-                    </div>
-                    <div className="text-[11px]">
-                      <span className="text-slate-500">Payment Terms:</span> <strong className="text-slate-900">{selectedPo.paymentTerms}</strong>
-                    </div>
+                    <div className="text-[11px] text-slate-800 font-medium leading-snug">{selectedPo.shippingAddress}</div>
+                    
+                    {selectedPo.showPaymentTerms && (
+                      <div className="mt-2.5 pt-1.5 border-t border-slate-200 text-[11px]">
+                        <span className="text-slate-600 font-medium">Payment Terms:</span>{' '}
+                        <strong className="text-slate-950">{selectedPo.paymentTerms}</strong>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Line Items Table */}
                 <table className="w-full text-left border-collapse mb-6 text-xs">
                   <thead>
-                    <tr className="bg-slate-900 text-white font-bold text-[11px]">
-                      <th className="p-2 border border-slate-800 w-8 text-center">#</th>
-                      <th className="p-2 border border-slate-800">Item Description</th>
-                      <th className="p-2 border border-slate-800 text-center">Category</th>
-                      <th className="p-2 border border-slate-800 text-center">HSN</th>
-                      <th className="p-2 border border-slate-800 text-right w-16">Qty</th>
-                      <th className="p-2 border border-slate-800 text-center w-14">Unit</th>
-                      <th className="p-2 border border-slate-800 text-right w-20">Rate (₹)</th>
-                      <th className="p-2 border border-slate-800 text-right w-16">GST %</th>
-                      <th className="p-2 border border-slate-800 text-right w-24">Amount (₹)</th>
+                    <tr className="bg-slate-950 text-white font-bold text-[11px]">
+                      <th className="p-2 border border-slate-900 w-8 text-center">#</th>
+                      <th className="p-2 border border-slate-900">Item Description</th>
+                      <th className="p-2 border border-slate-900 text-center">Category</th>
+                      <th className="p-2 border border-slate-900 text-center">HSN</th>
+                      <th className="p-2 border border-slate-900 text-right w-16">Qty</th>
+                      <th className="p-2 border border-slate-900 text-center w-14">Unit</th>
+                      {selectedPo.showPricing && (
+                        <>
+                          <th className="p-2 border border-slate-900 text-right w-20">Rate (₹)</th>
+                          <th className="p-2 border border-slate-900 text-right w-16">GST %</th>
+                          <th className="p-2 border border-slate-900 text-right w-24">Amount (₹)</th>
+                        </>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {selectedPo.items.map((item, idx) => (
-                      <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}>
+                      <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}>
                         <td className="p-2 border border-slate-200 text-center font-mono">{idx + 1}</td>
-                        <td className="p-2 border border-slate-200 font-bold text-slate-900">{item.description}</td>
+                        <td className="p-2 border border-slate-200 font-bold text-slate-950">{item.description}</td>
                         <td className="p-2 border border-slate-200 text-center text-[10px] text-slate-600">{item.category}</td>
-                        <td className="p-2 border border-slate-200 text-center font-mono text-[11px] text-slate-600">{item.hsnCode}</td>
-                        <td className="p-2 border border-slate-200 text-right font-mono font-bold text-slate-900">{item.qty}</td>
+                        <td className="p-2 border border-slate-200 text-center font-mono text-[11px] text-slate-600">{item.hsnCode || '-'}</td>
+                        <td className="p-2 border border-slate-200 text-right font-mono font-bold text-slate-950">{item.qty}</td>
                         <td className="p-2 border border-slate-200 text-center text-slate-600">{item.unit}</td>
-                        <td className="p-2 border border-slate-200 text-right font-mono">₹{item.rate.toLocaleString('en-IN')}</td>
-                        <td className="p-2 border border-slate-200 text-right font-mono">{item.gstRate}%</td>
-                        <td className="p-2 border border-slate-200 text-right font-mono font-bold text-slate-900">₹{item.total.toLocaleString('en-IN')}</td>
+                        {selectedPo.showPricing && (
+                          <>
+                            <td className="p-2 border border-slate-200 text-right font-mono">₹{item.rate.toLocaleString('en-IN')}</td>
+                            <td className="p-2 border border-slate-200 text-right font-mono">{item.gstRate}%</td>
+                            <td className="p-2 border border-slate-200 text-right font-mono font-bold text-slate-950">₹{item.total.toLocaleString('en-IN')}</td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </tbody>
                 </table>
 
-                {/* Calculation Summary & Terms Grid */}
-                <div className="grid grid-cols-12 gap-6 mb-6">
-                  {/* Terms & Conditions */}
-                  <div className="col-span-7 bg-amber-50/50 p-3 rounded border border-amber-200/80 text-[10px] text-slate-700 space-y-1">
-                    <div className="font-bold text-amber-900 uppercase tracking-wider text-[10px]">
-                      MANDATORY TRANSIT & QUALITY SLA:
+                {/* Financial Summary or Quantity-Only Banner */}
+                {selectedPo.showPricing ? (
+                  <div className="grid grid-cols-12 gap-6 mb-6">
+                    <div className="col-span-7">
+                      {selectedPo.showSla && (
+                        <div className="bg-amber-50/60 p-3 rounded border border-amber-200 text-[10px] text-slate-700 space-y-1">
+                          <div className="font-bold text-amber-950 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-amber-800" /> MANDATORY TRANSIT & QUALITY SLA:
+                          </div>
+                          <div className="whitespace-pre-line font-mono text-[10px] text-slate-800">
+                            {selectedPo.specialInstructions}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="whitespace-pre-line font-mono text-[10px] text-slate-800">
-                      {selectedPo.specialInstructions}
+
+                    <div className="col-span-5 bg-slate-50 p-3.5 rounded-lg border border-slate-300 space-y-1.5 font-mono text-xs">
+                      <div className="flex justify-between text-slate-600">
+                        <span>Subtotal:</span>
+                        <span>₹{selectedPo.subtotal.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>CGST (2.5% / 9%):</span>
+                        <span>₹{(selectedPo.gstTotal / 2).toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-600">
+                        <span>SGST (2.5% / 9%):</span>
+                        <span>₹{(selectedPo.gstTotal / 2).toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="border-t-2 border-slate-900 pt-1.5 flex justify-between font-bold text-slate-950 text-sm">
+                        <span>TOTAL PO VALUE:</span>
+                        <span className="text-amber-900">₹{selectedPo.grandTotal.toLocaleString('en-IN')}</span>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Financials Box */}
-                  <div className="col-span-5 bg-slate-50 p-3 rounded border border-slate-200 space-y-1.5 font-mono text-xs">
-                    <div className="flex justify-between text-slate-600">
-                      <span>Subtotal:</span>
-                      <span>₹{selectedPo.subtotal.toLocaleString('en-IN')}</span>
+                ) : (
+                  <div className="mb-6 space-y-3">
+                    <div className="bg-cyan-50 p-3 rounded border border-cyan-200 text-center font-mono font-bold text-cyan-950 text-xs">
+                      QUANTITY-ONLY PURCHASE ORDER • TOTAL UNITS ORDERED: {selectedPo.items.reduce((a, b) => a + b.qty, 0)} Pcs
                     </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>CGST (9%):</span>
-                      <span>₹{(selectedPo.gstTotal / 2).toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>SGST (9%):</span>
-                      <span>₹{(selectedPo.gstTotal / 2).toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="border-t border-slate-300 pt-1.5 flex justify-between font-bold text-slate-900 text-sm">
-                      <span>TOTAL VALUE:</span>
-                      <span className="text-amber-900">₹{selectedPo.grandTotal.toLocaleString('en-IN')}</span>
-                    </div>
+                    {selectedPo.showSla && (
+                      <div className="bg-amber-50/60 p-3 rounded border border-amber-200 text-[10px] text-slate-700 space-y-1">
+                        <div className="font-bold text-amber-950 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                          <ShieldCheck className="w-3.5 h-3.5 text-amber-800" /> MANDATORY TRANSIT & QUALITY SLA:
+                        </div>
+                        <div className="whitespace-pre-line font-mono text-[10px] text-slate-800">
+                          {selectedPo.specialInstructions}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
 
-                <div className="text-[11px] font-bold text-slate-800 italic border-t border-slate-200 pt-2 mb-8">
-                  Amount in Words: {numberToWordsINR(selectedPo.grandTotal)}
-                </div>
+                {selectedPo.showPricing && (
+                  <div className="text-[11px] font-bold text-slate-900 italic border-t border-slate-200 pt-2 mb-8">
+                    Amount in Words: {numberToWordsINR(selectedPo.grandTotal)}
+                  </div>
+                )}
 
-                {/* Signatures Footer */}
-                <div className="pt-6 border-t-2 border-slate-900 flex justify-between items-end">
+                {/* Signatures Footer with Hima's Founder Signature Image */}
+                <div className="pt-6 border-t-2 border-slate-950 flex justify-between items-end">
                   <div>
-                    <div className="text-[10px] text-slate-500 font-mono">Acceptance by Vendor:</div>
-                    <div className="mt-8 text-xs font-semibold text-slate-700">Authorized Vendor Representative Signature</div>
+                    <div className="text-[10px] text-slate-500 font-mono">Acceptance & Confirmation by Vendor:</div>
+                    <div className="mt-10 text-xs font-semibold text-slate-700">Authorized Vendor Representative Signature</div>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-[10px] text-slate-600 font-bold uppercase tracking-wider">
-                      FOR GUDORIA FOOD INNOVATIONS PRIVATE LIMITED
+                    <div className="text-[10px] text-slate-700 font-extrabold uppercase tracking-wider mb-1">
+                      FOR GUDORIA FOOD INNOVATIONS PVT LTD
                     </div>
 
-                    {/* Digital Signature Graphic Stamp */}
-                    <div className="my-2 inline-flex items-center justify-end gap-2 border-2 border-dashed border-amber-800/60 p-2 rounded-lg bg-amber-50/80">
-                      <div className="p-1.5 bg-amber-900 text-amber-100 rounded-full">
-                        <Award className="w-5 h-5" />
-                      </div>
-                      <div className="text-left font-mono">
-                        <div className="text-[10px] font-bold text-amber-950 uppercase">OFFICIALLY SIGNED & AUTHORIZED</div>
-                        <div className="text-[9px] text-slate-700 font-semibold">{selectedPo.founderSignatureName}</div>
-                        <div className="text-[8px] text-amber-900 opacity-80">REF: {selectedPo.poNumber} | VERIFIED</div>
-                      </div>
+                    {/* Actual Founder Hima Signature Image */}
+                    <div className="my-1 flex justify-end">
+                      <img 
+                        src="/images/brand/founder_signature.jpg" 
+                        alt="Founder Hima Signature" 
+                        className="h-14 max-w-[170px] object-contain"
+                      />
                     </div>
 
-                    <div className="text-xs font-bold text-slate-900">{selectedPo.founderSignatureName}</div>
-                    <div className="text-[10px] text-slate-500">Founder & Managing Director</div>
+                    <div className="text-xs font-black text-slate-950">{selectedPo.founderSignatureName}</div>
+                    <div className="text-[10px] text-slate-600 font-semibold">Founder & Managing Director</div>
                   </div>
                 </div>
               </div>
