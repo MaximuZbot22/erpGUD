@@ -165,6 +165,91 @@ function numberToWordsINR(amount: number): string {
   return `Rupees ${numToWords(rounded)} Only/-`;
 }
 
+export interface ConsolidatedPOItem {
+  id: string;
+  category: POItem['category'];
+  description: string;
+  subtext?: string;
+  hsnCode: string;
+  qty: number;
+  unit: string;
+  rate: number;
+  gstRate: number;
+  total: number;
+}
+
+export function getConsolidatedPOItems(items: POItem[]): ConsolidatedPOItem[] {
+  const map = new Map<string, POItem[]>();
+
+  for (const item of items) {
+    const key = `${item.category}__${item.rate}__${item.gstRate}__${item.hsnCode}__${item.unit}`;
+    if (!map.has(key)) {
+      map.set(key, []);
+    }
+    map.get(key)!.push(item);
+  }
+
+  const result: ConsolidatedPOItem[] = [];
+
+  map.forEach((groupItems, key) => {
+    if (groupItems.length === 1) {
+      const single = groupItems[0];
+      result.push({
+        id: single.id,
+        category: single.category,
+        description: single.description,
+        hsnCode: single.hsnCode,
+        qty: single.qty,
+        unit: single.unit,
+        rate: single.rate,
+        gstRate: single.gstRate,
+        total: single.total
+      });
+    } else {
+      const first = groupItems[0];
+      const totalQty = groupItems.reduce((acc, curr) => acc + curr.qty, 0);
+      const grandTotal = groupItems.reduce((acc, curr) => acc + curr.total, 0);
+
+      const firstQty = first.qty;
+      const allSameQty = groupItems.every(i => i.qty === firstQty);
+
+      const flavorNames = groupItems.map(i => {
+        let cleanName = i.description
+          .replace(/25g/gi, '')
+          .replace(/8g/gi, '')
+          .replace(/Chocolate[s]?/gi, '')
+          .trim();
+        return allSameQty ? cleanName : `${cleanName} (${i.qty} ${i.unit})`;
+      });
+
+      const titleCategory = first.category === '25g Chocolate' 
+        ? '25g Premium Dark Chocolates'
+        : first.category === '8g Chocolate'
+        ? '8g Mini Dark Chocolates'
+        : `${first.category} Assortment`;
+
+      const subtext = allSameQty
+        ? `${groupItems.length} Flavors: ${flavorNames.join(', ')} (${firstQty} ${first.unit} per flavor)`
+        : `Flavor Breakdown: ${flavorNames.join(', ')}`;
+
+      result.push({
+        id: `group-${key}`,
+        category: first.category,
+        description: titleCategory,
+        subtext: subtext,
+        hsnCode: first.hsnCode,
+        qty: totalQty,
+        unit: first.unit,
+        rate: first.rate,
+        gstRate: first.gstRate,
+        total: grandTotal
+      });
+    }
+  });
+
+  return result;
+}
+
 export const ProcurementManager: React.FC = () => {
   const [purchaseOrders, setPurchaseOrders] = useState<SupplierPO[]>(() => {
     return StorageEngine.getLocal<SupplierPO[]>(STORAGE_PO_KEY, []);
@@ -180,8 +265,27 @@ export const ProcurementManager: React.FC = () => {
   const [selectedPo, setSelectedPo] = useState<SupplierPO | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [copySuccess, setCopySuccess] = useState(false);
+  const [pdfStatus, setPdfStatus] = useState<'idle' | 'generating' | 'success' | 'error'>('idle');
+  const [isConsolidated, setIsConsolidated] = useState<boolean>(true);
 
   const poPrintRef = useRef<HTMLDivElement>(null);
+
+  const handleDeletePo = (id: string, poNumber: string) => {
+    if (window.confirm(`Are you sure you want to delete Purchase Order ${poNumber}? This action cannot be undone.`)) {
+      const updatedPOs = purchaseOrders.filter(p => p.id !== id);
+      setPurchaseOrders(updatedPOs);
+      StorageEngine.setLocal(STORAGE_PO_KEY, updatedPOs);
+      auditLogService.logSystemActivity(
+        `Purchase Order Deleted`,
+        `Deleted Purchase Order ${poNumber} from local register`
+      );
+      if (selectedPo?.id === id) {
+        setSelectedPo(null);
+        setIsPdfModalOpen(false);
+      }
+    }
+  };
+
 
   // New PO Form State
   const [poForm, setPoForm] = useState<POFormState>({
@@ -461,48 +565,113 @@ export const ProcurementManager: React.FC = () => {
     alert(`✅ Goods Receipt ${newGrn.grnNumber} registered!\nBatch ${newGrn.batchIdAssigned} has been automatically ingested into Stock Tracker.`);
   };
 
-  // PDF Export (Offscreen Clean Clone pattern to eliminate modal clipping)
+  // Production-Grade Non-Blocking PDF Export Pipeline
   const handleDownloadPdf = async () => {
-    if (!poPrintRef.current || !selectedPo) return;
+    if (!poPrintRef.current || !selectedPo || pdfStatus === 'generating') return;
+    setPdfStatus('generating');
+
+    // Yield to browser main thread so React renders loading state on the download button
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     let tempContainer: HTMLDivElement | null = null;
+    let blobUrl: string | null = null;
+
     try {
       const html2pdf = (await import('html2pdf.js')).default;
       
-      // Clone element into offscreen container to avoid scrollbar/modal clipping
+      // Clone element into unconstrained off-screen wrapper node (no modal scrollbar bounds!)
       const clone = poPrintRef.current.cloneNode(true) as HTMLDivElement;
       clone.style.width = '794px';
       clone.style.maxWidth = '794px';
       clone.style.margin = '0';
       clone.style.boxSizing = 'border-box';
       clone.style.background = '#ffffff';
+      clone.style.color = '#0f172a';
+      clone.style.padding = '32px';
 
       tempContainer = document.createElement('div');
       tempContainer.style.position = 'fixed';
       tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '0';
+      tempContainer.style.top = '0px';
       tempContainer.style.width = '794px';
+      tempContainer.style.backgroundColor = '#ffffff';
+      tempContainer.style.color = '#000000';
       tempContainer.style.zIndex = '-99999';
       tempContainer.appendChild(clone);
       document.body.appendChild(tempContainer);
 
+      const fileName = `${selectedPo.poNumber}_${selectedPo.supplierName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
       const opt = {
         margin: [8, 8, 8, 8] as [number, number, number, number],
-        filename: `${selectedPo.poNumber}_${selectedPo.supplierName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 800 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        filename: fileName,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 1.75, useCORS: true, logging: false, windowWidth: 800 },
+        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
       };
 
-      await html2pdf().set(opt as any).from(clone).save();
-    } catch (err) {
+      // Generate direct binary Blob without base64 allocations
+      const worker = html2pdf().set(opt as any).from(clone);
+      const pdfBlob: Blob = await worker.output('blob');
+
+      // Trigger single native file download via temporary Object URL
+      blobUrl = URL.createObjectURL(pdfBlob);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = blobUrl;
+      downloadAnchor.download = fileName;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      document.body.removeChild(downloadAnchor);
+
+      setPdfStatus('success');
+    } catch (err: any) {
       console.error('PDF Generation Error:', err);
-      window.print();
+      setPdfStatus('error');
+      // Fallback to isolated print preview if html2pdf fails
+      handlePrintPo();
     } finally {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
       if (tempContainer && document.body.contains(tempContainer)) {
         document.body.removeChild(tempContainer);
       }
+      await new Promise(resolve => setTimeout(resolve, 50));
+      setPdfStatus('idle');
     }
   };
+
+  // Single-PO Isolated Print Handler (Prevents background PO list leakage)
+  const handlePrintPo = () => {
+    if (!poPrintRef.current || !selectedPo) return;
+
+    let printMount = document.getElementById('po-print-mount');
+    if (!printMount) {
+      printMount = document.createElement('div');
+      printMount.id = 'po-print-mount';
+      document.body.appendChild(printMount);
+    }
+
+    const clone = poPrintRef.current.cloneNode(true) as HTMLElement;
+    clone.style.width = '100%';
+    clone.style.maxWidth = '100%';
+    clone.style.boxShadow = 'none';
+
+    printMount.innerHTML = '';
+    printMount.appendChild(clone);
+
+    document.body.classList.add('printing-po-active');
+
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('printing-po-active');
+        if (printMount && document.body.contains(printMount)) {
+          document.body.removeChild(printMount);
+        }
+      }, 500);
+    }, 100);
+  };
+
 
   // Copy Transmittal
   const handleCopyTransmittal = () => {
@@ -728,6 +897,15 @@ _Please confirm acceptance and target dispatch date._`;
                         className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200"
                       >
                         <Copy className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Copy WhatsApp
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="secondary"
+                        onClick={() => handleDeletePo(po.id, po.poNumber)}
+                        className="text-xs bg-slate-800 hover:bg-rose-950/60 hover:text-rose-400 text-slate-400 border border-slate-700/60 hover:border-rose-800/60"
+                        title="Delete Purchase Order"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-rose-400" />
                       </Button>
                     </div>
 
@@ -1238,12 +1416,40 @@ _Please confirm acceptance and target dispatch date._`;
           <div className="space-y-4">
             {/* Top Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-950 p-3 rounded border border-slate-800">
-              <div className="flex items-center gap-2">
-                <Button size="sm" onClick={handleDownloadPdf} className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold">
-                  <Download className="w-4 h-4 mr-1.5" /> Download PDF Document
+              <div className="flex flex-wrap items-center gap-2">
+                <Button 
+                  size="sm" 
+                  onClick={handleDownloadPdf} 
+                  disabled={pdfStatus === 'generating'}
+                  className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold"
+                >
+                  {pdfStatus === 'generating' ? (
+                    <RefreshCw className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-1.5" />
+                  )}
+                  {pdfStatus === 'generating' ? 'Generating PDF...' : 'Download PDF Document'}
                 </Button>
-                <Button size="sm" variant="secondary" onClick={() => window.print()} className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs">
+                <Button size="sm" variant="secondary" onClick={handlePrintPo} className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs">
                   <Printer className="w-4 h-4 mr-1.5" /> Print PO
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="secondary"
+                  onClick={() => setIsConsolidated(!isConsolidated)}
+                  className={`text-xs ${isConsolidated ? 'bg-amber-950/80 border border-amber-600 text-amber-300 font-bold' : 'bg-slate-800 text-slate-300'}`}
+                  title="Toggle between consolidated flavor grouping and individual line items"
+                >
+                  <Sparkles className="w-3.5 h-3.5 mr-1 text-amber-400" />
+                  {isConsolidated ? '✨ Consolidated (1-Page)' : '📋 Itemized (All Rows)'}
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  onClick={() => selectedPo && handleDeletePo(selectedPo.id, selectedPo.poNumber)}
+                  className="bg-slate-800 hover:bg-rose-950/60 text-rose-400 text-xs border border-slate-700 hover:border-rose-800"
+                >
+                  <Trash2 className="w-4 h-4 mr-1 text-rose-400" /> Delete PO
                 </Button>
               </div>
 
@@ -1263,24 +1469,24 @@ _Please confirm acceptance and target dispatch date._`;
               <div 
                 ref={poPrintRef}
                 id="printable-document"
-                className="w-full max-w-[794px] min-h-[285mm] bg-white text-slate-900 p-6 sm:p-8 mx-auto font-sans text-xs shadow-lg relative border-t-4 border-amber-900"
+                className="w-full max-w-[794px] bg-white text-slate-900 p-5 sm:p-6 mx-auto font-sans text-xs shadow-lg relative border-t-4 border-amber-900"
                 style={{ color: '#0f172a' }}
               >
                 {/* Executive Professional B2B Header */}
-                <div className="flex justify-between items-start border-b-2 border-slate-900 pb-5 mb-6">
+                <div className="flex justify-between items-start border-b-2 border-slate-900 pb-3 mb-3">
                   {/* Left: Gudoria Brand Details */}
-                  <div className="flex items-start gap-3.5">
-                    <div className="p-2.5 bg-slate-950 text-amber-400 rounded-xl flex-shrink-0 shadow-md">
-                      <GudLogo size={46} />
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-slate-950 text-amber-400 rounded-xl flex-shrink-0 shadow-md">
+                      <GudLogo size={38} />
                     </div>
                     <div>
-                      <h1 className="text-xl font-black tracking-tight text-slate-950 uppercase leading-none">
+                      <h1 className="text-lg font-black tracking-tight text-slate-950 uppercase leading-none">
                         GUDORIA FOOD INNOVATIONS PVT LTD
                       </h1>
-                      <p className="text-[10px] text-slate-600 font-semibold mt-1">
+                      <p className="text-[10px] text-slate-600 font-semibold mt-0.5">
                         Pranavarn Tower, 50/549C, B-Block Office, B4 1st Floor, Petta, Poonithura, Ernakulam-682038
                       </p>
-                      <div className="flex flex-wrap items-center gap-3 text-[10px] text-slate-600 font-mono mt-0.5">
+                      <div className="flex flex-wrap items-center gap-2.5 text-[10px] text-slate-600 font-mono mt-0.5">
                         <span>Phone: 09544809992</span>
                         <span>•</span>
                         <span>Email: gudchocolates@gmail.com</span>
@@ -1291,43 +1497,43 @@ _Please confirm acceptance and target dispatch date._`;
                   </div>
 
                   {/* Right: Sleek PO Metadata Card */}
-                  <div className="text-right flex-shrink-0 bg-slate-900 text-white p-3 rounded-lg border border-slate-800 shadow-md">
-                    <div className="text-[10px] font-extrabold uppercase tracking-widest text-amber-400 mb-1 border-b border-slate-800 pb-1">
+                  <div className="text-right flex-shrink-0 bg-slate-900 text-white p-2.5 rounded-lg border border-slate-800 shadow-md">
+                    <div className="text-[9px] font-extrabold uppercase tracking-widest text-amber-400 mb-0.5 border-b border-slate-800 pb-0.5">
                       OFFICIAL PURCHASE ORDER
                     </div>
-                    <div className="text-sm font-mono font-bold text-white tracking-wider">{selectedPo.poNumber}</div>
-                    <div className="text-[10px] text-slate-300 font-mono mt-1">Date: <strong className="text-slate-100">{selectedPo.date}</strong></div>
-                    <div className="text-[10px] text-slate-300 font-mono">Expected: <strong className="text-amber-400">{selectedPo.expectedDelivery}</strong></div>
+                    <div className="text-xs font-mono font-bold text-white tracking-wider">{selectedPo.poNumber}</div>
+                    <div className="text-[9px] text-slate-300 font-mono mt-0.5">Date: <strong className="text-slate-100">{selectedPo.date}</strong></div>
+                    <div className="text-[9px] text-slate-300 font-mono">Expected: <strong className="text-amber-400">{selectedPo.expectedDelivery}</strong></div>
                   </div>
                 </div>
 
                 {/* Info Grid: Vendor Details vs Delivery Location */}
-                <div className="grid grid-cols-2 gap-5 mb-6">
+                <div className="grid grid-cols-2 gap-3 mb-3">
                   {/* Vendor Box */}
-                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-300">
-                    <div className="text-[10px] font-extrabold uppercase text-amber-900 tracking-wider mb-1.5 flex items-center gap-1">
-                      <Building2 className="w-3.5 h-3.5 text-amber-700" /> VENDOR / SUPPLIER DETAILS:
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-300">
+                    <div className="text-[9px] font-extrabold uppercase text-amber-900 tracking-wider mb-1 flex items-center gap-1">
+                      <Building2 className="w-3 h-3 text-amber-700" /> VENDOR / SUPPLIER DETAILS:
                     </div>
                     <div className="text-xs font-bold text-slate-950">{selectedPo.supplierName}</div>
-                    <div className="text-[11px] text-slate-700 mt-1 leading-snug">{selectedPo.supplierAddress}</div>
-                    <div className="text-[11px] text-slate-700 mt-1">Contact: <strong>{selectedPo.supplierContact}</strong></div>
-                    <div className="text-[11px] text-slate-700 font-mono">Phone: {selectedPo.supplierPhone}</div>
+                    <div className="text-[10px] text-slate-700 mt-0.5 leading-snug">{selectedPo.supplierAddress}</div>
+                    <div className="text-[10px] text-slate-700 mt-0.5">Contact: <strong>{selectedPo.supplierContact}</strong></div>
+                    <div className="text-[10px] text-slate-700 font-mono">Phone: {selectedPo.supplierPhone}</div>
                     {selectedPo.supplierGstin && (
-                      <div className="text-[11px] text-slate-900 font-mono font-bold mt-1.5 pt-1 border-t border-slate-200">
+                      <div className="text-[10px] text-slate-900 font-mono font-bold mt-1 pt-0.5 border-t border-slate-200">
                         GSTIN: {selectedPo.supplierGstin}
                       </div>
                     )}
                   </div>
 
                   {/* Ship To Box */}
-                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-300">
-                    <div className="text-[10px] font-extrabold uppercase text-amber-900 tracking-wider mb-1.5 flex items-center gap-1">
-                      <Truck className="w-3.5 h-3.5 text-amber-700" /> DELIVERY LOCATION & TERMS:
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-300">
+                    <div className="text-[9px] font-extrabold uppercase text-amber-900 tracking-wider mb-1 flex items-center gap-1">
+                      <Truck className="w-3 h-3 text-amber-700" /> DELIVERY LOCATION & TERMS:
                     </div>
-                    <div className="text-[11px] text-slate-800 font-medium leading-snug">{selectedPo.shippingAddress}</div>
+                    <div className="text-[10px] text-slate-800 font-medium leading-snug">{selectedPo.shippingAddress}</div>
                     
                     {selectedPo.showPaymentTerms && (
-                      <div className="mt-2.5 pt-1.5 border-t border-slate-200 text-[11px]">
+                      <div className="mt-2 pt-1 border-t border-slate-200 text-[10px]">
                         <span className="text-slate-600 font-medium">Payment Terms:</span>{' '}
                         <strong className="text-slate-950">{selectedPo.paymentTerms}</strong>
                       </div>
@@ -1336,38 +1542,45 @@ _Please confirm acceptance and target dispatch date._`;
                 </div>
 
                 {/* Line Items Table */}
-                <table className="w-full text-left border-collapse mb-6 text-xs">
+                <table className="w-full text-left border-collapse mb-3 text-xs">
                   <thead>
-                    <tr className="bg-slate-950 text-white font-bold text-[11px]">
-                      <th className="p-2 border border-slate-900 w-8 text-center">#</th>
-                      <th className="p-2 border border-slate-900">Item Description</th>
-                      <th className="p-2 border border-slate-900 text-center">Category</th>
-                      <th className="p-2 border border-slate-900 text-center">HSN</th>
-                      <th className="p-2 border border-slate-900 text-right w-16">Qty</th>
-                      <th className="p-2 border border-slate-900 text-center w-14">Unit</th>
+                    <tr className="bg-slate-950 text-white font-bold text-[10px]">
+                      <th className="py-1.5 px-2 border border-slate-900 w-8 text-center">#</th>
+                      <th className="py-1.5 px-2 border border-slate-900">Item Description</th>
+                      <th className="py-1.5 px-2 border border-slate-900 text-center">Category</th>
+                      <th className="py-1.5 px-2 border border-slate-900 text-center">HSN</th>
+                      <th className="py-1.5 px-2 border border-slate-900 text-right w-16">Qty</th>
+                      <th className="py-1.5 px-2 border border-slate-900 text-center w-14">Unit</th>
                       {selectedPo.showPricing && (
                         <>
-                          <th className="p-2 border border-slate-900 text-right w-20">Rate (₹)</th>
-                          <th className="p-2 border border-slate-900 text-right w-16">GST %</th>
-                          <th className="p-2 border border-slate-900 text-right w-24">Amount (₹)</th>
+                          <th className="py-1.5 px-2 border border-slate-900 text-right w-20">Rate (₹)</th>
+                          <th className="py-1.5 px-2 border border-slate-900 text-right w-14">GST %</th>
+                          <th className="py-1.5 px-2 border border-slate-900 text-right w-24">Amount (₹)</th>
                         </>
                       )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {selectedPo.items.map((item, idx) => (
+                    {(isConsolidated ? getConsolidatedPOItems(selectedPo.items) : selectedPo.items).map((item, idx) => (
                       <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}>
-                        <td className="p-2 border border-slate-200 text-center font-mono">{idx + 1}</td>
-                        <td className="p-2 border border-slate-200 font-bold text-slate-950">{item.description}</td>
-                        <td className="p-2 border border-slate-200 text-center text-[10px] text-slate-600">{item.category}</td>
-                        <td className="p-2 border border-slate-200 text-center font-mono text-[11px] text-slate-600">{item.hsnCode || '-'}</td>
-                        <td className="p-2 border border-slate-200 text-right font-mono font-bold text-slate-950">{item.qty}</td>
-                        <td className="p-2 border border-slate-200 text-center text-slate-600">{item.unit}</td>
+                        <td className="py-1.5 px-2 border border-slate-200 text-center font-mono text-[11px]">{idx + 1}</td>
+                        <td className="py-1.5 px-2 border border-slate-200 font-bold text-slate-950">
+                          <div>{item.description}</div>
+                          {(item as ConsolidatedPOItem).subtext && (
+                            <div className="text-[10px] text-amber-900 font-medium font-mono mt-0.5 whitespace-normal leading-tight">
+                              {(item as ConsolidatedPOItem).subtext}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-1.5 px-2 border border-slate-200 text-center text-[10px] text-slate-600">{item.category}</td>
+                        <td className="py-1.5 px-2 border border-slate-200 text-center font-mono text-[10px] text-slate-600">{item.hsnCode || '-'}</td>
+                        <td className="py-1.5 px-2 border border-slate-200 text-right font-mono font-bold text-slate-950 text-[11px]">{item.qty.toLocaleString('en-IN')}</td>
+                        <td className="py-1.5 px-2 border border-slate-200 text-center text-slate-600 text-[10px]">{item.unit}</td>
                         {selectedPo.showPricing && (
                           <>
-                            <td className="p-2 border border-slate-200 text-right font-mono">₹{item.rate.toLocaleString('en-IN')}</td>
-                            <td className="p-2 border border-slate-200 text-right font-mono">{item.gstRate}%</td>
-                            <td className="p-2 border border-slate-200 text-right font-mono font-bold text-slate-950">₹{item.total.toLocaleString('en-IN')}</td>
+                            <td className="py-1.5 px-2 border border-slate-200 text-right font-mono text-[11px]">₹{item.rate.toLocaleString('en-IN')}</td>
+                            <td className="py-1.5 px-2 border border-slate-200 text-right font-mono text-[10px]">{item.gstRate}%</td>
+                            <td className="py-1.5 px-2 border border-slate-200 text-right font-mono font-bold text-slate-950 text-[11px]">₹{item.total.toLocaleString('en-IN')}</td>
                           </>
                         )}
                       </tr>
@@ -1377,50 +1590,50 @@ _Please confirm acceptance and target dispatch date._`;
 
                 {/* Financial Summary or Quantity-Only Banner */}
                 {selectedPo.showPricing ? (
-                  <div className="grid grid-cols-12 gap-6 mb-6">
+                  <div className="grid grid-cols-12 gap-4 mb-3">
                     <div className="col-span-7">
                       {selectedPo.showSla && (
-                        <div className="bg-amber-50/60 p-3 rounded border border-amber-200 text-[10px] text-slate-700 space-y-1">
-                          <div className="font-bold text-amber-950 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                        <div className="bg-amber-50/60 p-2.5 rounded border border-amber-200 text-[10px] text-slate-700 space-y-0.5">
+                          <div className="font-bold text-amber-950 uppercase tracking-wider text-[9px] flex items-center gap-1">
                             <ShieldCheck className="w-3.5 h-3.5 text-amber-800" /> MANDATORY TRANSIT & QUALITY SLA:
                           </div>
-                          <div className="whitespace-pre-line font-mono text-[10px] text-slate-800">
+                          <div className="whitespace-pre-line font-mono text-[9px] text-slate-800 leading-tight">
                             {selectedPo.specialInstructions}
                           </div>
                         </div>
                       )}
                     </div>
 
-                    <div className="col-span-5 bg-slate-50 p-3.5 rounded-lg border border-slate-300 space-y-1.5 font-mono text-xs">
-                      <div className="flex justify-between text-slate-600">
+                    <div className="col-span-5 bg-slate-50 p-2.5 rounded-lg border border-slate-300 space-y-1 font-mono text-xs">
+                      <div className="flex justify-between text-slate-600 text-[11px]">
                         <span>Subtotal:</span>
                         <span>₹{selectedPo.subtotal.toLocaleString('en-IN')}</span>
                       </div>
-                      <div className="flex justify-between text-slate-600">
+                      <div className="flex justify-between text-slate-600 text-[11px]">
                         <span>CGST (2.5% / 9%):</span>
                         <span>₹{(selectedPo.gstTotal / 2).toLocaleString('en-IN')}</span>
                       </div>
-                      <div className="flex justify-between text-slate-600">
+                      <div className="flex justify-between text-slate-600 text-[11px]">
                         <span>SGST (2.5% / 9%):</span>
                         <span>₹{(selectedPo.gstTotal / 2).toLocaleString('en-IN')}</span>
                       </div>
-                      <div className="border-t-2 border-slate-900 pt-1.5 flex justify-between font-bold text-slate-950 text-sm">
+                      <div className="border-t-2 border-slate-900 pt-1 flex justify-between font-bold text-slate-950 text-xs">
                         <span>TOTAL PO VALUE:</span>
-                        <span className="text-amber-900">₹{selectedPo.grandTotal.toLocaleString('en-IN')}</span>
+                        <span className="text-amber-900 font-extrabold text-sm">₹{selectedPo.grandTotal.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-6 space-y-3">
-                    <div className="bg-cyan-50 p-3 rounded border border-cyan-200 text-center font-mono font-bold text-cyan-950 text-xs">
-                      QUANTITY-ONLY PURCHASE ORDER • TOTAL UNITS ORDERED: {selectedPo.items.reduce((a, b) => a + b.qty, 0)} Pcs
+                  <div className="mb-3 space-y-2">
+                    <div className="bg-cyan-50 p-2.5 rounded border border-cyan-200 text-center font-mono font-bold text-cyan-950 text-xs">
+                      QUANTITY-ONLY PURCHASE ORDER • TOTAL UNITS ORDERED: {selectedPo.items.reduce((a, b) => a + b.qty, 0).toLocaleString('en-IN')} Pcs
                     </div>
                     {selectedPo.showSla && (
-                      <div className="bg-amber-50/60 p-3 rounded border border-amber-200 text-[10px] text-slate-700 space-y-1">
-                        <div className="font-bold text-amber-950 uppercase tracking-wider text-[10px] flex items-center gap-1">
+                      <div className="bg-amber-50/60 p-2.5 rounded border border-amber-200 text-[10px] text-slate-700 space-y-0.5">
+                        <div className="font-bold text-amber-950 uppercase tracking-wider text-[9px] flex items-center gap-1">
                           <ShieldCheck className="w-3.5 h-3.5 text-amber-800" /> MANDATORY TRANSIT & QUALITY SLA:
                         </div>
-                        <div className="whitespace-pre-line font-mono text-[10px] text-slate-800">
+                        <div className="whitespace-pre-line font-mono text-[9px] text-slate-800 leading-tight">
                           {selectedPo.specialInstructions}
                         </div>
                       </div>
@@ -1429,34 +1642,34 @@ _Please confirm acceptance and target dispatch date._`;
                 )}
 
                 {selectedPo.showPricing && (
-                  <div className="text-[11px] font-bold text-slate-900 italic border-t border-slate-200 pt-2 mb-8">
+                  <div className="text-[10px] font-bold text-slate-900 italic border-t border-slate-200 pt-1.5 mb-4">
                     Amount in Words: {numberToWordsINR(selectedPo.grandTotal)}
                   </div>
                 )}
 
                 {/* Signatures Footer with Hima's Founder Signature Image */}
-                <div className="pt-6 border-t-2 border-slate-950 flex justify-between items-end">
+                <div className="pt-3 border-t-2 border-slate-950 flex justify-between items-end">
                   <div>
-                    <div className="text-[10px] text-slate-500 font-mono">Acceptance & Confirmation by Vendor:</div>
-                    <div className="mt-10 text-xs font-semibold text-slate-700">Authorized Vendor Representative Signature</div>
+                    <div className="text-[9px] text-slate-500 font-mono">Acceptance & Confirmation by Vendor:</div>
+                    <div className="mt-8 text-[11px] font-semibold text-slate-700">Authorized Vendor Representative Signature</div>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-[10px] text-slate-700 font-extrabold uppercase tracking-wider mb-1">
+                    <div className="text-[9px] text-slate-700 font-extrabold uppercase tracking-wider mb-0.5">
                       FOR GUDORIA FOOD INNOVATIONS PVT LTD
                     </div>
 
                     {/* Actual Founder Hima Signature Image */}
-                    <div className="my-1 flex justify-end">
+                    <div className="my-0.5 flex justify-end">
                       <img 
                         src="/images/brand/founder_signature.jpg" 
                         alt="Founder Hima Signature" 
-                        className="h-14 max-w-[170px] object-contain"
+                        className="h-11 max-w-[150px] object-contain"
                       />
                     </div>
 
-                    <div className="text-xs font-black text-slate-950">{selectedPo.founderSignatureName}</div>
-                    <div className="text-[10px] text-slate-600 font-semibold">Founder & Managing Director</div>
+                    <div className="text-[11px] font-black text-slate-950">{selectedPo.founderSignatureName}</div>
+                    <div className="text-[9px] text-slate-600 font-semibold">Founder & Managing Director</div>
                   </div>
                 </div>
               </div>
