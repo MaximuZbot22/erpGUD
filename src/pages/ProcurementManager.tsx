@@ -86,20 +86,20 @@ const STORAGE_GRN_KEY = 'gud_goods_receipts_v1';
 
 // Preset Master Flavors & Items
 export const PRESET_25G_FLAVORS: Omit<POItem, 'id' | 'qty' | 'total'>[] = [
-  { category: '25g Chocolate', description: 'Almond Noir 25g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 65, gstRate: 18 },
-  { category: '25g Chocolate', description: 'Peanut Royale 25g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 65, gstRate: 18 },
-  { category: '25g Chocolate', description: 'Orange Sunset 25g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 65, gstRate: 18 },
-  { category: '25g Chocolate', description: 'Sun-Kissed Lemon 25g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 65, gstRate: 18 },
-  { category: '25g Chocolate', description: 'Indian Sea Salt 25g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 65, gstRate: 18 },
-  { category: '25g Chocolate', description: 'Midnight Mocha 25g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 65, gstRate: 18 },
-  { category: '25g Chocolate', description: 'Malabar Jackfruit 25g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 65, gstRate: 18 }
+  { category: '25g Chocolate', description: 'Almond Noir 25g', hsnCode: '1806', unit: 'Pcs', rate: 52.5, gstRate: 5 },
+  { category: '25g Chocolate', description: 'Peanut Royale 25g', hsnCode: '1806', unit: 'Pcs', rate: 52.5, gstRate: 5 },
+  { category: '25g Chocolate', description: 'Orange Sunset 25g', hsnCode: '1806', unit: 'Pcs', rate: 52.5, gstRate: 5 },
+  { category: '25g Chocolate', description: 'Sun-Kissed Lemon 25g', hsnCode: '1806', unit: 'Pcs', rate: 52.5, gstRate: 5 },
+  { category: '25g Chocolate', description: 'Indian Sea Salt 25g', hsnCode: '1806', unit: 'Pcs', rate: 52.5, gstRate: 5 },
+  { category: '25g Chocolate', description: 'Midnight Mocha 25g', hsnCode: '1806', unit: 'Pcs', rate: 52.5, gstRate: 5 },
+  { category: '25g Chocolate', description: 'Malabar Jackfruit 25g', hsnCode: '1806', unit: 'Pcs', rate: 52.5, gstRate: 5 }
 ];
 
 export const PRESET_8G_FLAVORS: Omit<POItem, 'id' | 'qty' | 'total'>[] = [
-  { category: '8g Chocolate', description: 'Mini Dark Velvet 8g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 22, gstRate: 18 },
-  { category: '8g Chocolate', description: 'Mini Milk Chocolate 8g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 22, gstRate: 18 },
-  { category: '8g Chocolate', description: 'Mini Salted Caramel 8g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 22, gstRate: 18 },
-  { category: '8g Chocolate', description: 'Mini Roasted Nut 8g', hsnCode: '1806 90 90', unit: 'Pcs', rate: 22, gstRate: 18 }
+  { category: '8g Chocolate', description: 'Almond Noir 8g', hsnCode: '1806', unit: 'Pcs', rate: 17.6, gstRate: 5 },
+  { category: '8g Chocolate', description: 'Peanut Royale 8g', hsnCode: '1806', unit: 'Pcs', rate: 17.6, gstRate: 5 },
+  { category: '8g Chocolate', description: 'Orange Sunset 8g', hsnCode: '1806', unit: 'Pcs', rate: 17.6, gstRate: 5 },
+  { category: '8g Chocolate', description: 'Sun-Kissed Lemon 8g', hsnCode: '1806', unit: 'Pcs', rate: 17.6, gstRate: 5 }
 ];
 
 export const PRESET_HAMPER_PACKAGING: Omit<POItem, 'id' | 'qty' | 'total'>[] = [
@@ -113,12 +113,12 @@ export const PRESET_HAMPER_PACKAGING: Omit<POItem, 'id' | 'qty' | 'total'>[] = [
 // Preset Suppliers
 export const PRESET_SUPPLIERS = [
   {
-    name: 'Scaria (Gourmet Chocolate Manufacturing)',
+    name: 'Cochin Cocoa Products (Scaria)',
     contact: 'Mr. Scaria / Production Head',
-    address: 'Industrial Development Area, Kalamassery, Ernakulam, Kerala 683109',
+    address: 'Bldg.No:14/307, 307A, Vennikulam, Kokkapally, Thiruvaniyoor, Cochin -682 308, Kerala',
     phone: '+91 98470 12345',
-    email: 'scaria.orders@gourmetchoc.com',
-    gstin: '32AAACG1234F1Z5'
+    email: 'cochincocoaproducts@gmail.com',
+    gstin: '32AAGFC8295H1ZA'
   },
   {
     name: 'Ernakulam Packaging & Printing Co.',
@@ -188,7 +188,7 @@ export const ProcurementManager: React.FC = () => {
     supplierEmail: PRESET_SUPPLIERS[0].email,
     supplierGstin: PRESET_SUPPLIERS[0].gstin,
     paymentTerms: '50% Advance, 50% on Delivery',
-    shippingAddress: 'Gudoria Food Innovations Private Limited, Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038',
+    shippingAddress: 'Gudoria Food Innovations(P) Ltd, Pranavarn Tower, 50/549C, B-Block Office, B4 First Floor, Petta, Poonithura, Ernakulam-682038',
     specialInstructions: '1. Temperature-controlled transit required (18°C–22°C).\n2. Minimum 6 months remaining shelf life upon receipt.\n3. Defective/damaged packaging will be rejected at GRN inspection.',
     founderSignatureName: 'Founder / Managing Director',
     items: [
@@ -196,12 +196,12 @@ export const ProcurementManager: React.FC = () => {
         id: `item-${Date.now()}-1`,
         category: '25g Chocolate',
         description: 'Almond Noir 25g',
-        hsnCode: '1806 90 90',
+        hsnCode: '1806',
         qty: 100,
         unit: 'Pcs',
-        rate: 65,
-        gstRate: 18,
-        total: 6500
+        rate: 52.5,
+        gstRate: 5,
+        total: 5250
       }
     ]
   });
@@ -505,7 +505,7 @@ _Please confirm acceptance and target dispatch date._`;
                 supplierEmail: PRESET_SUPPLIERS[0].email,
                 supplierGstin: PRESET_SUPPLIERS[0].gstin,
                 paymentTerms: '50% Advance, 50% on Delivery',
-                shippingAddress: 'Gudoria Food Innovations Private Limited, Pranavam Tower 1st Floor, Petta, Maradu, Ernakulam 682038',
+                shippingAddress: 'Gudoria Food Innovations(P) Ltd, Pranavarn Tower, 50/549C, B-Block Office, B4 First Floor, Petta, Poonithura, Ernakulam-682038',
                 specialInstructions: '1. Temperature-controlled cold chain transit required (18°C–22°C).\n2. Minimum 6 months remaining shelf life upon receipt.\n3. Packaging defects or moisture compromise will result in GRN rejection.',
                 founderSignatureName: 'Founder / Managing Director',
                 items: PRESET_25G_FLAVORS.map((p, idx) => ({ ...p, id: `item-${Date.now()}-${idx}`, qty: 100, total: 100 * p.rate }))
@@ -1139,7 +1139,7 @@ _Please confirm acceptance and target dispatch date._`;
                         Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038
                       </p>
                       <p className="text-[10px] text-slate-500 font-mono">
-                        Phone: 09544809992 | Email: gudchocolates@gmail.com | GSTIN: 32AAFCG1234F1Z0
+                        Phone: 09544809992 | Email: gudchocolates@gmail.com | GSTIN: 32AANCA8181G1ZK
                       </p>
                     </div>
                   </div>
