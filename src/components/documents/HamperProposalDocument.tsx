@@ -23,8 +23,10 @@ export const HamperProposalDocument: React.FC<ProposalDocProps> = ({ project, on
     gstTotal += clientGst;
   });
 
-  const totalExpenses = project.otherExpenses.reduce((acc, e) => acc + e.amount, 0);
-  const grandTotal = Math.round(subtotal + gstTotal + totalExpenses);
+  // Only billable expenses are charged to the client on the proposal quote
+  const billableExpenses = project.otherExpenses.filter(e => e.billableToClient !== false);
+  const totalBillableExpenses = billableExpenses.reduce((acc, e) => acc + e.amount, 0);
+  const grandTotal = Math.round(subtotal + gstTotal + totalBillableExpenses);
 
   const handlePrint = () => {
     window.print();
@@ -122,10 +124,10 @@ export const HamperProposalDocument: React.FC<ProposalDocProps> = ({ project, on
               <span>GST Total:</span>
               <span>₹{Math.round(gstTotal).toLocaleString('en-IN')}</span>
             </div>
-            {totalExpenses > 0 && (
+            {totalBillableExpenses > 0 && (
               <div className="flex justify-between text-slate-600">
-                <span>Services & Freight:</span>
-                <span>₹{totalExpenses.toLocaleString('en-IN')}</span>
+                <span>Services & Logistics:</span>
+                <span>₹{totalBillableExpenses.toLocaleString('en-IN')}</span>
               </div>
             )}
             <div className="flex justify-between text-base font-bold text-purple-900 border-t border-slate-300 pt-2">

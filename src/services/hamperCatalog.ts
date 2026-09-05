@@ -1,4 +1,5 @@
 import { StorageEngine } from './storageEngine';
+import { GoogleSheetsService } from './google';
 
 export interface HamperCatalogItem {
   id: string;
@@ -8,6 +9,8 @@ export interface HamperCatalogItem {
   ourUnitCost: number;
   clientUnitCost?: number;
   gstRate: 5 | 18;
+  shelfLife?: string;
+  inStockQty?: number;
 }
 
 export const SPREADSHEET_ID = '1bymKSeyIeSCInLlo6d3IBdr4fuoSV6iL6MDjHMtcmYU';
@@ -50,18 +53,59 @@ export class HamperCatalogService {
   }
 
   /**
-   * Add or update an item
+   * Add or update an item locally
    */
   static saveItem(item: HamperCatalogItem): HamperCatalogItem[] {
     const list = this.getCatalog();
     const idx = list.findIndex(i => i.id === item.id || i.description.toLowerCase() === item.description.toLowerCase());
     if (idx >= 0) {
-      list[idx] = item;
+      list[idx] = { ...list[idx], ...item };
     } else {
       list.push(item);
     }
     this.saveCatalog(list);
     return list;
+  }
+
+  /**
+   * Add a new item locally and append directly to Google Sheet 'items' tab
+   */
+  static async addNewItemWithSheetSync(
+    item: HamperCatalogItem,
+    googleToken: string | null
+  ): Promise<{ items: HamperCatalogItem[]; syncedToGoogle: boolean }> {
+    // 1. Save locally first (instant UI update)
+    const updated = this.saveItem(item);
+
+    // 2. If Google token exists, append to 'items' tab in Google Sheets
+    let syncedToGoogle = false;
+    if (googleToken) {
+      try {
+        // Tab columns: ['Category', 'Item Description', 'Qty', 'Our Per unit Cost', 'gst', 'Shelf Life', 'In Stock Qty']
+        const rowData = [
+          item.category,
+          item.description,
+          String(item.defaultQty || 1),
+          `₹${item.ourUnitCost}`,
+          `${item.gstRate}%`,
+          item.shelfLife || (item.category === 'Chocolates' || item.category === 'Chocolate Box' ? '6 Months' : 'N/A (Non-perishable)'),
+          String(item.inStockQty || 0)
+        ];
+
+        await GoogleSheetsService.appendSpreadsheetValues(
+          googleToken,
+          SPREADSHEET_ID,
+          "'items'!A:G",
+          [rowData]
+        );
+        syncedToGoogle = true;
+        console.log('[HamperCatalogService] Appended new item to Google Sheet successfully:', item.description);
+      } catch (err) {
+        console.warn('[HamperCatalogService] Failed to append to Google Sheet directly (saved locally):', err);
+      }
+    }
+
+    return { items: updated, syncedToGoogle };
   }
 
   /**
