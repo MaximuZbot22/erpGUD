@@ -2,26 +2,25 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gud-primary: #e50914;
-  --color-gud-secondary: #b80710;
-  --color-gud-red: #ff1e27;
-  --color-gud-charcoal: #121212;
-  --color-gud-card: #181818;
-  --color-gud-card-subtle: #212121;
-  --color-gud-border: #2a2a2a;
-  --color-workspace-bg: #0a0a0a;
-  --color-surface-card: #141414;
-  --color-surface-card-subtle: #1e1e1e;
-  --color-active-pill: #2a1215;
-  --font-heading: "Outfit", sans-serif;
-  --font-body: "Plus Jakarta Sans", "Outfit", sans-serif;
+  --color-yt-bg: #0f0f0f;
+  --color-yt-surface: #1f1f1f;
+  --color-yt-surface-hover: #272727;
+  --color-yt-border: #2e2e2e;
+  --color-yt-border-subtle: #242424;
+  --color-yt-text-primary: #f1f1f1;
+  --color-yt-text-secondary: #aaaaaa;
+  --color-yt-chip: #272727;
+  --color-yt-chip-hover: #3f3f3f;
+  --color-yt-accent: #3ea6ff;
+  --font-heading: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Plus Jakarta Sans", "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 @layer base {
   html, body {
     font-family: var(--font-body);
-    background-color: #09090b;
-    color: #f4f4f5;
+    background-color: #0f0f0f;
+    color: #f1f1f1;
     color-scheme: dark;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -29,44 +28,39 @@
   }
 }
 
-/* Custom Scrollbar for YouTube/Linear feel */
+/* Custom Scrollbar for YouTube feel */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #0f0f0f;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #272727;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #3f3f3f;
 }
 
 /* ════════════════════════════════════════════════════════════════ */
-/* 🔴 YOUTUBE & LEICA PRO RED-BLACK-WHITE INTERACTION FOUNDATIONS    */
+/* 📺 YOUTUBE CLEAN DARK UI INTERACTION FOUNDATIONS               */
 /* ════════════════════════════════════════════════════════════════ */
 
-/* Zero latency tactile feedback on press with smooth hue changes */
+/* Zero latency tactile feedback on press with smooth transitions */
 .tactile-press {
-  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+  transition: transform 100ms cubic-bezier(0.16, 1, 0.3, 1), background-color 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
 }
 .tactile-press:active {
-  transform: scale(0.97);
-}
-
-/* Red glow effect */
-.glow-red {
-  box-shadow: 0 0 20px -4px rgba(229, 9, 20, 0.35);
+  transform: scale(0.98);
 }
 
 /* Apple Spring scale entry for dialogs and popovers */
-@keyframes appleSpringEntry {
+@keyframes ytSpringEntry {
   0% {
     opacity: 0;
-    transform: scale(0.96) translateY(6px);
+    transform: scale(0.97) translateY(4px);
   }
   100% {
     opacity: 1;
@@ -75,14 +69,14 @@
 }
 
 .animate-spring-in {
-  animation: appleSpringEntry 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+  animation: ytSpringEntry 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
 }
 
 /* Page transitions */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -91,29 +85,29 @@
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Crisp, modern luxury panels in Charcoal & Red - zero muddy blur */
+/* Clean YouTube dark panels - zero muddy blur, matte surface */
 .glass-panel {
-  background: #141414;
-  border: 1px solid #272727;
+  background: #1f1f1f;
+  border: 1px solid #2e2e2e;
 }
 
 .glass-panel-luxury {
-  background: #181818;
+  background: #1f1f1f;
   border: 1px solid #383838;
 }
 
-/* Premium Card hover with smooth hue & shadow reaction */
+/* YouTube Card hover with smooth subtle reaction */
 .luxury-card {
-  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
 }
 .luxury-card:hover {
-  transform: translateY(-2px);
-  background-color: #1a1a1a;
-  border-color: #404040;
-  box-shadow: 0 14px 28px -10px rgba(0, 0, 0, 0.85);
+  transform: translateY(-1px);
+  background-color: #272727;
+  border-color: #444444;
+  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.6);
 }
 
 /* ════════════════════════════════════════════════════════════════ */

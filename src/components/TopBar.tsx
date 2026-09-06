@@ -41,10 +41,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
 
   return (
     <>
-      <header className="h-14 border-b border-[#242424] bg-[#0c0c0c] px-6 flex items-center justify-between relative z-20 select-none print-hide print:hidden">
+      <header className="h-14 border-b border-[#272727] bg-[#0f0f0f] px-6 flex items-center justify-between relative z-20 select-none print-hide print:hidden">
         {/* Global Google Workspace Pill Search Bar */}
         <div className="relative w-full max-w-md">
-          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-500">
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#888888]">
             <Search className="w-4 h-4" />
           </span>
           <input
@@ -52,9 +52,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
             placeholder="Search orders, inventory, contacts, invoices... (⌘K)"
             value={searchVal}
             onChange={handleSearchChange}
-            className="w-full pl-10 pr-9 py-2 text-xs bg-[#161616] hover:bg-[#1a1a1a] border border-[#2d2d2d] hover:border-[#404040] rounded-full transition-all focus:outline-none focus:ring-1 focus:ring-red-500/50 text-white placeholder-neutral-500 shadow-inner"
+            className="w-full pl-10 pr-9 py-2 text-xs bg-[#121212] hover:bg-[#181818] border border-[#303030] hover:border-[#444444] rounded-full transition-all focus:outline-none focus:border-[#3ea6ff] focus:ring-1 focus:ring-[#3ea6ff]/30 text-white placeholder-[#888888] shadow-inner"
           />
-          <kbd className="hidden sm:inline-flex absolute inset-y-0 right-0 pr-3.5 items-center pointer-events-none text-[9px] font-mono text-neutral-500">
+          <kbd className="hidden sm:inline-flex absolute inset-y-0 right-0 pr-3.5 items-center pointer-events-none text-[9px] font-mono text-[#888888]">
             ⌘K
           </kbd>
         </div>
@@ -65,13 +65,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
           <button
             onClick={toggleVersion}
             title="Click to switch between v2 Clean (6 Sheets) and v1 Legacy (15 Sheets)"
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border tactile-press cursor-pointer ${
-              version === 'v2'
-                ? 'bg-red-600/10 text-red-400 border-red-500/30 hover:bg-red-600/20'
-                : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700'
-            }`}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-[#272727] hover:bg-[#383838] text-[#f1f1f1] border border-[#383838] tactile-press cursor-pointer"
           >
-            <span className={`w-2 h-2 rounded-full ${version === 'v2' ? 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]' : 'bg-neutral-400'}`} />
+            <span className={`w-2 h-2 rounded-full ${version === 'v2' ? 'bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.6)]' : 'bg-neutral-400'}`} />
             <span>{version === 'v2' ? 'ERP v2 Clean (6 Sheets)' : 'ERP v1 Legacy (15 Sheets)'}</span>
           </button>
 
@@ -80,9 +76,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
             <button
               onClick={signInWithGoogle}
               title="Click to authenticate Google Workspace APIs"
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 rounded-full text-[11px] font-semibold cursor-pointer tactile-press"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-[#272727] hover:bg-[#383838] text-neutral-200 border border-[#383838] rounded-full text-[11px] font-medium cursor-pointer tactile-press"
             >
-              <Sparkles className="w-3.5 h-3.5 text-red-400" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>Connect Drive/Sheets</span>
             </button>
           )}
@@ -90,11 +86,11 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
           {/* Notification Button */}
           <button
             onClick={() => setIsNotifOpen(true)}
-            className="p-2 text-neutral-400 hover:text-white hover:bg-[#1f1f1f] rounded-full relative tactile-press"
+            className="p-2 text-[#aaaaaa] hover:text-white hover:bg-[#272727] rounded-full relative tactile-press"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#e50914] rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-[#0c0c0c] shadow-sm animate-pulse">
+              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#cc0000] rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-[#0f0f0f] shadow-sm">
                 {unreadCount}
               </span>
             )}

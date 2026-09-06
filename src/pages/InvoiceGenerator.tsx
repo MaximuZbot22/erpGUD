@@ -840,63 +840,69 @@ CIN: U72200KL2015PTC039279
   return (
     <div className="space-y-6 pb-20">
       {/* Top Banner (Hidden on Print) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#121212] p-5 rounded-2xl border border-[#262626] shadow-xl print:hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#1f1f1f] p-5 rounded-2xl border border-[#2e2e2e] shadow-sm print:hidden">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider rounded-md bg-red-600/15 text-red-400 border border-red-500/30 font-heading">
+            <span className="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider rounded-md bg-[#272727] text-white border border-[#383838] font-heading">
               GUD Billing Engine
             </span>
-            <span className="text-xs text-neutral-400">GST 5% & 18% Multi-Tier</span>
+            <span className="text-xs text-[#aaaaaa]">GST 5% & 18% Multi-Tier</span>
           </div>
           <h1 className="text-xl font-bold text-white mt-1 font-heading">
             Invoice Studio & Generator
           </h1>
-          <p className="text-xs text-neutral-400 mt-0.5">
+          <p className="text-xs text-[#aaaaaa] mt-0.5">
             Create wholesale invoices, customize pricing presets, export PDF & Drive documents, and sync to Google Sheets.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {draftSavedAlert && (
-            <span className="text-[10px] font-bold text-red-400 bg-red-950/40 border border-red-800/60 px-2.5 py-1 rounded-md flex items-center gap-1">
+            <span className="text-[10px] font-medium text-[#aaaaaa] bg-[#272727] border border-[#383838] px-2.5 py-1 rounded-md flex items-center gap-1">
               <span>💾</span> Saved
             </span>
           )}
-          <Button variant="ghost" size="sm" onClick={handleClearToBlankForm} className="text-xs text-rose-400 hover:bg-rose-950/30 border border-[#2a2a2a]">
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Clear</span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleClearToBlankForm} 
+            className="text-xs bg-[#272727] hover:bg-[#383838] text-white border border-[#383838] font-medium"
+            title="Reset all quantities, client fields, and rates to a clean blank invoice"
+          >
+            <RefreshCw className="w-3.5 h-3.5 mr-1" />
+            <span>New / Blank Invoice</span>
           </Button>
           {!googleToken && (
-            <Button variant="outline" size="sm" onClick={signInWithGoogle} className="text-xs border-[#333333] text-neutral-300 hover:text-white hover:bg-[#202020]">
+            <Button variant="outline" size="sm" onClick={signInWithGoogle} className="text-xs border-[#383838] bg-[#272727] hover:bg-[#383838] text-neutral-200">
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Connect Drive</span>
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={handleSaveToGoogleDocs} disabled={exportingDocs} className="text-xs border-[#333333] text-neutral-300 hover:text-white hover:bg-[#202020]">
+          <Button variant="outline" size="sm" onClick={handleSaveToGoogleDocs} disabled={exportingDocs} className="text-xs border-[#383838] bg-[#272727] hover:bg-[#383838] text-neutral-200">
             <FolderPlus className="w-3.5 h-3.5" />
             <span>{exportingDocs ? 'Saving...' : 'Save to Drive'}</span>
           </Button>
           <Button 
-            variant="primary"
+            variant="primary" 
             size="sm" 
             onClick={handleDownloadPdf} 
             disabled={pdfStatus === 'generating'} 
-            className="text-xs font-bold bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-950/50"
+            className="text-xs font-semibold bg-[#f1f1f1] hover:bg-white text-[#0f0f0f] shadow-sm rounded-xl"
           >
             <Download className={`w-3.5 h-3.5 ${pdfStatus === 'generating' ? 'animate-spin' : ''}`} />
             <span>{pdfStatus === 'generating' ? 'Generating PDF...' : 'Download PDF'}</span>
           </Button>
-          <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs border-[#333333] text-neutral-300 hover:text-white hover:bg-[#202020]">
+          <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs border-[#383838] bg-[#272727] hover:bg-[#383838] text-neutral-200">
             <Printer className="w-3.5 h-3.5" />
             <span>Print</span>
           </Button>
           {invoiceMode === 'new' ? (
-            <Button variant="secondary" size="sm" onClick={handleSaveAndPushOrder} disabled={saving} className="text-xs border-[#333333] text-white hover:bg-[#2c2c2c]">
-              <Save className="w-3.5 h-3.5 text-red-400" />
+            <Button variant="secondary" size="sm" onClick={handleSaveAndPushOrder} disabled={saving} className="text-xs border-[#383838] bg-[#272727] hover:bg-[#383838] text-white">
+              <Save className="w-3.5 h-3.5 text-neutral-300" />
               <span>{saving ? 'Syncing...' : 'Save & Log'}</span>
             </Button>
           ) : (
-            <span className="px-3 py-1.5 text-[11px] font-bold text-neutral-300 bg-[#1c1c1c] rounded-lg border border-[#303030]">
+            <span className="px-3 py-1.5 text-[11px] font-medium text-neutral-300 bg-[#272727] rounded-lg border border-[#383838]">
               📋 From-Sheet Mode
             </span>
           )}
@@ -907,17 +913,32 @@ CIN: U72200KL2015PTC039279
         {/* Editor Controls (Hidden on Print) */}
         <div className="lg:col-span-5 space-y-5 print:hidden">
 
-          {/* ── Mode Toggle ────────────────────────────────── */}
+          {/* ── Mode Toggle & Quick Reset Action Bar ── */}
           <Card className="border border-[#262626]">
-            <CardContent className="p-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Invoice Workflow</p>
+            <CardContent className="p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Invoice Workflow</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFlavors({ almond: 0, peanut: 0, orange: 0, lemon: 0, seaSalt: 0, mocha: 0, jackfruit: 0 });
+                    setBox6Qty(0);
+                    setBox8Qty(0);
+                    setHamperQty(0);
+                  }}
+                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#202020] hover:bg-[#2a2a2a] text-neutral-300 border border-[#333333] transition-all"
+                  title="Zero out all flavor and box quantities immediately"
+                >
+                  ↺ Reset Quantities (0)
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => { setInvoiceMode('new'); setSelectedOrderId(''); }}
                   className={`p-2.5 rounded-lg border text-xs font-bold transition tactile-press ${
                     invoiceMode === 'new'
-                      ? 'bg-red-600 border-red-600 text-white shadow-sm'
+                      ? 'bg-neutral-800 border-neutral-600 text-white shadow-sm'
                       : 'bg-[#181818] border-[#2c2c2c] text-neutral-400 hover:text-white hover:bg-[#222222]'
                   }`}
                 >
@@ -1119,9 +1140,19 @@ CIN: U72200KL2015PTC039279
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold flex items-center justify-between">
                 <span>25g Chocolate Bar Flavor Counters</span>
-                <span className="text-xs font-bold text-red-400 font-mono">
-                  Total: {totalBarsQty} bars
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-neutral-300 font-mono">
+                    Total: {totalBarsQty} bars
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFlavors({ almond: 0, peanut: 0, orange: 0, lemon: 0, seaSalt: 0, mocha: 0, jackfruit: 0 })}
+                    className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#1e1e1e] hover:bg-[#282828] text-neutral-300 border border-[#333333] transition-all"
+                    title="Zero out all flavor counters"
+                  >
+                    Zero Flavors (0)
+                  </button>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
@@ -1135,7 +1166,7 @@ CIN: U72200KL2015PTC039279
                       onClick={() => setBarUnitPrice(150)}
                       className={`px-2.5 py-1 text-[11px] rounded-lg font-mono font-semibold transition-all ${
                         barUnitPrice === 150 
-                          ? 'bg-red-600 text-white shadow-sm font-bold' 
+                          ? 'bg-neutral-800 text-white border border-neutral-600 shadow-sm font-bold' 
                           : 'bg-[#1e1e1e] border border-[#303030] text-neutral-300 hover:bg-[#282828] hover:text-white'
                       }`}
                     >
@@ -1146,7 +1177,7 @@ CIN: U72200KL2015PTC039279
                       onClick={() => setBarUnitPrice(130)}
                       className={`px-2.5 py-1 text-[11px] rounded-lg font-mono font-semibold transition-all ${
                         barUnitPrice === 130 
-                          ? 'bg-red-600 text-white shadow-sm font-bold' 
+                          ? 'bg-neutral-800 text-white border border-neutral-600 shadow-sm font-bold' 
                           : 'bg-[#1e1e1e] border border-[#303030] text-neutral-300 hover:bg-[#282828] hover:text-white'
                       }`}
                     >
@@ -1157,7 +1188,7 @@ CIN: U72200KL2015PTC039279
                       onClick={() => setBarUnitPrice(120)}
                       className={`px-2.5 py-1 text-[11px] rounded-lg font-mono font-semibold transition-all ${
                         barUnitPrice === 120 
-                          ? 'bg-red-600 text-white shadow-sm font-bold' 
+                          ? 'bg-neutral-800 text-white border border-neutral-600 shadow-sm font-bold' 
                           : 'bg-[#1e1e1e] border border-[#303030] text-neutral-300 hover:bg-[#282828] hover:text-white'
                       }`}
                     >
@@ -1169,7 +1200,7 @@ CIN: U72200KL2015PTC039279
                   type="number"
                   value={barUnitPrice}
                   onChange={e => setBarUnitPrice(Number(e.target.value))}
-                  className="w-full rounded-lg border border-[#303030] p-1.5 text-xs bg-[#141414] text-white font-mono font-semibold focus:outline-none focus:border-red-500"
+                  className="w-full rounded-lg border border-[#303030] p-1.5 text-xs bg-[#141414] text-white font-mono font-semibold focus:outline-none focus:border-neutral-500"
                 />
               </div>
 
@@ -1204,12 +1235,12 @@ CIN: U72200KL2015PTC039279
                           min="0"
                           value={flavors[fk]}
                           onChange={e => setFlavors(prev => ({ ...prev, [fk]: Math.max(0, parseInt(e.target.value) || 0) }))}
-                          className="w-12 text-center font-bold font-mono text-white bg-[#141414] border border-[#303030] rounded-lg py-1 text-xs focus:outline-none focus:border-red-500"
+                          className="w-12 text-center font-bold font-mono text-white bg-[#141414] border border-[#303030] rounded-lg py-1 text-xs focus:outline-none focus:border-neutral-500"
                         />
                         <button
                           type="button"
                           onClick={() => adjustFlavor(fk, 1)}
-                          className="w-7 h-7 rounded-lg bg-red-600 hover:bg-red-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm"
+                          className="w-7 h-7 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -1224,7 +1255,17 @@ CIN: U72200KL2015PTC039279
           {/* Interactive Boxes & Hampers Counters & Custom Rates */}
           <Card>
             <CardHeader className="pb-3 border-b border-[#242424]">
-              <CardTitle className="text-sm font-semibold text-white">Boxes & Gift Hampers (Editable Rates)</CardTitle>
+              <CardTitle className="text-sm font-semibold text-white flex items-center justify-between">
+                <span>Boxes & Gift Hampers (Editable Rates)</span>
+                <button
+                  type="button"
+                  onClick={() => { setBox6Qty(0); setBox8Qty(0); setHamperQty(0); }}
+                  className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#1e1e1e] hover:bg-[#282828] text-neutral-300 border border-[#333333] transition-all"
+                  title="Zero out all box and hamper quantities"
+                >
+                  Zero Boxes (0)
+                </button>
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-xs pt-3">
               {/* Gift Hamper */}
@@ -1243,7 +1284,7 @@ CIN: U72200KL2015PTC039279
                       onChange={e => setHamperQty(Math.max(0, parseInt(e.target.value) || 0))}
                       className="w-12 text-center font-bold font-mono bg-[#141414] border border-[#303030] rounded-lg py-1 text-xs text-white" />
                     <button type="button" onClick={() => setHamperQty(hamperQty + 1)}
-                      className="w-7 h-7 rounded-lg bg-red-600 hover:bg-red-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
+                      className="w-7 h-7 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1275,18 +1316,18 @@ CIN: U72200KL2015PTC039279
                       onChange={e => setBox6Qty(Math.max(0, parseInt(e.target.value) || 0))}
                       className="w-12 text-center font-bold font-mono bg-[#141414] border border-[#303030] rounded-lg py-1 text-xs text-white" />
                     <button type="button" onClick={() => setBox6Qty(box6Qty + 1)}
-                      className="w-7 h-7 rounded-lg bg-red-600 hover:bg-red-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
+                      className="w-7 h-7 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-[11px] pt-1 border-t border-[#202020]">
-                  <span className="text-neutral-400 font-medium">Rate (₹/box):</span>
+                  <span className="text-neutral-400 font-medium">Rate (₹/Box):</span>
                   <input
                     type="number"
                     value={box6UnitPrice}
                     onChange={e => setBox6UnitPrice(Number(e.target.value))}
-                    className="w-28 rounded-lg border border-[#303030] p-1 text-right font-mono text-xs bg-[#141414] text-white focus:outline-none focus:border-red-500"
+                    className="w-28 rounded-lg border border-[#303030] p-1 text-right font-mono text-xs bg-[#141414] text-white focus:outline-none focus:border-neutral-500"
                   />
                 </div>
               </div>
@@ -1307,18 +1348,18 @@ CIN: U72200KL2015PTC039279
                       onChange={e => setBox8Qty(Math.max(0, parseInt(e.target.value) || 0))}
                       className="w-12 text-center font-bold font-mono bg-[#141414] border border-[#303030] rounded-lg py-1 text-xs text-white" />
                     <button type="button" onClick={() => setBox8Qty(box8Qty + 1)}
-                      className="w-7 h-7 rounded-lg bg-red-600 hover:bg-red-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
+                      className="w-7 h-7 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-[11px] pt-1 border-t border-[#202020]">
-                  <span className="text-neutral-400 font-medium">Rate (₹/box):</span>
+                  <span className="text-neutral-400 font-medium">Rate (₹/Box):</span>
                   <input
                     type="number"
                     value={box8UnitPrice}
                     onChange={e => setBox8UnitPrice(Number(e.target.value))}
-                    className="w-28 rounded-lg border border-[#303030] p-1 text-right font-mono text-xs bg-[#141414] text-white focus:outline-none focus:border-red-500"
+                    className="w-28 rounded-lg border border-[#303030] p-1 text-right font-mono text-xs bg-[#141414] text-white focus:outline-none focus:border-neutral-500"
                   />
                 </div>
               </div>

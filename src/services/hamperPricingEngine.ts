@@ -129,10 +129,10 @@ export class HamperPricingEngine {
       'Value Pick (~45% Margin)',
       '/images/brand/prod_real_ppan1026.jpg',
       {
-        bg: 'from-[#1a1a1a] to-[#0f0f0f]',
-        border: 'border-[#333333]',
-        text: 'text-neutral-300',
-        accent: 'bg-neutral-700'
+        bg: 'bg-[#1f1f1f]',
+        border: 'border-[#2e2e2e]',
+        text: 'text-[#aaaaaa]',
+        accent: 'bg-[#272727]'
       }
     );
 
@@ -166,10 +166,10 @@ export class HamperPricingEngine {
       'Most Popular (Balanced)',
       '/images/brand/prod_gift_8.jpg',
       {
-        bg: 'from-[#221013] via-[#171717] to-[#0d0d0d]',
-        border: 'border-red-600/50',
-        text: 'text-red-400',
-        accent: 'bg-red-600'
+        bg: 'bg-[#212121]',
+        border: 'border-[#3f3f3f]',
+        text: 'text-white',
+        accent: 'bg-white'
       }
     );
 
@@ -205,10 +205,10 @@ export class HamperPricingEngine {
       'VIP Luxury Upgrade',
       '/images/brand/kerala_heritage_hamper.jpg',
       {
-        bg: 'from-[#2a0e14] via-[#1a1416] to-[#0a0a0a]',
-        border: 'border-red-500/70',
-        text: 'text-red-300',
-        accent: 'bg-red-600'
+        bg: 'bg-[#1f1f1f]',
+        border: 'border-[#2e2e2e]',
+        text: 'text-zinc-200',
+        accent: 'bg-[#272727]'
       }
     );
 

@@ -57,17 +57,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           collapsed ? 'justify-center px-2 py-2.5' : 'justify-between px-3 py-2'
         } ${
           isActive
-            ? 'bg-red-600/15 text-white border border-red-500/40 shadow-sm shadow-red-950/20 font-semibold'
-            : 'text-neutral-400 hover:text-white hover:bg-[#1a1a1a]'
+            ? 'bg-[#272727] text-white font-semibold'
+            : 'text-[#aaaaaa] hover:text-white hover:bg-[#222222]'
         }`}
       >
         <div className={`flex items-center truncate ${collapsed ? 'justify-center' : 'gap-2.5'}`}>
           <DynamicIcon 
             name={mod.iconName} 
-            className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
+            className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-105 ${
               isActive 
-                ? 'text-red-500' 
-                : 'text-neutral-500 group-hover:text-red-400'
+                ? 'text-white' 
+                : 'text-[#888888] group-hover:text-white'
             }`} 
           />
           {!collapsed && <span className="truncate">{mod.name}</span>}
@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
 
   return (
     <aside
-      className={`h-full border-r border-[#242424] bg-[#0c0c0c] flex flex-col justify-between transition-all duration-300 relative z-30 select-none print-hide print:hidden ${
+      className={`h-full border-r border-[#242424] bg-[#0f0f0f] flex flex-col justify-between transition-all duration-300 relative z-30 select-none print-hide print:hidden ${
         collapsed ? 'w-16' : 'w-60'
       }`}
     >
@@ -97,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
         {/* Header Block */}
         <div className={`h-16 flex items-center border-b border-[#242424] ${collapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="text-red-500 flex-shrink-0 bg-red-600/10 p-1.5 rounded-xl border border-red-500/20 shadow-sm shadow-red-950/20">
+            <div className="text-white flex-shrink-0 bg-[#272727] p-1.5 rounded-xl border border-[#383838]">
               <GudLogo size={22} />
             </div>
             {!collapsed && (
@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
                 <span className="font-bold tracking-tight text-white text-sm font-heading whitespace-nowrap">
                   GUDORIA ERP
                 </span>
-                <span className="text-[10px] text-red-400/80 font-medium tracking-wide">
+                <span className="text-[10px] text-[#aaaaaa] font-medium tracking-wide">
                   Atelier Confectionery
                 </span>
               </div>
@@ -114,7 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
 
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="absolute -right-3 top-5 p-1 bg-[#181818] border border-[#383838] rounded-full text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors shadow-md"
+            className="absolute -right-3 top-5 p-1 bg-[#1f1f1f] border border-[#383838] rounded-full text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors shadow-md"
           >
             {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
           </button>
@@ -126,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             href="/invoice-generator"
             onClick={(e) => { e.preventDefault(); onNavigate('/invoice-generator'); }}
             title={collapsed ? "New Invoice" : undefined}
-            className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl shadow-md shadow-red-950/40 border border-red-500/30 tactile-press font-semibold text-xs group cursor-pointer ${
+            className={`w-full flex items-center justify-center gap-2 bg-[#f1f1f1] hover:bg-white text-[#0f0f0f] rounded-xl font-semibold text-xs shadow-sm tactile-press group cursor-pointer ${
               collapsed ? 'p-2.5' : 'px-3 py-2.5'
             }`}
           >
@@ -220,16 +220,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             title="View Profile Details"
           >
             {/* Avatar Fallback */}
-            <div className="w-8.5 h-8.5 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-full bg-[#383838] text-white flex items-center justify-center font-bold text-xs shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
               {profile.displayName ? profile.displayName.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
             </div>
             
             {!collapsed && (
               <div className="min-w-0 leading-tight">
-                <p className="text-xs font-semibold text-white truncate group-hover:text-red-400">
+                <p className="text-xs font-semibold text-white truncate group-hover:text-neutral-300">
                   {profile.displayName || 'GUD Member'}
                 </p>
-                <span className="text-[9px] font-semibold text-red-400 bg-red-950/40 border border-red-900/40 px-1.5 py-0.5 rounded-full mt-0.5 inline-block capitalize">
+                <span className="text-[9px] font-medium text-[#aaaaaa] bg-[#272727] border border-[#383838] px-1.5 py-0.5 rounded-full mt-0.5 inline-block capitalize">
                   {profile.role}
                 </span>
               </div>
@@ -240,9 +240,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             <button
               onClick={signOutUser}
               title="Sign Out"
-              className="p-1.5 rounded-md text-neutral-400 hover:text-red-500 hover:bg-red-950/20 transition-all"
+              className="p-1.5 rounded-md text-[#aaaaaa] hover:text-white hover:bg-[#272727] transition-all"
             >
-              <LogOut className="w-4.5 h-4.5" />
+              <LogOut className="w-4 h-4" />
             </button>
           )}
         </div>

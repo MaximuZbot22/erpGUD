@@ -277,7 +277,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           description="Customer Master directory"
           trend={{ value: 12.5, type: 'up' }}
           sparklineData={[30, 32, 35, 34, 38, activeCustomersCount || 73]}
-          icon={<Users className="w-5 h-5 text-[#e50914]" />}
+          icon={<Users className="w-5 h-5 text-neutral-300" />}
         />
         <StatisticsCard
           title="Production Runs"
@@ -285,7 +285,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           description="Active outsourced batches"
           trend={{ value: 8.4, type: 'up' }}
           sparklineData={[5, 8, 6, 9, 7, activeProductionRuns || 8]}
-          icon={<Factory className="w-5 h-5 text-zinc-300" />}
+          icon={<Factory className="w-5 h-5 text-neutral-300" />}
         />
         <StatisticsCard
           title="Accounts Payable"
@@ -311,13 +311,13 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           <div 
             key={idx} 
             onClick={() => onNavigate('/invoice-generator')}
-            className="bg-[#141414] border border-[#262626] rounded-xl p-2.5 flex flex-col items-center text-center hover:border-[#e50914]/60 hover:bg-[#181818] transition-all group cursor-pointer tactile-press shadow-sm"
+            className="bg-[#1f1f1f] border border-[#2e2e2e] rounded-xl p-2.5 flex flex-col items-center text-center hover:border-[#444444] hover:bg-[#272727] transition-all group cursor-pointer tactile-press shadow-sm"
           >
-            <div className="w-14 h-14 rounded-lg bg-black p-1 flex items-center justify-center overflow-hidden border border-[#222222] mb-2">
-              <img src={p.image} alt={p.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+            <div className="w-14 h-14 rounded-lg bg-black p-1 flex items-center justify-center overflow-hidden border border-[#2e2e2e] mb-2">
+              <img src={p.image} alt={p.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
             </div>
-            <p className="text-[11px] font-bold text-zinc-100 truncate w-full">{p.name}</p>
-            <span className="text-[9px] font-mono text-[#ff1e27] bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30 inline-block mt-1 truncate max-w-full">
+            <p className="text-[11px] font-medium text-white truncate w-full">{p.name}</p>
+            <span className="text-[9px] font-mono text-[#aaaaaa] bg-[#272727] px-1.5 py-0.5 rounded border border-[#383838] inline-block mt-1 truncate max-w-full">
               {p.tag}
             </span>
           </div>
@@ -329,10 +329,10 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
         
         {/* Left 2 Cols: Critical Operations */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border border-[#262626] bg-[#141414]">
-            <CardHeader className="border-b border-[#222222]">
+          <Card className="border border-[#2e2e2e] bg-[#1f1f1f]">
+            <CardHeader className="border-b border-[#282828]">
               <CardTitle className="flex items-center gap-2">
-                <CheckSquare className="w-4 h-4 text-[#408d6d]" />
+                <CheckSquare className="w-4 h-4 text-emerald-400" />
                 <span>Critical Operations & Actions</span>
               </CardTitle>
               <Button variant="secondary" size="xs" onClick={() => onNavigate('/tasks')} leftIcon={<Plus className="w-3.5 h-3.5" />}>
@@ -349,15 +349,15 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           </Card>
 
           {/* Accounts Payable / Receivable Table */}
-          <Card className="border border-[#262626] bg-[#141414]">
-            <CardHeader className="border-b border-[#222222]">
+          <Card className="border border-[#2e2e2e] bg-[#1f1f1f]">
+            <CardHeader className="border-b border-[#282828]">
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-amber-400" />
                   <span>Accounts Payable & Receivable</span>
                 </CardTitle>
               </div>
-              <Button variant="outline" size="xs" onClick={() => onNavigate('/finance')} rightIcon={<ArrowRight className="w-3.5 h-3.5 text-[#e50914]" />}>
+              <Button variant="outline" size="xs" onClick={() => onNavigate('/finance')} rightIcon={<ArrowRight className="w-3.5 h-3.5 text-[#aaaaaa]" />}>
                 Finance Ledger
               </Button>
             </CardHeader>
@@ -375,17 +375,17 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
         <div className="space-y-6">
           
           {/* Quick Operations Guide Search */}
-          <Card className="border border-[#262626] bg-[#141414]">
-            <CardHeader className="pb-2 border-b border-[#222222]">
+          <Card className="border border-[#2e2e2e] bg-[#1f1f1f]">
+            <CardHeader className="pb-2 border-b border-[#282828]">
               <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-[#e50914]" />
-                <CardTitle className="text-xs font-bold text-zinc-200">Module & Record Directory</CardTitle>
+                <HelpCircle className="w-4 h-4 text-[#aaaaaa]" />
+                <CardTitle className="text-xs font-bold text-white">Module & Record Directory</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="pt-3 space-y-3">
               <form onSubmit={handleDirectorySearch} className="flex gap-2">
                 <div className="relative flex-1">
-                  <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-zinc-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-[#888888] pointer-events-none">
                     <Search className="w-3.5 h-3.5" />
                   </span>
                   <input
@@ -396,13 +396,13 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
                       setSearchQuery(e.target.value);
                       if (!e.target.value) setSearchResult(null);
                     }}
-                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-black border border-[#2a2a2a] rounded-lg focus:outline-none focus:border-[#e50914] text-zinc-100 placeholder-zinc-500"
+                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-white placeholder-[#888888]"
                   />
                 </div>
-                <Button type="submit" size="xs" className="px-3 py-1.5 bg-[#e50914] hover:bg-[#ff1e27] text-white font-bold tactile-press">Find</Button>
+                <Button type="submit" size="xs" className="px-3 py-1.5 bg-[#f1f1f1] hover:bg-white text-[#0f0f0f] font-semibold tactile-press">Find</Button>
               </form>
               {searchResult && (
-                <div className="p-2.5 bg-red-950/20 border border-red-900/30 rounded-lg text-red-300 font-medium text-[11px]">
+                <div className="p-2.5 bg-[#272727] border border-[#383838] rounded-lg text-neutral-200 font-medium text-[11px]">
                   {searchResult}
                 </div>
               )}
@@ -410,71 +410,71 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           </Card>
 
           {/* Module Quick Shortcuts */}
-          <Card className="border border-[#262626] bg-[#141414]">
-            <CardHeader className="border-b border-[#222222]">
+          <Card className="border border-[#2e2e2e] bg-[#1f1f1f]">
+            <CardHeader className="border-b border-[#282828]">
               <CardTitle className="flex items-center gap-2 text-xs">
-                <Layers className="w-4 h-4 text-[#e50914]" />
+                <Layers className="w-4 h-4 text-[#aaaaaa]" />
                 <span>Quick Modules</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-2">
               <button 
                 onClick={() => onNavigate('/documents')}
-                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
+                className="p-3 text-left bg-[#181818] border border-[#282828] rounded-xl hover:border-[#444444] hover:bg-[#222222] transition-all text-xs space-y-1 group tactile-press"
               >
-                <FileText className="w-4 h-4 text-[#e50914] mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-zinc-100">Asset Vault</p>
-                <span className="text-[10px] text-zinc-400 block">Drive & Sheet 2-Way</span>
+                <FileText className="w-4 h-4 text-[#aaaaaa] mb-1 group-hover:text-white transition-colors" />
+                <p className="font-semibold text-white">Asset Vault</p>
+                <span className="text-[10px] text-[#aaaaaa] block">Drive & Sheet 2-Way</span>
               </button>
 
               <button 
                 onClick={() => onNavigate('/invoice-generator')}
-                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
+                className="p-3 text-left bg-[#181818] border border-[#282828] rounded-xl hover:border-[#444444] hover:bg-[#222222] transition-all text-xs space-y-1 group tactile-press"
               >
-                <ShoppingBag className="w-4 h-4 text-[#ff1e27] mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-zinc-100">Invoice Studio</p>
-                <span className="text-[10px] text-zinc-400 block">PDF Generator</span>
+                <ShoppingBag className="w-4 h-4 text-[#aaaaaa] mb-1 group-hover:text-white transition-colors" />
+                <p className="font-semibold text-white">Invoice Studio</p>
+                <span className="text-[10px] text-[#aaaaaa] block">PDF Generator</span>
               </button>
 
               <button 
                 onClick={() => onNavigate('/orders')}
-                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
+                className="p-3 text-left bg-[#181818] border border-[#282828] rounded-xl hover:border-[#444444] hover:bg-[#222222] transition-all text-xs space-y-1 group tactile-press"
               >
-                <Users className="w-4 h-4 text-zinc-300 mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-zinc-100">Customers</p>
-                <span className="text-[10px] text-zinc-400 block">Master Registry</span>
+                <Users className="w-4 h-4 text-[#aaaaaa] mb-1 group-hover:text-white transition-colors" />
+                <p className="font-semibold text-white">Customers</p>
+                <span className="text-[10px] text-[#aaaaaa] block">Master Registry</span>
               </button>
 
               <button 
                 onClick={() => onNavigate('/supply-chain')}
-                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
+                className="p-3 text-left bg-[#181818] border border-[#282828] rounded-xl hover:border-[#444444] hover:bg-[#222222] transition-all text-xs space-y-1 group tactile-press"
               >
-                <Factory className="w-4 h-4 text-zinc-300 mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-zinc-100">Supply Chain</p>
-                <span className="text-[10px] text-zinc-400 block">Vendors & POs</span>
+                <Factory className="w-4 h-4 text-[#aaaaaa] mb-1 group-hover:text-white transition-colors" />
+                <p className="font-semibold text-white">Supply Chain</p>
+                <span className="text-[10px] text-[#aaaaaa] block">Vendors & POs</span>
               </button>
             </CardContent>
           </Card>
 
           {/* Recent Audit Activities */}
-          <Card className="border border-[#262626] bg-[#141414]">
-            <CardHeader className="border-b border-[#222222]">
+          <Card className="border border-[#2e2e2e] bg-[#1f1f1f]">
+            <CardHeader className="border-b border-[#282828]">
               <CardTitle className="flex items-center gap-2 text-xs">
-                <ShieldCheck className="w-4 h-4 text-[#e50914]" />
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>Audit Timeline</span>
               </CardTitle>
-              {logsLoading && <RefreshCcw className="w-3.5 h-3.5 animate-spin text-zinc-500" />}
+              {logsLoading && <RefreshCcw className="w-3.5 h-3.5 animate-spin text-neutral-500" />}
             </CardHeader>
             <CardContent className="space-y-3">
               {recentLogs.map((log) => (
-                <div key={log.id} className="text-xs flex items-start gap-2.5 pb-2.5 border-b border-[#222222] last:border-0 last:pb-0">
-                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#e50914] flex-shrink-0" />
+                <div key={log.id} className="text-xs flex items-start gap-2.5 pb-2.5 border-b border-[#282828] last:border-0 last:pb-0">
+                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#aaaaaa] flex-shrink-0" />
                   <div className="flex-1 space-y-0.5 min-w-0">
-                    <p className="font-medium text-zinc-200 leading-snug truncate">
+                    <p className="font-medium text-neutral-200 leading-snug truncate">
                       {log.action}
                     </p>
-                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
-                      <span className="font-semibold text-zinc-300">{log.actorName}</span>
+                    <div className="flex items-center gap-1.5 text-[10px] text-[#888888]">
+                      <span className="font-medium text-neutral-300">{log.actorName}</span>
                       <span>•</span>
                       <span>{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
