@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
-import { Printer, Download, ArrowLeft, Send } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Printer, Download, ArrowLeft, Send, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { TajHamperProject } from '../../pages/HamperStudio';
 import { GudLogo } from '../Sidebar';
+import { exportElementToPdf, printIsolatedElement } from '../../utils/documentExport';
 
 interface ProposalDocProps {
   project: TajHamperProject;
@@ -11,6 +12,7 @@ interface ProposalDocProps {
 
 export const HamperProposalDocument: React.FC<ProposalDocProps> = ({ project, onBack }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   // Math Calculations for Proposal
   let subtotal = 0;
@@ -29,25 +31,54 @@ export const HamperProposalDocument: React.FC<ProposalDocProps> = ({ project, on
   const grandTotal = Math.round(subtotal + gstTotal + totalBillableExpenses);
 
   const handlePrint = () => {
-    window.print();
+    if (!printRef.current) {
+      window.print();
+      return;
+    }
+    printIsolatedElement(printRef.current);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!printRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      await exportElementToPdf(printRef.current, {
+        fileName: `PROPOSAL-${project.id || 'Project'}.pdf`,
+        padding: '24px',
+        scale: 1.75
+      });
+    } catch (err) {
+      console.error('Hamper Proposal PDF download error:', err);
+      handlePrint();
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       {/* Top Controls Bar */}
-      <div className="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800 print:hidden">
-        <Button onClick={onBack} variant="outline" className="text-slate-300 border-slate-700 text-xs">
+      <div className="flex justify-between items-center bg-[#181818] p-4 rounded-xl border border-[#282828] print:hidden">
+        <Button onClick={onBack} variant="outline" className="text-neutral-300 border-[#383838] hover:bg-[#252525] text-xs">
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Project Workstation
         </Button>
         <div className="flex gap-2">
-          <Button onClick={handlePrint} className="bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs">
-            <Printer className="w-4 h-4 mr-1" /> Print Proposal PDF
+          <Button
+            onClick={handleDownloadPdf}
+            disabled={downloading}
+            className="bg-[#242424] hover:bg-[#303030] text-white border border-[#383838] font-medium text-xs"
+          >
+            {downloading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Download className="w-4 h-4 mr-1" />}
+            Download PDF
+          </Button>
+          <Button onClick={handlePrint} className="bg-red-600 hover:bg-red-500 text-white font-semibold text-xs">
+            <Printer className="w-4 h-4 mr-1" /> Print Proposal / Save as PDF
           </Button>
         </div>
       </div>
 
       {/* Printable A4 Document Sheet */}
-      <div ref={printRef} className="bg-white text-slate-900 p-10 rounded-xl shadow-2xl space-y-8 font-sans border border-slate-200 text-sm print:p-0 print:shadow-none print:border-none print:rounded-none">
+      <div ref={printRef} className="bg-white text-slate-900 p-10 rounded-xl shadow-2xl space-y-8 font-sans border border-slate-200 text-sm max-w-[794px] mx-auto box-border print:p-0 print:shadow-none print:border-none print:rounded-none">
         {/* Header */}
         <div className="flex justify-between items-start border-b border-slate-200 pb-6">
           <div>

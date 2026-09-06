@@ -11,6 +11,7 @@ import seedData from '../data/seedDataV2.json';
 import { GoogleSheetsService, GoogleDriveService } from '../services/google';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
+import { exportElementToPdf, printIsolatedElement } from '../utils/documentExport';
 
 interface InvoiceItem {
   id: string;
@@ -629,7 +630,12 @@ export const InvoiceGenerator: React.FC = () => {
   const [pdfStatus, setPdfStatus] = useState<'idle' | 'generating' | 'success' | 'error'>('idle');
 
   const handlePrint = () => {
-    window.print();
+    const element = document.getElementById('printable-invoice-container');
+    if (!element) {
+      window.print();
+      return;
+    }
+    printIsolatedElement(element);
   };
 
   // Production-Grade Non-Blocking PDF Export Pipeline
@@ -637,77 +643,34 @@ export const InvoiceGenerator: React.FC = () => {
     if (pdfStatus === 'generating') return;
     setPdfStatus('generating');
 
-    // Step 1: Yield to browser main thread so React renders the loading state on the button
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    const element = document.getElementById('printable-invoice-container');
-    if (!element) {
-      setPdfStatus('idle');
-      return;
-    }
-
-    // Step 2: Create isolated off-screen wrapper node for rendering
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'fixed';
-    tempContainer.style.left = '-9999px';
-    tempContainer.style.top = '0px';
-    tempContainer.style.width = '794px';
-    tempContainer.style.backgroundColor = '#ffffff';
-    tempContainer.style.color = '#000000';
-    tempContainer.style.zIndex = '-9999';
-
-    const clone = element.cloneNode(true) as HTMLElement;
-    clone.style.boxShadow = 'none';
-    clone.style.border = 'none';
-    clone.style.borderRadius = '0';
-    clone.style.padding = '32px';
-
-    tempContainer.appendChild(clone);
-    document.body.appendChild(tempContainer);
-
-    let blobUrl: string | null = null;
-
     try {
-      // Step 3: Dynamically load html2pdf module without blocking app startup
-      const html2pdf = (await import('html2pdf.js')).default;
-      const opt = {
-        margin: 0.3,
-        filename: `${invoiceNoFormatted}.pdf`,
-        image: { type: 'jpeg' as const, quality: 0.95 },
-        html2canvas: { scale: 1.75, useCORS: true, logging: false },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' as const }
-      };
+      const element = document.getElementById('printable-invoice-container');
+      if (!element) throw new Error('Invoice container not found');
 
-      // Step 4: Generate direct binary Blob without unneeded base64 string allocations
-      const worker = html2pdf().set(opt).from(clone);
-      const pdfBlob: Blob = await worker.output('blob');
-
-      // Step 5: Trigger native download via temporary Object URL
-      blobUrl = URL.createObjectURL(pdfBlob);
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.href = blobUrl;
-      downloadAnchor.download = `${invoiceNoFormatted}.pdf`;
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      document.body.removeChild(downloadAnchor);
-
+      await exportElementToPdf(element, {
+        fileName: invoiceNoFormatted,
+        padding: '24px',
+        scale: 1.75
+      });
       setPdfStatus('success');
+      sendNotification({
+        title: 'PDF Downloaded',
+        message: `${invoiceNoFormatted}.pdf ready and saved!`,
+        priority: 'low',
+        channels: ['in-app']
+      });
     } catch (err: any) {
       console.error('PDF generation error:', err);
       setPdfStatus('error');
-      // Fallback to native print preview if html2pdf fails
-      window.print();
+      // Fallback to isolated native print if html2pdf fails
+      const element = document.getElementById('printable-invoice-container');
+      if (element) {
+        printIsolatedElement(element);
+      } else {
+        window.print();
+      }
     } finally {
-      // Step 6: Strict Garbage Collection & Memory Cleanup Path
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-      }
-      if (document.body.contains(tempContainer)) {
-        document.body.removeChild(tempContainer);
-      }
-      // Step 7: Yield to main thread before returning UI to idle state
-      await new Promise(resolve => setTimeout(resolve, 50));
-      setPdfStatus('idle');
+      setTimeout(() => setPdfStatus('idle'), 600);
     }
   };
 
@@ -1483,7 +1446,7 @@ CIN: U72200KL2015PTC039279
         <div className="lg:col-span-7">
           <div 
             id="printable-invoice-container"
-            className="bg-white text-slate-900 p-8 rounded-xl shadow-lg border border-slate-200 font-sans text-xs"
+            className="bg-white text-slate-900 p-8 rounded-xl shadow-lg border border-slate-200 font-sans text-xs max-w-[794px] mx-auto box-border"
           >
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-200 pb-4 mb-4">
