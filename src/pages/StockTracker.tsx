@@ -38,14 +38,21 @@ export interface StockMovement {
   flavors: FlavorData;
 }
 
-const FLAVOR_CONFIG: { key: keyof FlavorData; name: string; shortName: string; color: string; bg: string; border: string }[] = [
-  { key: 'almond', name: 'Almond Noir 25g', shortName: 'Almond', color: 'text-amber-400', bg: 'bg-amber-950/30', border: 'border-amber-800/50' },
-  { key: 'orange', name: 'Orange Sunset 25g', shortName: 'Orange', color: 'text-orange-400', bg: 'bg-orange-950/30', border: 'border-orange-800/50' },
-  { key: 'jackfruit', name: 'Malabar Jackfruit 25g', shortName: 'Jackfruit', color: 'text-yellow-400', bg: 'bg-yellow-950/30', border: 'border-yellow-800/50' },
-  { key: 'lemon', name: 'Sun-Kissed Lemon 25g', shortName: 'Lemon', color: 'text-lime-400', bg: 'bg-lime-950/30', border: 'border-lime-800/50' },
-  { key: 'mocha', name: 'Midnight Mocha 25g', shortName: 'Mocha', color: 'text-amber-600', bg: 'bg-amber-900/30', border: 'border-amber-700/50' },
-  { key: 'seaSalt', name: 'Indian Sea Salt 25g', shortName: 'Sea Salt', color: 'text-cyan-400', bg: 'bg-cyan-950/30', border: 'border-cyan-800/50' },
-  { key: 'peanuts', name: 'Peanut Royale 25g', shortName: 'Peanuts', color: 'text-stone-300', bg: 'bg-stone-900/40', border: 'border-stone-700/50' }
+const FLAVOR_CONFIG: { 
+  key: keyof FlavorData; 
+  name: string; 
+  shortName: string; 
+  color: string; 
+  dotColor: string; 
+  image: string; 
+}[] = [
+  { key: 'almond', name: 'Almond Noir 25g', shortName: 'Almond', color: 'text-amber-400', dotColor: 'bg-amber-500', image: '/images/brand/prod_almond_art.png' },
+  { key: 'orange', name: 'Orange Sunset 25g', shortName: 'Orange', color: 'text-orange-400', dotColor: 'bg-orange-500', image: '/images/brand/prod_orange_art.png' },
+  { key: 'jackfruit', name: 'Malabar Jackfruit 25g', shortName: 'Jackfruit', color: 'text-yellow-400', dotColor: 'bg-yellow-400', image: '/images/brand/prod_jackfruit_art.png' },
+  { key: 'lemon', name: 'Sun-Kissed Lemon 25g', shortName: 'Lemon', color: 'text-lime-400', dotColor: 'bg-lime-400', image: '/images/brand/prod_lemon_art.png' },
+  { key: 'mocha', name: 'Midnight Mocha 25g', shortName: 'Mocha', color: 'text-amber-600', dotColor: 'bg-amber-700', image: '/images/brand/prod_mocha_art.png' },
+  { key: 'seaSalt', name: 'Indian Sea Salt 25g', shortName: 'Sea Salt', color: 'text-cyan-400', dotColor: 'bg-cyan-400', image: '/images/brand/prod_seasalt_art.png' },
+  { key: 'peanuts', name: 'Peanut Royale 25g', shortName: 'Peanuts', color: 'text-stone-300', dotColor: 'bg-stone-300', image: '/images/brand/prod_peanut_art.png' }
 ];
 
 const parseSafeInt = (val: any): number => {
@@ -693,42 +700,42 @@ export const StockTracker: React.FC = () => {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* TOP DASHBOARD HEADER & QUICK MOBILE LOOKUP */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#1F1F1F] border border-[#2E2E2E] p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800">
+            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-[#272727] text-neutral-300 border border-[#383838]">
               Live Stock Engine
             </span>
-            <span className="text-xs text-slate-400 font-medium">7 Gourmet Flavors</span>
+            <span className="text-xs text-neutral-400 font-medium">7 Gourmet Flavors</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mt-1.5 flex items-center gap-2">
+          <h1 className="text-xl font-bold text-white mt-1.5 flex items-center gap-2">
             <span>Chocolate Stock Checker & FIFO Engine</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+          <p className="text-xs text-neutral-400 mt-1 max-w-2xl">
             Real-time batch balances, FIFO stock clearance warnings, sample tracking, and 2-way Google Sheet sync.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {googleToken ? (
-            <Button variant="outline" size="sm" onClick={fetchSheetStockData} disabled={loadingSync} className="text-xs border-slate-700 hover:bg-slate-800 text-slate-200">
-              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingSync ? 'animate-spin' : ''}`} />
+            <Button variant="secondary" size="sm" onClick={fetchSheetStockData} disabled={loadingSync} className="text-xs">
+              <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loadingSync ? 'animate-spin' : ''}`} />
               {loadingSync ? 'Syncing...' : 'Sync Sheet'}
             </Button>
           ) : (
-            <Button variant="outline" size="sm" onClick={signInWithGoogle} className="text-xs border-amber-500/50 text-amber-300 hover:bg-amber-950/40">
-              <Sparkles className="w-3.5 h-3.5 mr-1 text-amber-400" />
+            <Button variant="secondary" size="sm" onClick={signInWithGoogle} className="text-xs">
+              <Sparkles className="w-3.5 h-3.5 mr-1.5 text-neutral-300" />
               Connect Stock Sheet
             </Button>
           )}
 
-          <Button onClick={() => setIsReceivingModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md">
-            <Plus className="w-4 h-4 mr-1" />
+          <Button variant="primary" size="sm" onClick={() => setIsReceivingModalOpen(true)} className="text-xs font-semibold">
+            <Plus className="w-3.5 h-3.5 mr-1" />
             Receive Stock Batch
           </Button>
 
-          <Button onClick={() => setIsMovementModalOpen(true)} className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-md">
-            <Truck className="w-4 h-4 mr-1" />
+          <Button variant="secondary" size="sm" onClick={() => setIsMovementModalOpen(true)} className="text-xs">
+            <Truck className="w-3.5 h-3.5 mr-1.5" />
             Dispatch / Move Stock
           </Button>
         </div>
@@ -738,48 +745,41 @@ export const StockTracker: React.FC = () => {
       {/* 🚨 PERSISTENT FIFO CLEARANCE WARNING BANNER */}
       {/* ───────────────────────────────────────────────────────────── */}
       {fifoOldestBatch && (
-        <div className="relative bg-slate-900/90 border border-slate-800/80 border-l-4 border-l-amber-500/80 p-5 rounded-xl shadow-xl overflow-hidden backdrop-blur-md">
-          {/* Subtle Ambient Background Graphic */}
-          <div 
-            className="absolute inset-0 opacity-15 pointer-events-none bg-cover bg-center mix-blend-overlay"
-            style={{ backgroundImage: "url('/images/banner_bg.png')" }}
-          />
-
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
-            <div className="flex items-start gap-4">
-              {/* Minimal Icon Badge */}
-              <div className="p-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg flex-shrink-0 mt-0.5 shadow-sm">
-                <Clock className="w-5 h-5" />
+        <div className="bg-[#1F1F1F] border border-[#2E2E2E] border-l-4 border-l-amber-500/80 p-4 rounded-xl shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="p-2 bg-[#272727] border border-[#383838] text-amber-400 rounded-lg flex-shrink-0 mt-0.5">
+                <Clock className="w-4 h-4" />
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="px-2.5 py-0.5 text-[10px] font-semibold tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded-full font-mono uppercase">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2 py-0.5 text-[10px] font-semibold tracking-wider bg-amber-500/10 text-amber-300 border border-amber-500/20 rounded-md font-mono uppercase">
                     FIFO Clearance Priority
                   </span>
-                  <span className="text-xs font-mono text-slate-400">
+                  <span className="text-xs font-mono text-neutral-400">
                     Received {fifoOldestBatch.dateReceived}
                   </span>
                 </div>
 
-                <h3 className="text-base font-semibold text-slate-100 leading-snug">
+                <h3 className="text-sm font-semibold text-white leading-snug">
                   Oldest Batch <span className="text-amber-400 font-mono font-bold">{fifoOldestBatch.batchId}</span> Available for Dispatch
                 </h3>
 
-                <p className="text-xs text-slate-400 leading-relaxed max-w-3xl">
-                  This batch contains <span className="text-slate-200 font-medium">{fifoOldestBatch.totalGoodLeft} good bars</span>. Dispatching from this batch first prevents stock expiration and maintains optimal shelf turnover.
+                <p className="text-xs text-neutral-400 leading-relaxed max-w-3xl">
+                  This batch contains <span className="text-neutral-200 font-medium">{fifoOldestBatch.totalGoodLeft} good bars</span>. Dispatching from this batch first prevents stock expiration and maintains optimal shelf turnover.
                 </p>
 
-                {/* Refined Flavor Breakdown Pills */}
-                <div className="flex flex-wrap gap-1.5 pt-2">
+                {/* Flavor Breakdown Pills */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   {FLAVOR_CONFIG.map(f => {
                     const rem = fifoOldestBatch.goodRemaining[f.key];
                     if (rem === 0) return null;
                     return (
-                      <span key={f.key} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-800/80 border border-slate-700/60 text-slate-300">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400/80" />
+                      <span key={f.key} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#272727] border border-[#383838] text-neutral-300">
+                        <span className={`w-1.5 h-1.5 rounded-full ${f.dotColor}`} />
                         <span>{f.shortName}:</span>
-                        <span className="font-mono text-slate-100 font-semibold">{rem} left</span>
+                        <span className="font-mono text-white font-semibold">{rem} left</span>
                       </span>
                     );
                   })}
@@ -788,12 +788,13 @@ export const StockTracker: React.FC = () => {
             </div>
 
             <Button
+              variant="secondary"
               size="sm"
               onClick={() => {
                 setNewMovementForm(prev => ({ ...prev, batchId: fifoOldestBatch.batchId }));
                 setIsMovementModalOpen(true);
               }}
-              className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 font-medium text-xs whitespace-nowrap shadow-sm self-start lg:self-center transition-all duration-200 px-4 py-2 rounded-lg"
+              className="text-xs font-medium whitespace-nowrap self-start lg:self-center px-3.5 py-1.5"
             >
               Dispatch From {fifoOldestBatch.batchId} →
             </Button>
@@ -804,63 +805,63 @@ export const StockTracker: React.FC = () => {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* GRAND TOTAL KPI SUMMARY CARDS */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-slate-900 border-slate-800">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Good Stock Available</p>
-              <h4 className="text-2xl font-extrabold text-emerald-400 font-mono mt-1">
-                {grandTotals.sumGood} <span className="text-xs font-normal text-slate-400">bars</span>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Total Good Stock Available</p>
+              <h4 className="text-2xl font-bold text-white font-mono mt-1">
+                {grandTotals.sumGood} <span className="text-xs font-normal text-neutral-400">bars</span>
               </h4>
-              <p className="text-[10px] text-emerald-500/90 mt-0.5 font-semibold">Ready for customer orders</p>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">Ready for customer orders</p>
             </div>
-            <div className="p-3 bg-emerald-950/50 text-emerald-400 rounded-xl border border-emerald-800/60">
-              <CheckCircle2 className="w-5 h-5" />
+            <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
+              <CheckCircle2 className="w-4 h-4" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Damaged Stock</p>
-              <h4 className="text-2xl font-extrabold text-rose-400 font-mono mt-1">
-                {grandTotals.sumDamaged} <span className="text-xs font-normal text-slate-400">bars</span>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Total Damaged Stock</p>
+              <h4 className="text-2xl font-bold text-white font-mono mt-1">
+                {grandTotals.sumDamaged} <span className="text-xs font-normal text-neutral-400">bars</span>
               </h4>
-              <p className="text-[10px] text-rose-400/90 mt-0.5 font-semibold">Available for samples / supplier returns</p>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">Available for samples / returns</p>
             </div>
-            <div className="p-3 bg-rose-950/50 text-rose-400 rounded-xl border border-rose-800/60">
-              <AlertTriangle className="w-5 h-5" />
+            <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
+              <AlertTriangle className="w-4 h-4" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Batches</p>
-              <h4 className="text-2xl font-extrabold text-amber-300 font-mono mt-1">
-                {batchBalances.filter(b => b.totalGoodLeft > 0).length} <span className="text-xs font-normal text-slate-400">batches</span>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Active Batches</p>
+              <h4 className="text-2xl font-bold text-white font-mono mt-1">
+                {batchBalances.filter(b => b.totalGoodLeft > 0).length} <span className="text-xs font-normal text-neutral-400">batches</span>
               </h4>
-              <p className="text-[10px] text-amber-400/90 mt-0.5 font-semibold">FIFO prioritized</p>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">FIFO prioritized</p>
             </div>
-            <div className="p-3 bg-amber-950/50 text-amber-400 rounded-xl border border-amber-800/60">
-              <Boxes className="w-5 h-5" />
+            <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
+              <Boxes className="w-4 h-4" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Movements Logged</p>
-              <h4 className="text-2xl font-extrabold text-cyan-300 font-mono mt-1">
-                {movements.length} <span className="text-xs font-normal text-slate-400">records</span>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Movements Logged</p>
+              <h4 className="text-2xl font-bold text-white font-mono mt-1">
+                {movements.length} <span className="text-xs font-normal text-neutral-400">records</span>
               </h4>
-              <p className="text-[10px] text-cyan-400/90 mt-0.5 font-semibold">Dispatches & returns</p>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">Dispatches & returns</p>
             </div>
-            <div className="p-3 bg-cyan-950/50 text-cyan-400 rounded-xl border border-cyan-800/60">
-              <Truck className="w-5 h-5" />
+            <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
+              <Truck className="w-4 h-4" />
             </div>
           </CardContent>
         </Card>
@@ -869,26 +870,26 @@ export const StockTracker: React.FC = () => {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* 🍫 INSTANT FLAVOR STOCK MATRIX (FOR ON-THE-GO LOOKUP ON PHONE) */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <Card className="bg-slate-900 border-slate-800">
-        <CardHeader className="pb-3 flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-800/60">
+      <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
+        <CardHeader className="pb-3 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#2E2E2E]">
           <div>
             <CardTitle className="text-base font-bold text-white flex items-center gap-2">
-              <Layers className="w-4 h-4 text-emerald-400" />
+              <Layers className="w-4 h-4 text-neutral-300" />
               <span>Instant Flavor Stock Lookup (7 Chocolates)</span>
             </CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Check instant available quantities on your phone when customers ask for stock.
+            <p className="text-xs text-neutral-400 mt-0.5">
+              Real-time available inventory across all 7 artisanal chocolate flavors.
             </p>
           </div>
 
           <div className="relative w-full md:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-neutral-400" />
             <input
               type="text"
               placeholder="Search flavor..."
               value={searchVal}
               onChange={e => setSearchVal(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#121212] border border-[#2E2E2E] rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400"
             />
           </div>
         </CardHeader>
@@ -900,31 +901,71 @@ export const StockTracker: React.FC = () => {
               const isLow = goodQty < 50;
 
               return (
-                <div key={f.key} className={`p-4 rounded-xl border transition-all ${f.bg} ${f.border} hover:scale-[1.01]`}>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-bold ${f.color}`}>{f.name}</span>
-                    <span className={`px-2 py-0.5 text-[9px] font-extrabold rounded-full ${
-                      isLow ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                    }`}>
-                      {isLow ? 'Low Stock' : 'Available'}
+                <div 
+                  key={f.key} 
+                  className="p-3.5 rounded-xl border border-[#2E2E2E] bg-[#181818] hover:bg-[#202020] hover:border-[#3E3E3E] transition-all flex flex-col justify-between group"
+                >
+                  {/* Top Row: Artwork Thumbnail + Flavor Name + Minimal Status Badge */}
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#2E2E2E] flex items-center justify-center p-1 flex-shrink-0 group-hover:border-[#444] transition">
+                          <img 
+                            src={f.image} 
+                            alt={f.name} 
+                            className="w-full h-full object-contain drop-shadow-sm" 
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${f.dotColor}`} />
+                            <h4 className="text-xs font-bold text-white truncate">{f.name}</h4>
+                          </div>
+                          <span className="text-[10px] text-neutral-400 font-medium block">25g Origin Bar</span>
+                        </div>
+                      </div>
+
+                      <span className={`px-2 py-0.5 text-[9px] font-semibold rounded-full flex-shrink-0 border ${
+                        isLow 
+                          ? 'bg-amber-950/40 text-amber-300 border-amber-800/40' 
+                          : 'bg-[#272727] text-neutral-300 border-[#383838]'
+                      }`}>
+                        {isLow ? 'Low Stock' : 'In Stock'}
+                      </span>
+                    </div>
+
+                    {/* Stock Numbers */}
+                    <div className="mt-3.5 pt-2.5 border-t border-[#262626] flex items-baseline justify-between">
+                      <div>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-2xl font-black font-mono text-white tracking-tight">{goodQty}</span>
+                          <span className="text-[11px] font-medium text-neutral-400">Good</span>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-xs font-bold font-mono text-neutral-400">
+                          {damagedQty > 0 ? (
+                            <span className="text-rose-400/90">{damagedQty}</span>
+                          ) : (
+                            <span>0</span>
+                          )}
+                        </span>
+                        <span className="text-[10px] text-neutral-400 block">Damaged/Samples</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Micro Footer */}
+                  <div className="mt-2.5 pt-2 border-t border-[#222222] flex items-center justify-between text-[10px] text-neutral-400">
+                    <span className="flex items-center gap-1">
+                      <span className={`w-1 h-1 rounded-full ${f.dotColor}`} />
+                      <span>{f.shortName}</span>
                     </span>
-                  </div>
-
-                  <div className="mt-3 flex items-baseline justify-between">
-                    <div>
-                      <span className="text-2xl font-black font-mono text-white">{goodQty}</span>
-                      <span className="text-xs font-medium text-slate-400 ml-1">Good</span>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="text-sm font-bold font-mono text-rose-400">{damagedQty}</span>
-                      <span className="text-[10px] text-slate-400 block">Damaged / Samples</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[10px] text-slate-400">
-                    <span>Standard Unit: 25g</span>
-                    <span className="font-semibold text-slate-300">Status: OK</span>
+                    <span className="font-mono text-neutral-400 font-medium">Ready</span>
                   </div>
                 </div>
               );
@@ -936,20 +977,20 @@ export const StockTracker: React.FC = () => {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* 📋 BATCH LEDGER TABLE (FIFO ORDERED) */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <Card className="bg-slate-900 border-slate-800">
-        <CardHeader className="pb-3 border-b border-slate-800/60">
+      <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
+        <CardHeader className="pb-3 border-b border-[#2E2E2E]">
           <CardTitle className="text-base font-bold text-white flex items-center gap-2">
-            <Clock className="w-4 h-4 text-amber-400" />
+            <Clock className="w-4 h-4 text-neutral-300" />
             <span>Batch Ledger & Stock Balances (Google Sheet Sync)</span>
           </CardTitle>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-neutral-400">
             Per-batch tracking. Oldest batches are listed first to enforce FIFO clearance rules.
           </p>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+              <tr className="bg-[#181818] border-b border-[#2E2E2E] text-neutral-400 font-semibold tracking-wider uppercase text-[11px]">
                 <th className="py-3 px-4">Date Received</th>
                 <th className="py-3 px-4">Batch ID</th>
                 <th className="py-3 px-4 text-center">Expiry (3 Mo)</th>
@@ -964,36 +1005,36 @@ export const StockTracker: React.FC = () => {
                 <th className="py-3 px-4 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300">
+            <tbody className="divide-y divide-[#262626] text-neutral-300">
               {paginatedBatches.map((b: any) => {
                 const isFifoOldest = fifoOldestBatch?.batchId === b.batchId;
                 return (
-                  <tr key={b.batchId} className={`hover:bg-slate-850/60 transition ${isFifoOldest ? 'bg-rose-950/20' : ''}`}>
-                    <td className="py-3 px-4 font-mono font-medium text-slate-400 whitespace-nowrap">
+                  <tr key={b.batchId} className={`hover:bg-[#272727]/50 transition ${isFifoOldest ? 'bg-amber-950/10' : ''}`}>
+                    <td className="py-3 px-4 font-mono text-neutral-400 whitespace-nowrap">
                       {b.dateReceived}
                     </td>
                     <td className="py-3 px-4 font-mono font-bold text-white">
                       <div className="flex items-center gap-1.5">
                         <span>{b.batchId}</span>
                         {isFifoOldest && (
-                          <span className="px-1.5 py-0.2 text-[9px] bg-rose-600 text-white rounded font-bold uppercase">
+                          <span className="px-1.5 py-0.2 text-[9px] bg-[#272727] text-amber-300 border border-amber-500/30 rounded font-semibold uppercase">
                             FIFO #1
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="py-3 px-4 text-center whitespace-nowrap">
-                      <div className="font-mono text-[11px] text-slate-300">{b.expiryDate}</div>
-                      <span className={`inline-block px-2 py-0.5 text-[9px] font-bold rounded-full mt-0.5 border ${
-                        b.shelfLifeStatus === 'EXPIRED' ? 'bg-rose-950 text-rose-400 border-rose-800' :
-                        b.shelfLifeStatus === 'CRITICAL' ? 'bg-amber-950 text-amber-400 border-amber-800 animate-pulse' :
-                        b.shelfLifeStatus === 'EXPIRING_SOON' ? 'bg-yellow-950 text-yellow-400 border-yellow-800' :
-                        'bg-emerald-950 text-emerald-400 border-emerald-800'
+                      <div className="font-mono text-[11px] text-neutral-300">{b.expiryDate}</div>
+                      <span className={`inline-block px-2 py-0.5 text-[9px] font-semibold rounded-full mt-0.5 border ${
+                        b.shelfLifeStatus === 'EXPIRED' ? 'bg-rose-950/40 text-rose-400 border-rose-800/40' :
+                        b.shelfLifeStatus === 'CRITICAL' ? 'bg-amber-950/40 text-amber-400 border-amber-800/40' :
+                        b.shelfLifeStatus === 'EXPIRING_SOON' ? 'bg-yellow-950/40 text-yellow-400 border-yellow-800/40' :
+                        'bg-[#272727] text-neutral-300 border-[#383838]'
                       }`}>
-                        {b.shelfLifeStatus === 'EXPIRED' ? '❌ EXPIRED' :
-                         b.shelfLifeStatus === 'CRITICAL' ? `🔴 ${b.daysRemaining}d Left` :
-                         b.shelfLifeStatus === 'EXPIRING_SOON' ? `🟡 ${b.daysRemaining}d Left` :
-                         `🟢 ${b.daysRemaining}d Left`}
+                        {b.shelfLifeStatus === 'EXPIRED' ? 'EXPIRED' :
+                         b.shelfLifeStatus === 'CRITICAL' ? `${b.daysRemaining}d Left` :
+                         b.shelfLifeStatus === 'EXPIRING_SOON' ? `${b.daysRemaining}d Left` :
+                         `${b.daysRemaining}d Left`}
                       </span>
                     </td>
 
@@ -1002,26 +1043,28 @@ export const StockTracker: React.FC = () => {
                       const damLeft = b.damagedRemaining[f.key];
                       return (
                         <td key={f.key} className="py-3 px-4 text-center font-mono">
-                          <span className="font-bold text-emerald-400">{goodLeft}</span>
-                          {damLeft > 0 && <span className="text-[10px] text-rose-400 ml-1">({damLeft}d)</span>}
+                          <span className="font-semibold text-white">{goodLeft}</span>
+                          {damLeft > 0 && <span className="text-[10px] text-rose-400/80 ml-1">({damLeft}d)</span>}
                         </td>
                       );
                     })}
 
-                    <td className="py-3 px-4 text-right font-mono font-bold text-amber-300 text-sm">
+                    <td className="py-3 px-4 text-right font-mono font-bold text-white text-sm">
                       {b.totalGoodLeft}
                     </td>
 
                     <td className="py-3 px-4 text-center">
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={() => {
                           setNewMovementForm(prev => ({ ...prev, batchId: b.batchId }));
                           setIsMovementModalOpen(true);
                         }}
-                        className="px-2.5 py-1 text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition"
+                        className="text-[11px] px-2.5 py-1"
                       >
                         Dispatch
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 );
@@ -1031,30 +1074,30 @@ export const StockTracker: React.FC = () => {
         </CardContent>
 
         {/* Batch Ledger 10-Row Pagination Bar */}
-        <div className="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+        <div className="p-3 bg-[#181818] border-t border-[#2E2E2E] flex items-center justify-between text-xs text-neutral-400">
           <span>
             Showing {paginatedBatches.length > 0 ? (batchPage - 1) * ROWS_PER_PAGE + 1 : 0} to {Math.min(batchPage * ROWS_PER_PAGE, batchBalances.length)} of {batchBalances.length} batches
           </span>
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={() => setBatchPage(p => Math.max(1, p - 1))}
               disabled={batchPage === 1}
-              className="text-xs px-2.5 py-1 border-slate-800"
+              className="text-xs px-2.5 py-1"
             >
               Previous
             </Button>
-            <span className="font-mono font-bold text-white text-xs px-1">
+            <span className="font-mono font-semibold text-white text-xs px-1">
               Page {batchPage} of {totalBatchPages}
             </span>
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={() => setBatchPage(p => Math.min(totalBatchPages, p + 1))}
               disabled={batchPage >= totalBatchPages}
-              className="text-xs px-2.5 py-1 border-slate-800"
+              className="text-xs px-2.5 py-1"
             >
               Next
             </Button>
@@ -1065,26 +1108,26 @@ export const StockTracker: React.FC = () => {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* 🚚 STOCK MOVEMENTS LOG */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <Card className="bg-slate-900 border-slate-800">
-        <CardHeader className="pb-3 border-b border-slate-800/60 flex items-center justify-between">
+      <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
+        <CardHeader className="pb-3 border-b border-[#2E2E2E] flex items-center justify-between">
           <div>
             <CardTitle className="text-base font-bold text-white flex items-center gap-2">
-              <Truck className="w-4 h-4 text-cyan-400" />
+              <Truck className="w-4 h-4 text-neutral-300" />
               <span>Stock Movements & Dispatches Log</span>
             </CardTitle>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-neutral-400">
               Audit trail of customer dispatches, samples, and supplier returns.
             </p>
           </div>
 
-          <Button size="sm" onClick={() => setIsMovementModalOpen(true)} className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs">
+          <Button variant="primary" size="sm" onClick={() => setIsMovementModalOpen(true)} className="text-xs font-semibold">
             + Record Movement
           </Button>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+              <tr className="bg-[#181818] border-b border-[#2E2E2E] text-neutral-400 font-semibold tracking-wider uppercase text-[11px]">
                 <th className="py-3 px-4">Date</th>
                 <th className="py-3 px-4">Reason / Customer</th>
                 <th className="py-3 px-4">Batch ID</th>
@@ -1092,24 +1135,24 @@ export const StockTracker: React.FC = () => {
                 <th className="py-3 px-4 text-right">Items Dispatched</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300">
+            <tbody className="divide-y divide-[#262626] text-neutral-300">
               {paginatedMovements.map(m => {
                 const totalItems = Object.values(m.flavors).reduce((a, b) => a + b, 0);
                 return (
-                  <tr key={m.id} className="hover:bg-slate-850/60">
-                    <td className="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">{m.date}</td>
-                    <td className="py-3 px-4 font-semibold text-white">{m.reason}</td>
-                    <td className="py-3 px-4 font-mono font-bold text-amber-300">{m.batchId}</td>
+                  <tr key={m.id} className="hover:bg-[#272727]/50">
+                    <td className="py-3 px-4 font-mono text-neutral-400 whitespace-nowrap">{m.date}</td>
+                    <td className="py-3 px-4 font-medium text-white">{m.reason}</td>
+                    <td className="py-3 px-4 font-mono text-neutral-200">{m.batchId}</td>
                     <td className="py-3 px-4">
-                      <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full border ${
+                      <span className={`px-2 py-0.5 text-[9px] font-semibold rounded-full border ${
                         m.stockType === 'Good'
-                          ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
-                          : 'bg-rose-950 text-rose-300 border-rose-800'
+                          ? 'bg-[#272727] text-neutral-300 border-[#383838]'
+                          : 'bg-rose-950/40 text-rose-300 border-rose-800/40'
                       }`}>
                         {m.stockType}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right font-mono font-bold text-white">
+                    <td className="py-3 px-4 text-right font-mono font-semibold text-white">
                       {totalItems} bars
                     </td>
                   </tr>
@@ -1120,30 +1163,30 @@ export const StockTracker: React.FC = () => {
         </CardContent>
 
         {/* Movements Log 10-Row Pagination Bar */}
-        <div className="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+        <div className="p-3 bg-[#181818] border-t border-[#2E2E2E] flex items-center justify-between text-xs text-neutral-400">
           <span>
             Showing {paginatedMovements.length > 0 ? (movementPage - 1) * ROWS_PER_PAGE + 1 : 0} to {Math.min(movementPage * ROWS_PER_PAGE, movements.length)} of {movements.length} logs
           </span>
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={() => setMovementPage(p => Math.max(1, p - 1))}
               disabled={movementPage === 1}
-              className="text-xs px-2.5 py-1 border-slate-800"
+              className="text-xs px-2.5 py-1"
             >
               Previous
             </Button>
-            <span className="font-mono font-bold text-white text-xs px-1">
+            <span className="font-mono font-semibold text-white text-xs px-1">
               Page {movementPage} of {totalMovementPages}
             </span>
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={() => setMovementPage(p => Math.min(totalMovementPages, p + 1))}
               disabled={movementPage >= totalMovementPages}
-              className="text-xs px-2.5 py-1 border-slate-800"
+              className="text-xs px-2.5 py-1"
             >
               Next
             </Button>
@@ -1158,26 +1201,26 @@ export const StockTracker: React.FC = () => {
         <Modal
           isOpen={isReceivingModalOpen}
           onClose={() => setIsReceivingModalOpen(false)}
-          title="📦 Receive New Chocolate Stock Batch"
+          title="Receive New Chocolate Stock Batch"
           footer={
             <div className="flex justify-end gap-2 w-full">
               <Button variant="ghost" size="sm" onClick={() => setIsReceivingModalOpen(false)}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleAddBatch} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold">
+              <Button variant="primary" size="sm" onClick={handleAddBatch} className="font-semibold text-xs">
                 Save & Push to Sheet
               </Button>
             </div>
           }
         >
-          <div className="space-y-4 text-xs text-slate-200">
+          <div className="space-y-4 text-xs text-neutral-200">
             {!googleToken && (
-              <div className="p-3 bg-amber-950/50 border border-amber-800/80 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up">
-                <div className="flex items-center gap-2 text-amber-300 font-medium">
-                  <Sparkles className="w-4 h-4 text-amber-400 animate-pulse flex-shrink-0" />
+              <div className="p-3 bg-[#272727] border border-[#383838] rounded-xl flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-neutral-300 font-medium">
+                  <Sparkles className="w-4 h-4 text-neutral-400 flex-shrink-0" />
                   <span>Connect Google Account to sync directly to Google Sheet!</span>
                 </div>
-                <Button size="sm" onClick={signInWithGoogle} className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs whitespace-nowrap">
+                <Button variant="primary" size="sm" onClick={signInWithGoogle} className="text-xs font-semibold whitespace-nowrap">
                   Sign In & Connect
                 </Button>
               </div>
@@ -1185,37 +1228,40 @@ export const StockTracker: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Date Received</label>
+                <label className="block font-medium text-neutral-300 mb-1">Date Received</label>
                 <input
                   type="date"
                   value={newBatchForm.dateReceived}
                   onChange={e => setNewBatchForm(prev => ({ ...prev, dateReceived: e.target.value }))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg p-2 text-white focus:outline-none focus:border-neutral-400"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Batch ID</label>
+                <label className="block font-medium text-neutral-300 mb-1">Batch ID</label>
                 <input
                   type="text"
                   value={newBatchForm.batchId}
                   onChange={e => setNewBatchForm(prev => ({ ...prev, batchId: e.target.value }))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono uppercase font-bold"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg p-2 text-white font-mono uppercase font-bold focus:outline-none focus:border-neutral-400"
                   placeholder="e.g. B-0825"
                 />
               </div>
             </div>
 
-            <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-3">
-              <h4 className="font-bold text-emerald-400 text-xs">Enter Quantities Received Per Flavor</h4>
+            <div className="p-3 bg-[#181818] border border-[#2E2E2E] rounded-xl space-y-2.5">
+              <h4 className="font-semibold text-white text-xs">Enter Quantities Received Per Flavor</h4>
               
               {FLAVOR_CONFIG.map(f => (
-                <div key={f.key} className="flex items-center justify-between gap-2 p-2 bg-slate-950 rounded-lg border border-slate-800">
-                  <span className={`font-semibold ${f.color} flex-1`}>{f.name}</span>
+                <div key={f.key} className="flex items-center justify-between gap-2 p-2 bg-[#121212] rounded-lg border border-[#2E2E2E]">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${f.dotColor}`} />
+                    <span className="font-medium text-white text-xs truncate">{f.name}</span>
+                  </div>
                   
                   <div className="flex items-center gap-2">
                     <div>
-                      <span className="text-[10px] text-slate-400 block text-right">Total In</span>
+                      <span className="text-[10px] text-neutral-400 block text-right">Total In</span>
                       <input
                         type="number"
                         min="0"
@@ -1227,12 +1273,12 @@ export const StockTracker: React.FC = () => {
                             totalIn: { ...prev.totalIn, [f.key]: val }
                           }));
                         }}
-                        className="w-16 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold text-white font-mono"
+                        className="w-16 bg-[#1F1F1F] border border-[#2E2E2E] rounded p-1 text-center font-bold text-white font-mono focus:outline-none focus:border-neutral-400"
                       />
                     </div>
 
                     <div>
-                      <span className="text-[10px] text-rose-400 block text-right">Damaged In</span>
+                      <span className="text-[10px] text-neutral-400 block text-right">Damaged</span>
                       <input
                         type="number"
                         min="0"
@@ -1244,7 +1290,7 @@ export const StockTracker: React.FC = () => {
                             damagedIn: { ...prev.damagedIn, [f.key]: val }
                           }));
                         }}
-                        className="w-14 bg-slate-900 border border-rose-900/60 rounded p-1 text-center font-bold text-rose-400 font-mono"
+                        className="w-14 bg-[#1F1F1F] border border-[#2E2E2E] rounded p-1 text-center font-bold text-rose-400 font-mono focus:outline-none focus:border-neutral-400"
                       />
                     </div>
                   </div>
@@ -1262,26 +1308,26 @@ export const StockTracker: React.FC = () => {
         <Modal
           isOpen={isMovementModalOpen}
           onClose={() => setIsMovementModalOpen(false)}
-          title="🚚 Record Stock Movement / Dispatch"
+          title="Record Stock Movement / Dispatch"
           footer={
             <div className="flex justify-end gap-2 w-full">
               <Button variant="ghost" size="sm" onClick={() => setIsMovementModalOpen(false)}>
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleAddMovement} className="bg-amber-600 hover:bg-amber-500 text-white font-bold">
+              <Button variant="primary" size="sm" onClick={handleAddMovement} className="font-semibold text-xs">
                 Log Dispatch & Sync
               </Button>
             </div>
           }
         >
-          <div className="space-y-4 text-xs text-slate-200">
+          <div className="space-y-4 text-xs text-neutral-200">
             {!googleToken && (
-              <div className="p-3 bg-amber-950/50 border border-amber-800/80 rounded-xl flex items-center justify-between gap-2 animate-fade-in-up">
-                <div className="flex items-center gap-2 text-amber-300 font-medium">
-                  <Sparkles className="w-4 h-4 text-amber-400 animate-pulse flex-shrink-0" />
+              <div className="p-3 bg-[#272727] border border-[#383838] rounded-xl flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 text-neutral-300 font-medium">
+                  <Sparkles className="w-4 h-4 text-neutral-400 flex-shrink-0" />
                   <span>Connect Google Account to sync dispatches directly to Google Sheet!</span>
                 </div>
-                <Button size="sm" onClick={signInWithGoogle} className="bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs whitespace-nowrap">
+                <Button variant="primary" size="sm" onClick={signInWithGoogle} className="text-xs font-semibold whitespace-nowrap">
                   Sign In & Connect
                 </Button>
               </div>
@@ -1289,21 +1335,21 @@ export const StockTracker: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Date</label>
+                <label className="block font-medium text-neutral-300 mb-1">Date</label>
                 <input
                   type="date"
                   value={newMovementForm.date}
                   onChange={e => setNewMovementForm(prev => ({ ...prev, date: e.target.value }))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg p-2 text-white focus:outline-none focus:border-neutral-400"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Target Batch ID</label>
+                <label className="block font-medium text-neutral-300 mb-1">Target Batch ID</label>
                 <select
                   value={newMovementForm.batchId}
                   onChange={e => setNewMovementForm(prev => ({ ...prev, batchId: e.target.value }))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono font-bold"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg p-2 text-white font-mono font-bold focus:outline-none focus:border-neutral-400"
                 >
                   <option value="AUTO_FIFO">⚡ AUTO-FIFO (Smart Multi-Batch Split across oldest batches)</option>
                   {batchBalances.map(b => (
@@ -1317,22 +1363,22 @@ export const StockTracker: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Reason / Customer</label>
+                <label className="block font-medium text-neutral-300 mb-1">Reason / Customer</label>
                 <input
                   type="text"
                   value={newMovementForm.reason}
                   onChange={e => setNewMovementForm(prev => ({ ...prev, reason: e.target.value }))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg p-2 text-white focus:outline-none focus:border-neutral-400"
                   placeholder="e.g. Order ORD-0215 or Tasting Sample"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-300 mb-1">Stock Type</label>
+                <label className="block font-medium text-neutral-300 mb-1">Stock Type</label>
                 <select
                   value={newMovementForm.stockType}
                   onChange={e => setNewMovementForm(prev => ({ ...prev, stockType: e.target.value as any }))}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-bold"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg p-2 text-white font-medium focus:outline-none focus:border-neutral-400"
                 >
                   <option value="Good">Good Stock (Regular Orders)</option>
                   <option value="Damaged">Damaged Stock (Samples / Supplier Return)</option>
@@ -1340,15 +1386,18 @@ export const StockTracker: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-900 border border-slate-800 rounded-xl space-y-3">
-              <h4 className="font-bold text-amber-400 text-xs">Dispatched Quantity Per Flavor</h4>
+            <div className="p-3 bg-[#181818] border border-[#2E2E2E] rounded-xl space-y-2.5">
+              <h4 className="font-semibold text-white text-xs">Dispatched Quantity Per Flavor</h4>
 
               {FLAVOR_CONFIG.map(f => (
-                <div key={f.key} className="flex items-center justify-between p-2 bg-slate-950 rounded-lg border border-slate-800">
-                  <span className={`font-semibold ${f.color}`}>{f.name}</span>
+                <div key={f.key} className="flex items-center justify-between p-2 bg-[#121212] rounded-lg border border-[#2E2E2E]">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${f.dotColor}`} />
+                    <span className="font-medium text-white text-xs truncate">{f.name}</span>
+                  </div>
                   
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-slate-400">Quantity</span>
+                    <span className="text-[10px] text-neutral-400">Quantity</span>
                     <input
                       type="number"
                       min="0"
@@ -1360,7 +1409,7 @@ export const StockTracker: React.FC = () => {
                           flavors: { ...prev.flavors, [f.key]: val }
                         }));
                       }}
-                      className="w-20 bg-slate-900 border border-amber-600/60 rounded p-1 text-center font-bold text-amber-300 font-mono"
+                      className="w-20 bg-[#1F1F1F] border border-[#2E2E2E] rounded p-1 text-center font-bold text-white font-mono focus:outline-none focus:border-neutral-400"
                     />
                   </div>
                 </div>
