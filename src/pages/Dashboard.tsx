@@ -183,24 +183,28 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
     { name: 'Almond Noir (25g)', image: '/images/brand/prod_almond_art.png', tag: 'Wholesale Standard' },
     { name: 'Orange Sunset (25g)', image: '/images/brand/prod_orange_art.png', tag: 'High Margin' },
     { name: 'Peanut Royale (25g)', image: '/images/brand/prod_peanut_art.png', tag: 'Bestseller' },
-    { name: 'Sun-Kissed Lemon (25g)', image: '/images/brand/prod_lemon_art.png', tag: 'Seasonal Specialty' },
+    { name: 'Sea Salt Noir (25g)', image: '/images/brand/prod_seasalt_art.png', tag: 'Artisan' },
+    { name: 'Mocha Espresso (25g)', image: '/images/brand/prod_mocha_art.png', tag: 'Gourmet' },
+    { name: 'Jackfruit Crunch (25g)', image: '/images/brand/prod_jackfruit_art.png', tag: 'Kerala Special' },
+    { name: 'Sun-Kissed Lemon (25g)', image: '/images/brand/prod_lemon_art.png', tag: 'Specialty' },
+    { name: '8-Piece Gift Box', image: '/images/brand/prod_gift_8.jpg', tag: 'Gift Suite' },
   ];
 
   return (
     <div className="space-y-6 animate-fade-in-up">
       
       {/* Brand Header Banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white p-6 rounded-3xl relative overflow-hidden shadow-2xl border border-amber-500/20 glass-panel-luxury">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-gradient-to-r from-[#121212] via-[#181818] to-[#121212] text-white p-6 rounded-3xl relative overflow-hidden shadow-2xl border border-[#2a2a2a]">
         <div className="space-y-1.5 relative z-10">
           <div className="flex items-center gap-2">
-            <span className="bg-amber-500/10 text-amber-300 text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full backdrop-blur-sm border border-amber-500/20">
+            <span className="bg-red-600/10 text-[#ff1e27] text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full backdrop-blur-sm border border-red-500/20">
               GUDORIA ATELIER ERP
             </span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight font-heading">
             Welcome, {profile?.displayName || 'GUD Management'}
           </h1>
-          <p className="text-xs text-slate-300/90 font-medium max-w-xl">
+          <p className="text-xs text-zinc-400 font-medium max-w-xl">
             Real-time multi-tier business orchestration, live Google Sheets sync & bespoke confectionery curation.
           </p>
         </div>
@@ -209,7 +213,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           {googleToken ? (
             <div className="flex items-center gap-2">
               <Button 
-                variant="gold" 
+                variant="primary" 
                 size="sm" 
                 onClick={async () => {
                   if (!googleToken) return;
@@ -236,6 +240,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
                 }}
                 disabled={loading}
                 leftIcon={<Sparkles className="w-4 h-4" />}
+                className="tactile-press"
               >
                 Push 907 Records Live
               </Button>
@@ -245,16 +250,18 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
                 onClick={fetchDashboardMetrics}
                 disabled={loading}
                 leftIcon={<RefreshCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />}
+                className="tactile-press border border-[#2a2a2a]"
               >
                 Sync Sheets
               </Button>
             </div>
           ) : (
             <Button 
-              variant="gold" 
+              variant="primary" 
               size="sm" 
               onClick={signInWithGoogle}
               leftIcon={<Sparkles className="w-4 h-4" />}
+              className="tactile-press"
             >
               Sign In Google Workspace
             </Button>
@@ -270,7 +277,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           description="Customer Master directory"
           trend={{ value: 12.5, type: 'up' }}
           sparklineData={[30, 32, 35, 34, 38, activeCustomersCount || 73]}
-          icon={<Users className="w-5 h-5 text-[#408d6d]" />}
+          icon={<Users className="w-5 h-5 text-[#e50914]" />}
         />
         <StatisticsCard
           title="Production Runs"
@@ -278,7 +285,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           description="Active outsourced batches"
           trend={{ value: 8.4, type: 'up' }}
           sparklineData={[5, 8, 6, 9, 7, activeProductionRuns || 8]}
-          icon={<Factory className="w-5 h-5 text-blue-400" />}
+          icon={<Factory className="w-5 h-5 text-zinc-300" />}
         />
         <StatisticsCard
           title="Accounts Payable"
@@ -299,15 +306,21 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
       </div>
 
       {/* Product Showcase Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
         {brandProducts.map((p, idx) => (
-          <a href="/orders" target="_blank" rel="noopener noreferrer" className="bg-slate-900/90 border border-slate-800/80 rounded-xl p-3 flex items-center gap-3 hover:border-[#408d6d]/50 transition-all group cursor-pointer block" >
-            <img src={p.image} alt={p.name} className="w-12 h-12 object-contain rounded-lg bg-slate-950 p-1 flex-shrink-0 group-hover:scale-110 transition-transform" />
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-100 truncate">{p.name}</p>
-              <span className="text-[9px] font-mono text-[#408d6d] bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-900/40 inline-block mt-0.5">{p.tag}</span>
+          <div 
+            key={idx} 
+            onClick={() => onNavigate('/invoice-generator')}
+            className="bg-[#141414] border border-[#262626] rounded-xl p-2.5 flex flex-col items-center text-center hover:border-[#e50914]/60 hover:bg-[#181818] transition-all group cursor-pointer tactile-press shadow-sm"
+          >
+            <div className="w-14 h-14 rounded-lg bg-black p-1 flex items-center justify-center overflow-hidden border border-[#222222] mb-2">
+              <img src={p.image} alt={p.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
             </div>
-          </a>
+            <p className="text-[11px] font-bold text-zinc-100 truncate w-full">{p.name}</p>
+            <span className="text-[9px] font-mono text-[#ff1e27] bg-red-950/40 px-1.5 py-0.5 rounded border border-red-900/30 inline-block mt-1 truncate max-w-full">
+              {p.tag}
+            </span>
+          </div>
         ))}
       </div>
 
@@ -316,8 +329,8 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
         
         {/* Left 2 Cols: Critical Operations */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border border-slate-800 bg-slate-900/80">
-            <CardHeader className="border-b border-slate-800">
+          <Card className="border border-[#262626] bg-[#141414]">
+            <CardHeader className="border-b border-[#222222]">
               <CardTitle className="flex items-center gap-2">
                 <CheckSquare className="w-4 h-4 text-[#408d6d]" />
                 <span>Critical Operations & Actions</span>
@@ -336,15 +349,15 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           </Card>
 
           {/* Accounts Payable / Receivable Table */}
-          <Card className="border border-slate-800 bg-slate-900/80">
-            <CardHeader className="border-b border-slate-800">
+          <Card className="border border-[#262626] bg-[#141414]">
+            <CardHeader className="border-b border-[#222222]">
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-amber-400" />
                   <span>Accounts Payable & Receivable</span>
                 </CardTitle>
               </div>
-              <Button variant="outline" size="xs" onClick={() => onNavigate('/finance')} rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+              <Button variant="outline" size="xs" onClick={() => onNavigate('/finance')} rightIcon={<ArrowRight className="w-3.5 h-3.5 text-[#e50914]" />}>
                 Finance Ledger
               </Button>
             </CardHeader>
@@ -362,17 +375,17 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
         <div className="space-y-6">
           
           {/* Quick Operations Guide Search */}
-          <Card className="border border-slate-800 bg-slate-900/80">
-            <CardHeader className="pb-2 border-b border-slate-800">
+          <Card className="border border-[#262626] bg-[#141414]">
+            <CardHeader className="pb-2 border-b border-[#222222]">
               <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-[#408d6d]" />
-                <CardTitle className="text-xs font-bold text-slate-200">Module & Record Directory</CardTitle>
+                <HelpCircle className="w-4 h-4 text-[#e50914]" />
+                <CardTitle className="text-xs font-bold text-zinc-200">Module & Record Directory</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="pt-3 space-y-3">
               <form onSubmit={handleDirectorySearch} className="flex gap-2">
                 <div className="relative flex-1">
-                  <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-500 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 pl-2.5 flex items-center text-zinc-500 pointer-events-none">
                     <Search className="w-3.5 h-3.5" />
                   </span>
                   <input
@@ -383,13 +396,13 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
                       setSearchQuery(e.target.value);
                       if (!e.target.value) setSearchResult(null);
                     }}
-                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#408d6d] text-slate-100 placeholder-slate-500"
+                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-black border border-[#2a2a2a] rounded-lg focus:outline-none focus:border-[#e50914] text-zinc-100 placeholder-zinc-500"
                   />
                 </div>
-                <Button type="submit" size="xs" className="px-3 py-1.5">Find</Button>
+                <Button type="submit" size="xs" className="px-3 py-1.5 bg-[#e50914] hover:bg-[#ff1e27] text-white font-bold tactile-press">Find</Button>
               </form>
               {searchResult && (
-                <div className="p-2.5 bg-emerald-950/30 border border-emerald-900/50 rounded-lg text-emerald-300 font-medium text-[11px]">
+                <div className="p-2.5 bg-red-950/20 border border-red-900/30 rounded-lg text-red-300 font-medium text-[11px]">
                   {searchResult}
                 </div>
               )}
@@ -397,71 +410,71 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           </Card>
 
           {/* Module Quick Shortcuts */}
-          <Card className="border border-slate-800 bg-slate-900/80">
-            <CardHeader className="border-b border-slate-800">
+          <Card className="border border-[#262626] bg-[#141414]">
+            <CardHeader className="border-b border-[#222222]">
               <CardTitle className="flex items-center gap-2 text-xs">
-                <Layers className="w-4 h-4 text-blue-400" />
+                <Layers className="w-4 h-4 text-[#e50914]" />
                 <span>Quick Modules</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-2">
               <button 
                 onClick={() => onNavigate('/documents')}
-                className="p-3 text-left bg-slate-950 border border-slate-800/80 rounded-xl hover:border-[#408d6d] transition-all text-xs space-y-1 group"
+                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
               >
-                <FileText className="w-4 h-4 text-[#408d6d] mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-slate-100">Asset Vault</p>
-                <span className="text-[10px] text-slate-400 block">Drive & Sheet 2-Way</span>
+                <FileText className="w-4 h-4 text-[#e50914] mb-1 group-hover:scale-110 transition-transform" />
+                <p className="font-bold text-zinc-100">Asset Vault</p>
+                <span className="text-[10px] text-zinc-400 block">Drive & Sheet 2-Way</span>
               </button>
 
               <button 
                 onClick={() => onNavigate('/invoice-generator')}
-                className="p-3 text-left bg-slate-950 border border-slate-800/80 rounded-xl hover:border-[#408d6d] transition-all text-xs space-y-1 group"
+                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
               >
-                <ShoppingBag className="w-4 h-4 text-amber-400 mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-slate-100">Invoice Studio</p>
-                <span className="text-[10px] text-slate-400 block">PDF Generator</span>
+                <ShoppingBag className="w-4 h-4 text-[#ff1e27] mb-1 group-hover:scale-110 transition-transform" />
+                <p className="font-bold text-zinc-100">Invoice Studio</p>
+                <span className="text-[10px] text-zinc-400 block">PDF Generator</span>
               </button>
 
               <button 
                 onClick={() => onNavigate('/orders')}
-                className="p-3 text-left bg-slate-950 border border-slate-800/80 rounded-xl hover:border-[#408d6d] transition-all text-xs space-y-1 group"
+                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
               >
-                <Users className="w-4 h-4 text-emerald-400 mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-slate-100">Customers</p>
-                <span className="text-[10px] text-slate-400 block">Master Registry</span>
+                <Users className="w-4 h-4 text-zinc-300 mb-1 group-hover:scale-110 transition-transform" />
+                <p className="font-bold text-zinc-100">Customers</p>
+                <span className="text-[10px] text-zinc-400 block">Master Registry</span>
               </button>
 
               <button 
                 onClick={() => onNavigate('/supply-chain')}
-                className="p-3 text-left bg-slate-950 border border-slate-800/80 rounded-xl hover:border-[#408d6d] transition-all text-xs space-y-1 group"
+                className="p-3 text-left bg-black border border-[#262626] rounded-xl hover:border-[#e50914]/60 hover:bg-[#181818] transition-all text-xs space-y-1 group tactile-press"
               >
-                <Factory className="w-4 h-4 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
-                <p className="font-bold text-slate-100">Supply Chain</p>
-                <span className="text-[10px] text-slate-400 block">Vendors & POs</span>
+                <Factory className="w-4 h-4 text-zinc-300 mb-1 group-hover:scale-110 transition-transform" />
+                <p className="font-bold text-zinc-100">Supply Chain</p>
+                <span className="text-[10px] text-zinc-400 block">Vendors & POs</span>
               </button>
             </CardContent>
           </Card>
 
           {/* Recent Audit Activities */}
-          <Card className="border border-slate-800 bg-slate-900/80">
-            <CardHeader className="border-b border-slate-800">
+          <Card className="border border-[#262626] bg-[#141414]">
+            <CardHeader className="border-b border-[#222222]">
               <CardTitle className="flex items-center gap-2 text-xs">
-                <ShieldCheck className="w-4 h-4 text-[#408d6d]" />
+                <ShieldCheck className="w-4 h-4 text-[#e50914]" />
                 <span>Audit Timeline</span>
               </CardTitle>
-              {logsLoading && <RefreshCcw className="w-3.5 h-3.5 animate-spin text-slate-500" />}
+              {logsLoading && <RefreshCcw className="w-3.5 h-3.5 animate-spin text-zinc-500" />}
             </CardHeader>
             <CardContent className="space-y-3">
               {recentLogs.map((log) => (
-                <div key={log.id} className="text-xs flex items-start gap-2.5 pb-2.5 border-b border-slate-800/60 last:border-0 last:pb-0">
-                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#408d6d] flex-shrink-0" />
+                <div key={log.id} className="text-xs flex items-start gap-2.5 pb-2.5 border-b border-[#222222] last:border-0 last:pb-0">
+                  <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#e50914] flex-shrink-0" />
                   <div className="flex-1 space-y-0.5 min-w-0">
-                    <p className="font-medium text-slate-200 leading-snug truncate">
+                    <p className="font-medium text-zinc-200 leading-snug truncate">
                       {log.action}
                     </p>
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                      <span className="font-semibold">{log.actorName}</span>
+                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                      <span className="font-semibold text-zinc-300">{log.actorName}</span>
                       <span>•</span>
                       <span>{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>

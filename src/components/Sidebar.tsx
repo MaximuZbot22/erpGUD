@@ -57,8 +57,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           collapsed ? 'justify-center px-2 py-2.5' : 'justify-between px-3 py-2'
         } ${
           isActive
-            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm shadow-emerald-950/20 font-semibold'
-            : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+            ? 'bg-red-600/15 text-white border border-red-500/40 shadow-sm shadow-red-950/20 font-semibold'
+            : 'text-neutral-400 hover:text-white hover:bg-[#1a1a1a]'
         }`}
       >
         <div className={`flex items-center truncate ${collapsed ? 'justify-center' : 'gap-2.5'}`}>
@@ -66,8 +66,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             name={mod.iconName} 
             className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
               isActive 
-                ? 'text-emerald-400' 
-                : 'text-slate-400 group-hover:text-slate-200'
+                ? 'text-red-500' 
+                : 'text-neutral-500 group-hover:text-red-400'
             }`} 
           />
           {!collapsed && <span className="truncate">{mod.name}</span>}
@@ -88,16 +88,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
 
   return (
     <aside
-      className={`h-full border-r border-slate-800/80 bg-slate-950/90 backdrop-blur-xl flex flex-col justify-between transition-all duration-300 relative z-30 select-none print-hide print:hidden ${
+      className={`h-full border-r border-[#242424] bg-[#0c0c0c] flex flex-col justify-between transition-all duration-300 relative z-30 select-none print-hide print:hidden ${
         collapsed ? 'w-16' : 'w-60'
       }`}
     >
       {/* Top Section */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Header Block */}
-        <div className={`h-16 flex items-center border-b border-slate-800/70 ${collapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
+        <div className={`h-16 flex items-center border-b border-[#242424] ${collapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="text-amber-400 flex-shrink-0 bg-amber-500/10 p-1.5 rounded-xl border border-amber-500/20 shadow-sm shadow-amber-950/20">
+            <div className="text-red-500 flex-shrink-0 bg-red-600/10 p-1.5 rounded-xl border border-red-500/20 shadow-sm shadow-red-950/20">
               <GudLogo size={22} />
             </div>
             {!collapsed && (
@@ -105,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
                 <span className="font-bold tracking-tight text-white text-sm font-heading whitespace-nowrap">
                   GUDORIA ERP
                 </span>
-                <span className="text-[10px] text-amber-400/80 font-medium tracking-wide">
+                <span className="text-[10px] text-red-400/80 font-medium tracking-wide">
                   Atelier Confectionery
                 </span>
               </div>
@@ -114,19 +114,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
 
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="absolute -right-3 top-5 p-1 bg-slate-900 border border-slate-700/80 rounded-full text-slate-400 hover:text-white hover:border-slate-500 transition-colors shadow-md"
+            className="absolute -right-3 top-5 p-1 bg-[#181818] border border-[#383838] rounded-full text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors shadow-md"
           >
             {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
           </button>
         </div>
 
         {/* Action Button */}
-        <div className={`p-3 border-b border-slate-800/60 ${collapsed ? 'px-2' : ''}`}>
+        <div className={`p-3 border-b border-[#242424] ${collapsed ? 'px-2' : ''}`}>
           <a
             href="/invoice-generator"
             onClick={(e) => { e.preventDefault(); onNavigate('/invoice-generator'); }}
             title={collapsed ? "New Invoice" : undefined}
-            className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white rounded-xl shadow-md shadow-emerald-950/40 border border-emerald-500/30 tactile-press font-semibold text-xs group cursor-pointer ${
+            className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl shadow-md shadow-red-950/40 border border-red-500/30 tactile-press font-semibold text-xs group cursor-pointer ${
               collapsed ? 'p-2.5' : 'px-3 py-2.5'
             }`}
           >
@@ -141,7 +141,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           {commandCenter.length > 0 && (
             <div className="space-y-1">
               {!collapsed && (
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2 mb-1.5">
+                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest pl-2 mb-1.5">
                   🏠 Command Center
                 </p>
               )}
@@ -153,7 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           {salesCustomers.length > 0 && (
             <div className="space-y-1">
               {!collapsed && (
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2 mb-1.5">
+                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest pl-2 mb-1.5">
                   🤝 Sales & Customers
                 </p>
               )}
@@ -165,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           {supplyChain.length > 0 && (
             <div className="space-y-1">
               {!collapsed && (
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2 mb-1.5">
+                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest pl-2 mb-1.5">
                   🏭 Supply Chain
                 </p>
               )}
@@ -177,7 +177,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           {businessIntel.length > 0 && (
             <div className="space-y-1">
               {!collapsed && (
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2 mb-1.5">
+                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest pl-2 mb-1.5">
                   📊 Business Intelligence
                 </p>
               )}
@@ -189,7 +189,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           {complianceAdmin.length > 0 && (
             <div className="space-y-1">
               {!collapsed && (
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2 mb-1.5">
+                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest pl-2 mb-1.5">
                   📋 Compliance & Admin
                 </p>
               )}
@@ -201,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
           {system.length > 0 && (
             <div className="space-y-1">
               {!collapsed && (
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2 mb-1.5">
+                <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest pl-2 mb-1.5">
                   ⚙️ System
                 </p>
               )}
@@ -212,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
       </div>
 
       {/* Bottom Profile Summary */}
-      <div className="p-3 border-t border-slate-50 dark:border-slate-800/40 bg-slate-50/50 dark:bg-slate-900/35">
+      <div className="p-3 border-t border-[#242424] bg-[#0f0f0f]">
         <div className={`flex items-center gap-2.5 ${collapsed ? 'justify-center' : 'justify-between'}`}>
           <div 
             onClick={() => setIsProfileOpen(true)}
@@ -220,16 +220,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             title="View Profile Details"
           >
             {/* Avatar Fallback */}
-            <div className="w-8.5 h-8.5 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-8.5 h-8.5 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform">
               {profile.displayName ? profile.displayName.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
             </div>
             
             {!collapsed && (
               <div className="min-w-0 leading-tight">
-                <p className="text-xs font-semibold text-slate-800 dark:text-white truncate group-hover:text-emerald-750 dark:group-hover:text-emerald-400">
+                <p className="text-xs font-semibold text-white truncate group-hover:text-red-400">
                   {profile.displayName || 'GUD Member'}
                 </p>
-                <span className="text-[9px] font-semibold text-emerald-700 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 px-1.5 py-0.2 rounded-full mt-0.5 inline-block capitalize">
+                <span className="text-[9px] font-semibold text-red-400 bg-red-950/40 border border-red-900/40 px-1.5 py-0.5 rounded-full mt-0.5 inline-block capitalize">
                   {profile.role}
                 </span>
               </div>
@@ -240,7 +240,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             <button
               onClick={signOutUser}
               title="Sign Out"
-              className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all"
+              className="p-1.5 rounded-md text-neutral-400 hover:text-red-500 hover:bg-red-950/20 transition-all"
             >
               <LogOut className="w-4.5 h-4.5" />
             </button>

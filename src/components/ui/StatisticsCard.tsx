@@ -12,6 +12,7 @@ interface StatisticsCardProps {
   };
   sparklineData?: number[]; // list of numbers to render a mini SVG line chart
   icon?: React.ReactNode;
+  redAccent?: boolean;
   goldAccent?: boolean;
 }
 
@@ -22,8 +23,11 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
   trend,
   sparklineData,
   icon,
+  redAccent = false,
   goldAccent = false
 }) => {
+  const isHighlighted = redAccent || goldAccent;
+
   // Render a simple SVG sparkline path
   const renderSparkline = () => {
     if (!sparklineData || sparklineData.length < 2) return null;
@@ -43,14 +47,14 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
       })
       .join(' ');
 
-    const strokeColor = trend?.type === 'down' ? '#f43f5e' : (goldAccent ? '#d4af37' : '#10b981');
+    const strokeColor = trend?.type === 'down' ? '#f43f5e' : (isHighlighted ? '#e50914' : '#e50914');
 
     return (
       <svg width={width} height={height} className="overflow-visible">
         <polyline
           fill="none"
           stroke={strokeColor}
-          strokeWidth="1.75"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
           points={points}
@@ -60,24 +64,24 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
   };
 
   return (
-    <Card hoverEffect luxuryBorder={goldAccent} className="relative overflow-hidden">
+    <Card hoverEffect className="relative overflow-hidden bg-[#141414] border-[#262626]">
       <CardContent className="flex items-start justify-between p-5">
         <div className="space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 font-heading">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 font-heading">
             {title}
           </p>
           <div className="flex items-baseline gap-2">
-            <span className={`text-2xl font-bold tracking-tight font-heading ${goldAccent ? 'text-amber-300' : 'text-white'}`}>
+            <span className="text-2xl font-bold tracking-tight font-heading text-white">
               {value}
             </span>
             
             {trend && (
               <span className={`inline-flex items-center text-xs font-semibold px-1.5 py-0.5 rounded-md ${
                 trend.type === 'up' 
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                  ? 'bg-red-500/10 text-[#ff1e27] border border-red-500/20' 
                   : trend.type === 'down' 
                     ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' 
-                    : 'bg-slate-800 text-slate-400'
+                    : 'bg-[#1e1e1e] text-zinc-400'
               }`}>
                 {trend.type === 'up' && <ArrowUpRight className="w-3.5 h-3.5 mr-0.5" />}
                 {trend.type === 'down' && <ArrowDownRight className="w-3.5 h-3.5 mr-0.5" />}
@@ -87,14 +91,14 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
             )}
           </div>
           {description && (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-zinc-400">
               {description}
             </p>
           )}
         </div>
 
         <div className="flex flex-col items-end justify-between h-full min-h-[48px] pl-4">
-          {icon && <div className={`p-2.5 rounded-xl border ${goldAccent ? 'bg-amber-500/10 border-amber-500/20 text-amber-300' : 'bg-slate-800/80 border-slate-700/80 text-emerald-400'}`}>{icon}</div>}
+          {icon && <div className="p-2.5 rounded-xl border bg-[#181818] border-[#2a2a2a] text-[#e50914]">{icon}</div>}
           <div className="mt-2">{renderSparkline()}</div>
         </div>
       </CardContent>
