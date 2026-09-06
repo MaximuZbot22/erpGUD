@@ -26,21 +26,33 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       case 'approved':
       case 'delivered':
         return {
-          bg: 'bg-emerald-950/40 border border-emerald-800/60',
+          bg: 'bg-emerald-500/10 border border-emerald-500/20 shadow-sm shadow-emerald-950/20',
           text: 'text-emerald-300 font-semibold',
-          dot: 'bg-[#408d6d]',
+          dot: 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]',
           displayLabel: label || 'Active'
         };
       
+      case 'gold':
+      case 'premium':
+      case 'signature':
+        return {
+          bg: 'bg-amber-500/10 border border-amber-500/30 shadow-sm shadow-amber-950/20',
+          text: 'text-amber-300 font-semibold',
+          dot: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]',
+          displayLabel: label || 'Premium'
+        };
+
       case 'warning':
       case 'pending':
       case 'follow-up':
       case 'beta':
       case 'partial':
+      case 'under review':
+      case 'sample ordered':
         return {
-          bg: 'bg-amber-950/40 border border-amber-800/60',
+          bg: 'bg-amber-500/10 border border-amber-500/20',
           text: 'text-amber-300 font-semibold',
-          dot: 'bg-amber-500',
+          dot: 'bg-amber-400',
           displayLabel: label || 'Pending'
         };
 
@@ -51,40 +63,28 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       case 'danger':
       case 'cancelled':
         return {
-          bg: 'bg-rose-950/40 border border-rose-800/60',
+          bg: 'bg-rose-500/10 border border-rose-500/20',
           text: 'text-rose-300 font-semibold',
-          dot: 'bg-rose-500',
+          dot: 'bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.6)]',
           displayLabel: label || 'Overdue'
         };
 
       case 'info':
-      case 'processing':
-      case 'in-progress':
-      case 'shipped':
-      case 'packed':
-        return {
-          bg: 'bg-cyan-950/40 border border-cyan-800/60',
-          text: 'text-cyan-300 font-semibold',
-          dot: 'bg-cyan-400',
-          displayLabel: label || 'Processing'
-        };
-
-      case 'google-sync-required':
+      case 'quoted':
+      case 'planning':
+      case 'sample':
       case 'sync':
         return {
-          bg: 'bg-purple-950/40 border border-purple-800/60',
-          text: 'text-purple-300 font-semibold',
-          dot: 'bg-purple-400',
-          displayLabel: label || 'Sync'
+          bg: 'bg-cyan-500/10 border border-cyan-500/20',
+          text: 'text-cyan-300 font-semibold',
+          dot: 'bg-cyan-400',
+          displayLabel: label || 'In Review'
         };
 
-      case 'disabled':
-      case 'neutral':
-      case 'draft':
       default:
         return {
-          bg: 'bg-slate-800/50 border border-slate-700/60',
-          text: 'text-slate-300 font-medium',
+          bg: 'bg-slate-800/60 border border-slate-700/60',
+          text: 'text-slate-300',
           dot: 'bg-slate-400',
           displayLabel: label || status
         };

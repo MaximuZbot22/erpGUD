@@ -2,7 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost' | 'gold';
   size?: 'xs' | 'sm' | 'md' | 'lg';
   loading?: boolean;
   leftIcon?: React.ReactNode;
@@ -20,21 +20,22 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl select-none tactile-press cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none';
   
   const variants = {
-    primary: 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm border border-transparent active:scale-[0.98]',
-    secondary: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-transparent dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 dark:text-emerald-300',
-    outline: 'bg-transparent border border-slate-300 hover:bg-slate-50 text-slate-700 dark:border-slate-700 dark:hover:bg-slate-800 dark:text-slate-200',
-    danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm border border-transparent active:scale-[0.98]',
-    ghost: 'bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-800 dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white',
+    primary: 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/40 border border-emerald-500/30',
+    secondary: 'bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 border border-slate-700/70',
+    gold: 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold shadow-md shadow-amber-950/30 border border-amber-400/40',
+    outline: 'bg-transparent border border-slate-700/80 hover:bg-slate-800/60 text-slate-200 hover:text-white',
+    danger: 'bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-950/40 border border-rose-500/30',
+    ghost: 'bg-transparent hover:bg-slate-800/60 text-slate-300 hover:text-white border border-transparent',
   };
 
   const sizes = {
-    xs: 'px-2 py-1 text-xs',
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-5 py-2.5 text-base',
+    xs: 'px-2.5 py-1 text-xs gap-1.5',
+    sm: 'px-3 py-1.5 text-xs font-semibold gap-1.5',
+    md: 'px-4 py-2 text-sm font-semibold gap-2',
+    lg: 'px-5 py-2.5 text-base font-semibold gap-2.5',
   };
 
   return (
@@ -43,10 +44,10 @@ export const Button: React.FC<ButtonProps> = ({
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
-      {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-      {!loading && leftIcon && <span className="mr-2 inline-flex">{leftIcon}</span>}
-      {children}
-      {!loading && rightIcon && <span className="ml-2 inline-flex">{rightIcon}</span>}
+      {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+      {!loading && leftIcon && <span className="inline-flex shrink-0">{leftIcon}</span>}
+      <span>{children}</span>
+      {!loading && rightIcon && <span className="inline-flex shrink-0">{rightIcon}</span>}
     </button>
   );
 };

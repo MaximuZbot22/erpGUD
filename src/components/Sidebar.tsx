@@ -53,20 +53,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
         href={mod.path}
         onClick={(e) => { e.preventDefault(); onNavigate(mod.path); }}
         title={collapsed ? mod.name : undefined}
-        className={`w-full flex items-center rounded-xl text-xs font-semibold group transition-all duration-150 cursor-pointer ${
+        className={`w-full flex items-center rounded-xl text-xs font-medium group tactile-press cursor-pointer transition-colors ${
           collapsed ? 'justify-center px-2 py-2.5' : 'justify-between px-3 py-2'
         } ${
           isActive
-            ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60 shadow-sm font-bold'
-            : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/50'
+            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm shadow-emerald-950/20 font-semibold'
+            : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
         }`}
       >
         <div className={`flex items-center truncate ${collapsed ? 'justify-center' : 'gap-2.5'}`}>
           <DynamicIcon 
             name={mod.iconName} 
-            className={`w-4 h-4 flex-shrink-0 ${
+            className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
               isActive 
-                ? 'text-white' 
+                ? 'text-emerald-400' 
                 : 'text-slate-400 group-hover:text-slate-200'
             }`} 
           />
@@ -78,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             <StatusBadge 
               status={mod.status} 
               label={mod.status === 'google-sync-required' ? 'Sync' : undefined} 
-              className="text-[9px] px-1 py-0 shadow-none border-0" 
+              className="text-[9px] px-1.5 py-0 shadow-none border-0" 
             />
           </span>
         )}
@@ -88,40 +88,45 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
 
   return (
     <aside
-      className={`h-full border-r border-slate-150 dark:border-slate-800/60 bg-white dark:bg-slate-900 flex flex-col justify-between transition-all duration-300 relative z-30 print-hide print:hidden ${
+      className={`h-full border-r border-slate-800/80 bg-slate-950/90 backdrop-blur-xl flex flex-col justify-between transition-all duration-300 relative z-30 select-none print-hide print:hidden ${
         collapsed ? 'w-16' : 'w-60'
       }`}
     >
       {/* Top Section */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Header Block */}
-        <div className={`h-16 flex items-center border-b border-slate-800/40 ${collapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
+        <div className={`h-16 flex items-center border-b border-slate-800/70 ${collapsed ? 'justify-center px-2' : 'justify-between px-4'}`}>
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="text-emerald-450 flex-shrink-0 bg-emerald-950/30 p-1.5 rounded-xl border border-emerald-900/50">
+            <div className="text-amber-400 flex-shrink-0 bg-amber-500/10 p-1.5 rounded-xl border border-amber-500/20 shadow-sm shadow-amber-950/20">
               <GudLogo size={22} />
             </div>
             {!collapsed && (
-              <span className="font-bold tracking-tight text-white text-sm whitespace-nowrap">
-                GUD Platform OS
-              </span>
+              <div className="flex flex-col">
+                <span className="font-bold tracking-tight text-white text-sm font-heading whitespace-nowrap">
+                  GUDORIA ERP
+                </span>
+                <span className="text-[10px] text-amber-400/80 font-medium tracking-wide">
+                  Atelier Confectionery
+                </span>
+              </div>
             )}
           </div>
 
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="absolute -right-3 top-5 p-1 bg-slate-900 border border-slate-800 rounded-full text-slate-400 hover:text-white hover:shadow-sm"
+            className="absolute -right-3 top-5 p-1 bg-slate-900 border border-slate-700/80 rounded-full text-slate-400 hover:text-white hover:border-slate-500 transition-colors shadow-md"
           >
             {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
           </button>
         </div>
 
-        {/* Gmail-Style "Create / Action" Button */}
-        <div className={`p-3 border-b border-slate-800/40 ${collapsed ? 'px-2' : ''}`}>
+        {/* Action Button */}
+        <div className={`p-3 border-b border-slate-800/60 ${collapsed ? 'px-2' : ''}`}>
           <a
             href="/invoice-generator"
             onClick={(e) => { e.preventDefault(); onNavigate('/invoice-generator'); }}
             title={collapsed ? "New Invoice" : undefined}
-            className={`w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl shadow-md transition-all font-bold text-xs group cursor-pointer ${
+            className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white rounded-xl shadow-md shadow-emerald-950/40 border border-emerald-500/30 tactile-press font-semibold text-xs group cursor-pointer ${
               collapsed ? 'p-2.5' : 'px-3 py-2.5'
             }`}
           >

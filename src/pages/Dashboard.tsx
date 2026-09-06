@@ -190,18 +190,18 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
     <div className="space-y-6 animate-fade-in-up">
       
       {/* Brand Header Banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-gradient-to-r from-[#2b352c] via-[#306a52] to-[#408d6d] text-white p-6 rounded-2xl relative overflow-hidden shadow-xl border border-emerald-900/40">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white p-6 rounded-3xl relative overflow-hidden shadow-2xl border border-amber-500/20 glass-panel-luxury">
         <div className="space-y-1.5 relative z-10">
           <div className="flex items-center gap-2">
-            <span className="bg-white/10 text-emerald-200 text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full backdrop-blur-sm border border-white/10">
-              GUDORIA FOOD INNOVATIONS
+            <span className="bg-amber-500/10 text-amber-300 text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full backdrop-blur-sm border border-amber-500/20">
+              GUDORIA ATELIER ERP
             </span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Welcome, {profile?.displayName || 'GUD Operating System'}
+          <h1 className="text-2xl font-bold tracking-tight font-heading">
+            Welcome, {profile?.displayName || 'GUD Management'}
           </h1>
-          <p className="text-xs text-emerald-100/80 font-medium max-w-xl">
-            Live bi-directional synchronization with Google Sheets active across 16 database tabs.
+          <p className="text-xs text-slate-300/90 font-medium max-w-xl">
+            Real-time multi-tier business orchestration, live Google Sheets sync & bespoke confectionery curation.
           </p>
         </div>
 
@@ -209,7 +209,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
           {googleToken ? (
             <div className="flex items-center gap-2">
               <Button 
-                variant="secondary" 
+                variant="gold" 
                 size="sm" 
                 onClick={async () => {
                   if (!googleToken) return;
@@ -235,8 +235,7 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
                   }
                 }}
                 disabled={loading}
-                className="!bg-[#408d6d] hover:!bg-[#306a52] !text-white font-bold hover:scale-[1.01] shadow-md border-0"
-                leftIcon={<Sparkles className="w-4 h-4 text-emerald-200 animate-pulse" />}
+                leftIcon={<Sparkles className="w-4 h-4" />}
               >
                 Push 907 Records Live
               </Button>
@@ -245,7 +244,6 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
                 size="sm" 
                 onClick={fetchDashboardMetrics}
                 disabled={loading}
-                className="!bg-slate-900/60 hover:!bg-slate-900/80 !text-white border border-white/20 hover:scale-[1.01]"
                 leftIcon={<RefreshCcw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />}
               >
                 Sync Sheets
@@ -253,11 +251,10 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
             </div>
           ) : (
             <Button 
-              variant="primary" 
+              variant="gold" 
               size="sm" 
               onClick={signInWithGoogle}
-              className="!bg-amber-500 hover:!bg-amber-600 !text-slate-950 font-bold hover:scale-[1.01] border-0"
-              leftIcon={<Sparkles className="w-4 h-4 fill-slate-950" />}
+              leftIcon={<Sparkles className="w-4 h-4" />}
             >
               Sign In Google Workspace
             </Button>

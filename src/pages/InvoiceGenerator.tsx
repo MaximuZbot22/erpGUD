@@ -840,63 +840,64 @@ CIN: U72200KL2015PTC039279
   return (
     <div className="space-y-6 pb-20">
       {/* Top Banner (Hidden on Print) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm print:hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl border border-amber-500/20 shadow-xl print:hidden glass-panel-luxury">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider rounded-md bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400">
+            <span className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-heading">
               GUD Billing Engine
             </span>
-            <span className="text-xs text-slate-500">GST 5% Compliant</span>
+            <span className="text-xs text-slate-400">GST Compliant Billing</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+          <h1 className="text-2xl font-bold text-white mt-1 font-heading">
             Invoice Studio & Generator
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Build invoices with flavor counters, custom pricing, Google Drive export, and live Google Sheets sync.
+          <p className="text-xs text-slate-300/80 mt-1">
+            Build bespoke invoices with flavor counters, custom pricing, Google Drive export, and live Google Sheets sync.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {draftSavedAlert && (
-            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 px-2.5 py-1 rounded-full animate-fade-in-up flex items-center gap-1">
+            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full animate-fade-in-up flex items-center gap-1">
               <span>💾</span> Draft Saved (Auto)
             </span>
           )}
-          <Button variant="ghost" size="sm" onClick={handleClearToBlankForm} className="text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50">
-            <Trash2 className="w-3.5 h-3.5 mr-1" />
-            Clear / Blank Form
+          <Button variant="ghost" size="sm" onClick={handleClearToBlankForm} className="text-xs text-rose-400 hover:bg-rose-500/10 border border-rose-500/20">
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Clear</span>
           </Button>
           {!googleToken && (
-            <Button variant="outline" size="sm" onClick={signInWithGoogle} className="text-xs border-amber-300 text-amber-800 dark:text-amber-400">
-              <RefreshCw className="w-3.5 h-3.5 mr-1" />
-              Connect Drive/Sheets
+            <Button variant="outline" size="sm" onClick={signInWithGoogle} className="text-xs border-amber-500/30 text-amber-300 hover:bg-amber-500/10">
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Connect Drive</span>
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={handleSaveToGoogleDocs} disabled={exportingDocs} className="text-xs">
-            <FolderPlus className="w-3.5 h-3.5 mr-1" />
-            {exportingDocs ? 'Saving...' : 'Save to Google Docs/Drive'}
+          <Button variant="outline" size="sm" onClick={handleSaveToGoogleDocs} disabled={exportingDocs} className="text-xs border-slate-700/80">
+            <FolderPlus className="w-3.5 h-3.5" />
+            <span>{exportingDocs ? 'Saving...' : 'Save to Drive'}</span>
           </Button>
           <Button 
+            variant="gold"
             size="sm" 
             onClick={handleDownloadPdf} 
             disabled={pdfStatus === 'generating'} 
-            className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs"
+            className="text-xs"
           >
-            <Download className={`w-3.5 h-3.5 mr-1 ${pdfStatus === 'generating' ? 'animate-spin' : ''}`} />
-            {pdfStatus === 'generating' ? 'Generating PDF...' : 'Download PDF'}
+            <Download className={`w-3.5 h-3.5 ${pdfStatus === 'generating' ? 'animate-spin' : ''}`} />
+            <span>{pdfStatus === 'generating' ? 'Generating PDF...' : 'Download PDF'}</span>
           </Button>
-          <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs">
-            <Printer className="w-3.5 h-3.5 mr-1" />
-            Print Preview
+          <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs border-slate-700/80">
+            <Printer className="w-3.5 h-3.5" />
+            <span>Print</span>
           </Button>
           {invoiceMode === 'new' ? (
-            <Button size="sm" onClick={handleSaveAndPushOrder} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs">
-              <Save className="w-3.5 h-3.5 mr-1" />
-              {saving ? 'Syncing...' : 'Save & Log Order'}
+            <Button variant="primary" size="sm" onClick={handleSaveAndPushOrder} disabled={saving} className="text-xs">
+              <Save className="w-3.5 h-3.5" />
+              <span>{saving ? 'Syncing...' : 'Save & Log'}</span>
             </Button>
           ) : (
-            <span className="px-3 py-1.5 text-[11px] font-bold text-amber-700 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 rounded-lg border border-amber-300 dark:border-amber-700">
-              📋 From-Sheet Mode — PDF only
+            <span className="px-3 py-1.5 text-[11px] font-bold text-amber-300 bg-amber-500/10 rounded-xl border border-amber-500/30">
+              📋 From-Sheet Mode
             </span>
           )}
         </div>

@@ -118,10 +118,10 @@ export function Table<T>({
         onMouseLeave={handleMouseLeaveOrUp}
         onMouseUp={handleMouseLeaveOrUp}
         onMouseMove={handleMouseMove}
-        className={`overflow-x-auto border border-slate-150 dark:border-slate-800/80 rounded-lg shadow-sm bg-white dark:bg-slate-900 select-none ${isMouseDown ? 'cursor-grabbing' : 'cursor-grab'}`}
+        className={`overflow-x-auto border border-slate-800/80 rounded-2xl shadow-xl shadow-black/40 bg-slate-900/80 backdrop-blur-md select-none ${isMouseDown ? 'cursor-grabbing' : 'cursor-grab'}`}
       >
         <table className="w-full border-collapse text-left text-xs">
-          <thead className="bg-slate-55/80 dark:bg-slate-900/60 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase font-semibold tracking-wider">
+          <thead className="bg-slate-950/60 border-b border-slate-800/80 text-slate-400 uppercase font-semibold tracking-wider font-heading">
             <tr>
               {/* Checkbox Column */}
               {onSelectionChange && (
@@ -130,7 +130,7 @@ export function Table<T>({
                     type="checkbox"
                     checked={data.length > 0 && selectedIds.length === data.length}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                    className="rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
                   />
                 </th>
               )}
@@ -139,13 +139,13 @@ export function Table<T>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-5 py-3.5 ${col.sortable ? 'cursor-pointer select-none hover:bg-slate-50 dark:hover:bg-slate-800' : ''} ${col.className || ''}`}
+                  className={`px-5 py-3.5 ${col.sortable ? 'cursor-pointer select-none hover:bg-slate-800/50 hover:text-white transition-colors' : ''} ${col.className || ''}`}
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
                   <div className="flex items-center gap-1.5">
                     <span>{col.header}</span>
                     {col.sortable && sortKey === col.key && (
-                      sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />
+                      sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-emerald-400" /> : <ChevronDown className="w-3.5 h-3.5 text-emerald-400" />
                     )}
                   </div>
                 </th>
@@ -156,7 +156,7 @@ export function Table<T>({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70 text-slate-700 dark:text-slate-300">
+          <tbody className="divide-y divide-slate-800/60 text-slate-200">
             {loading ? (
               <tr>
                 <td colSpan={columns.length + (onSelectionChange ? 1 : 0) + (rowActions ? 1 : 0)} className="py-12 text-center text-slate-400 dark:text-slate-500">

@@ -23,13 +23,18 @@ export const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -64,20 +69,20 @@ export const Modal: React.FC<ModalProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(2, 6, 23, 0.82)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          backgroundColor: 'rgba(4, 7, 13, 0.82)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
           zIndex: 99998,
         }}
       />
 
-      {/* Centered Modal Content Card */}
+      {/* Centered Modal Content Card with Apple Spring */}
       <div 
-        className={`relative w-full ${sizes[size]} bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl z-[99999] text-left overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up`}
+        className={`relative w-full ${sizes[size]} bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 shadow-2xl shadow-black/80 z-[99999] text-left overflow-hidden flex flex-col max-h-[90vh] animate-spring-in`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4 flex-shrink-0">
-          <h3 className="text-base font-bold text-white tracking-wide">
+        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-4 flex-shrink-0">
+          <h3 className="text-base font-bold text-white tracking-wide font-heading">
             {title}
           </h3>
           <Button variant="ghost" size="xs" onClick={onClose} className="rounded-full !p-1.5 text-slate-400 hover:text-white">
@@ -92,7 +97,7 @@ export const Modal: React.FC<ModalProps> = ({
 
         {/* Footer */}
         {footer && (
-          <div className="mt-5 flex items-center justify-end gap-3 border-t border-slate-800 pt-4 flex-shrink-0">
+          <div className="mt-5 flex items-center justify-end gap-3 border-t border-slate-800/80 pt-4 flex-shrink-0">
             {footer}
           </div>
         )}

@@ -1136,7 +1136,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
 
         {/* Tab Switcher Navigation (Google Sheets mimic) */}
         {tabs.length > 0 && (
-          <div className="border-b border-slate-100 dark:border-slate-800 flex items-center gap-1 overflow-x-auto pb-px scrollbar-none">
+          <div className="border-b border-slate-800/80 flex items-center gap-1 overflow-x-auto pb-px scrollbar-none">
             {tabs.map((tab) => (
               <button
                 key={tab}
@@ -1145,10 +1145,10 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                   setSearchTerm('');
                   setSelectedRow(null);
                 }}
-                className={`px-4 py-2.5 text-xs font-semibold whitespace-nowrap border-b-2 transition-all ${
+                className={`px-4 py-2.5 text-xs font-semibold whitespace-nowrap border-b-2 tactile-press cursor-pointer ${
                   activeTab === tab 
-                    ? 'border-emerald-700 text-emerald-800 dark:border-emerald-450 dark:text-emerald-450 font-bold bg-emerald-50/20 dark:bg-emerald-950/10'
-                    : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-350'
+                    ? 'border-amber-400 text-amber-300 font-bold bg-amber-500/10 rounded-t-lg'
+                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 rounded-t-lg'
                 }`}
               >
                 {tab}
