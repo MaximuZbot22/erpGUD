@@ -11,11 +11,161 @@ export interface HamperCatalogItem {
   gstRate: 5 | 18;
   shelfLife?: string;
   inStockQty?: number;
+  imageUrl?: string;
 }
+
+export interface SourcedDiscoveryItem {
+  id: string;
+  category: 'Tins' | 'Chocolates' | 'Souvenir' | 'Packaging' | 'Chocolate Box' | 'Other';
+  description: string;
+  vendorLead: string;
+  estUnitCost: number;
+  gstRate: number;
+  landedUnitCost: number;
+  sampleMoq: number;
+  status: 'Approved' | 'Under Review' | 'Sample Ordered' | 'Rejected';
+  drivePhotoLink?: string;
+  readyForCatalog: boolean;
+  notes?: string;
+}
+
+export const SEED_DISCOVERY_ITEMS: SourcedDiscoveryItem[] = [
+  {
+    id: 'DISC-01',
+    category: 'Packaging',
+    description: 'Golden Pouch Bags (1 Big, 1 Small)',
+    vendorLead: 'Local Craft Market',
+    estUnitCost: 10.00,
+    gstRate: 18,
+    landedUnitCost: 11.80,
+    sampleMoq: 100,
+    status: 'Under Review',
+    readyForCatalog: false,
+    notes: 'Sourced for mini hampers; cost under trial'
+  },
+  {
+    id: 'DISC-02',
+    category: 'Chocolates',
+    description: 'Artisanal Jaggery Chocolates (GUD 70%)',
+    vendorLead: 'GUD Artisanal',
+    estUnitCost: 400.00,
+    gstRate: 5,
+    landedUnitCost: 420.00,
+    sampleMoq: 50,
+    status: 'Approved',
+    readyForCatalog: true,
+    notes: '8-piece artisanal chocolate gift box'
+  },
+  {
+    id: 'DISC-03',
+    category: 'Packaging',
+    description: 'Green Gift Box (12"x10"x4") with Gold Ribbon',
+    vendorLead: 'Deluxe Box Makers',
+    estUnitCost: 300.00,
+    gstRate: 18,
+    landedUnitCost: 354.00,
+    sampleMoq: 50,
+    status: 'Under Review',
+    readyForCatalog: false,
+    notes: 'Green box theme for premium Onam corporate hamper'
+  },
+  {
+    id: 'DISC-04',
+    category: 'Tins',
+    description: 'Banana Chips Kraft Pouches (Sweet & Salted)',
+    vendorLead: 'Kerala Delights',
+    estUnitCost: 41.00,
+    gstRate: 18,
+    landedUnitCost: 48.38,
+    sampleMoq: 150,
+    status: 'Approved',
+    readyForCatalog: true,
+    notes: 'Pouch alternative to tins for lightweight hamper'
+  },
+  {
+    id: 'DISC-05',
+    category: 'Souvenir',
+    description: 'Traditional Vishari Hand Fan (Bamboo)',
+    vendorLead: 'Kottayam Artisans',
+    estUnitCost: 50.00,
+    gstRate: 18,
+    landedUnitCost: 59.00,
+    sampleMoq: 50,
+    status: 'Approved',
+    readyForCatalog: true,
+    notes: 'Handcrafted eco-friendly fan souvenir'
+  },
+  {
+    id: 'DISC-06',
+    category: 'Souvenir',
+    description: 'Kathakali Face Figurine (Green Theme)',
+    vendorLead: 'Heritage Crafts',
+    estUnitCost: 50.00,
+    gstRate: 18,
+    landedUnitCost: 59.00,
+    sampleMoq: 50,
+    status: 'Under Review',
+    readyForCatalog: false,
+    notes: 'Color matched to green festive hamper collection'
+  },
+  {
+    id: 'DISC-07',
+    category: 'Souvenir',
+    description: 'Kerala Wooden Houseboat Miniature',
+    vendorLead: 'Alleppey Woodworks',
+    estUnitCost: 60.00,
+    gstRate: 18,
+    landedUnitCost: 70.80,
+    sampleMoq: 30,
+    status: 'Approved',
+    readyForCatalog: true,
+    notes: 'Polished rosewood finish sample approved'
+  },
+  {
+    id: 'DISC-08',
+    category: 'Packaging',
+    description: 'Onam Note Card (Floral Design Prints)',
+    vendorLead: 'Fine Prints Studio',
+    estUnitCost: 14.80,
+    gstRate: 18,
+    landedUnitCost: 17.46,
+    sampleMoq: 100,
+    status: 'Sample Ordered',
+    readyForCatalog: false,
+    notes: 'High GSM textured card with festive gold foil'
+  },
+  {
+    id: 'DISC-09',
+    category: 'Packaging',
+    description: 'Yellow Hamper Box (10"x8"x4")',
+    vendorLead: 'CraftBox Packaging',
+    estUnitCost: 225.00,
+    gstRate: 18,
+    landedUnitCost: 265.50,
+    sampleMoq: 50,
+    status: 'Sample Ordered',
+    readyForCatalog: false,
+    notes: 'Yellow festive box sample evaluation'
+  },
+  {
+    id: 'DISC-10',
+    category: 'Packaging',
+    description: 'Shredded Paper Filler (Golden Yellow)',
+    vendorLead: 'EcoPack Supplies',
+    estUnitCost: 18.00,
+    gstRate: 0,
+    landedUnitCost: 18.00,
+    sampleMoq: 50,
+    status: 'Rejected',
+    readyForCatalog: false,
+    notes: 'Dusty texture; stick with natural kraft shredded paper'
+  }
+];
 
 export const SPREADSHEET_ID = '1bymKSeyIeSCInLlo6d3IBdr4fuoSV6iL6MDjHMtcmYU';
 export const CSV_SYNC_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
 const STORAGE_KEY = 'gud_master_hamper_catalog_v1';
+const SOURCING_STORAGE_KEY = 'gud_hamper_sourcing_pipeline_v1';
 
 export const SEED_HAMPER_CATALOG: HamperCatalogItem[] = [
   { id: 'CAT-01', category: 'Tins', description: 'Banana chips, Sweet banana chips, Sharkaravarti (along with the design file)', defaultQty: 1, ourUnitCost: 41, gstRate: 18 },
@@ -163,4 +313,54 @@ export class HamperCatalogService {
       return this.getCatalog();
     }
   }
+
+  /**
+   * Get all scouted/sourcing pipeline items
+   */
+  static getSourcingPipeline(): SourcedDiscoveryItem[] {
+    return StorageEngine.getLocal<SourcedDiscoveryItem[]>(SOURCING_STORAGE_KEY, SEED_DISCOVERY_ITEMS);
+  }
+
+  /**
+   * Save sourcing pipeline items
+   */
+  static saveSourcingPipeline(items: SourcedDiscoveryItem[]): boolean {
+    return StorageEngine.setLocal(SOURCING_STORAGE_KEY, items);
+  }
+
+  /**
+   * Promote an approved sourced item directly into the active production catalog
+   */
+  static async promoteSourcedItemToCatalog(
+    sourced: SourcedDiscoveryItem,
+    initialStock: number = 25,
+    googleToken: string | null = null
+  ): Promise<{ updatedCatalog: HamperCatalogItem[]; updatedPipeline: SourcedDiscoveryItem[] }> {
+    // 1. Create new HamperCatalogItem
+    const newItem: HamperCatalogItem = {
+      id: `CAT-${Date.now().toString().slice(-4)}`,
+      category: sourced.category,
+      description: sourced.description,
+      defaultQty: 1,
+      ourUnitCost: sourced.landedUnitCost || sourced.estUnitCost,
+      clientUnitCost: Math.round((sourced.landedUnitCost || sourced.estUnitCost) * 1.8),
+      gstRate: sourced.gstRate as 5 | 18,
+      shelfLife: (sourced.category === 'Chocolates' || sourced.category === 'Chocolate Box') ? '6 Months' : 'N/A (Non-perishable)',
+      inStockQty: initialStock
+    };
+
+    // 2. Save into active catalog with optional sheet sync
+    const res = await this.addNewItemWithSheetSync(newItem, googleToken);
+
+    // 3. Mark sourced item as inducted / ready in pipeline
+    const pipeline = this.getSourcingPipeline();
+    const pIdx = pipeline.findIndex(p => p.id === sourced.id || p.description.toLowerCase() === sourced.description.toLowerCase());
+    if (pIdx >= 0) {
+      pipeline[pIdx] = { ...pipeline[pIdx], status: 'Approved', readyForCatalog: true };
+    }
+    this.saveSourcingPipeline(pipeline);
+
+    return { updatedCatalog: res.items, updatedPipeline: pipeline };
+  }
 }
+

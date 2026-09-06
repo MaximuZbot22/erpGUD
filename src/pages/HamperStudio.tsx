@@ -1,11 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { Gift, Plus, Trash2, CheckCircle2, FileSpreadsheet, RefreshCw, CheckSquare, Square, FileText, Truck } from 'lucide-react';
+import { 
+  Gift, Plus, Trash2, CheckCircle2, RefreshCw, CheckSquare, Square, 
+  FileText, Truck, Sparkles, Box, Compass, ArrowRight, Sliders, 
+  Info, ShieldCheck, ChevronRight, AlertTriangle, Layers, ArrowUpRight, Search
+} from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { StorageEngine } from '../services/storageEngine';
-import { auditLogService } from '../services/audit';
-import { HamperCatalogService, HamperCatalogItem } from '../services/hamperCatalog';
+import { 
+  HamperCatalogService, 
+  HamperCatalogItem, 
+  SourcedDiscoveryItem 
+} from '../services/hamperCatalog';
+import { 
+  HamperPricingEngine, 
+  STANDARD_BOX_SPECS, 
+  BoxCapacitySpec, 
+  CuratedTierRecipe, 
+  getItemVolumeUnits 
+} from '../services/hamperPricingEngine';
 import { HamperProposalDocument } from '../components/documents/HamperProposalDocument';
 import { HamperDeliveryNoteDocument } from '../components/documents/HamperDeliveryNoteDocument';
 
@@ -24,7 +38,7 @@ export interface TajProjectExpense {
   description: string;
   amount: number;
   category?: 'Travel' | 'Courier' | 'Porter' | 'Printing' | 'Packaging' | 'Other';
-  billableToClient?: boolean; // If true, added to client quote. If false, internal operational expense absorbed by us.
+  billableToClient?: boolean;
 }
 
 export interface TajHamperProject {
@@ -32,6 +46,9 @@ export interface TajHamperProject {
   projectName: string;
   clientName: string;
   date: string;
+  selectedBoxId?: string;
+  targetBudget?: number;
+  orderQuantity?: number;
   lineItems: TajHamperLineItem[];
   otherExpenses: TajProjectExpense[];
   status: 'Planning' | 'Quoted' | 'Approved' | 'In Assembly' | 'Delivered';
@@ -49,14 +66,30 @@ export const HamperStudio: React.FC = () => {
     return HamperCatalogService.getCatalog();
   });
 
-  const [activeProject, setActiveProject] = useState<TajHamperProject | null>(null);
-  const [viewMode, setViewMode] = useState<'workstation' | 'proposal' | 'delivery'>('workstation');
+  const [sourcingPipeline, setSourcingPipeline] = useState<SourcedDiscoveryItem[]>(() => {
+    return HamperCatalogService.getSourcingPipeline();
+  });
+
+  const [activeProject, setActiveProject] = useState<TajHamperProject | null>(() => {
+    const list = StorageEngine.getLocal<TajHamperProject[]>(STORAGE_KEY, []);
+    return list.length > 0 ? list[0] : null;
+  });
+
+  const [studioTab, setStudioTab] = useState<'workstation' | 'tier_recommender' | 'sourcing_pipeline'>('workstation');
+  const [viewMode, setViewMode] = useState<'studio' | 'proposal' | 'delivery'>('studio');
   
+  // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCatalogPickerOpen, setIsCatalogPickerOpen] = useState(false);
   const [isNewItemModalOpen, setIsNewItemModalOpen] = useState(false);
   const [loadingSync, setLoadingSync] = useState(false);
   const [savingNewItem, setSavingNewItem] = useState(false);
+
+  // Budget Engine State
+  const [targetBudgetInput, setTargetBudgetInput] = useState<number>(1000);
+  const [targetQtyInput, setTargetQtyInput] = useState<number>(50);
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const [catalogCategoryFilter, setCatalogCategoryFilter] = useState<string>('All');
 
   // New Project Form State
   const [projectName, setProjectName] = useState('');
@@ -72,7 +105,7 @@ export const HamperStudio: React.FC = () => {
     description: '',
     amount: 0,
     category: 'Travel',
-    billableToClient: false // Default to our end expense (absorbed)
+    billableToClient: false
   });
 
   // New Catalog Item Form State
@@ -96,6 +129,13 @@ export const HamperStudio: React.FC = () => {
     inStockQty: 25
   });
 
+  // Generate 3 Curated Tiers live
+  const generatedTiers = HamperPricingEngine.generateTiersForBudget(
+    targetBudgetInput || 1000,
+    targetQtyInput || 50,
+    masterCatalog
+  );
+
   // Sync Live Sheet Catalog
   const handleSyncLiveCatalog = async () => {
     setLoadingSync(true);
@@ -110,7 +150,7 @@ export const HamperStudio: React.FC = () => {
     }
   };
 
-  // Add New Item and reflect back into Google Sheets
+  // Add New Item to Catalog & append to Google Sheet
   const handleAddNewCatalogItem = async () => {
     if (!newItemForm.description.trim()) {
       alert('Please enter an Item Description.');
@@ -139,7 +179,6 @@ export const HamperStudio: React.FC = () => {
       const result = await HamperCatalogService.addNewItemWithSheetSync(itemToSave, token);
       setMasterCatalog(result.items);
 
-      // If there is an active project, auto-include this new item
       if (activeProject) {
         const newLine: TajHamperLineItem = {
           id: `LINE-${Date.now()}-${itemToSave.id}`,
@@ -150,8 +189,10 @@ export const HamperStudio: React.FC = () => {
           clientUnitCost: itemToSave.clientUnitCost || itemToSave.ourUnitCost * 2,
           gstRate: itemToSave.gstRate
         };
-        const updatedProj = { ...activeProject, lineItems: [...activeProject.lineItems, newLine] };
-        updateProjectState(updatedProj);
+        updateProjectState({
+          ...activeProject,
+          lineItems: [...activeProject.lineItems, newLine]
+        });
       }
 
       setIsNewItemModalOpen(false);
@@ -165,31 +206,36 @@ export const HamperStudio: React.FC = () => {
         shelfLife: 'N/A (Non-perishable)',
         inStockQty: 25
       });
-
-      if (result.syncedToGoogle) {
-        alert(`✓ Added "${itemToSave.description}" to Master Catalog and appended to Google Sheet ('items' tab)!`);
-      } else {
-        alert(`✓ Added "${itemToSave.description}" to Master Catalog locally! (Connect Google Workspace to auto-sync to Sheets)`);
-      }
-    } catch (err: any) {
-      console.error('Error adding new catalog item:', err);
-      alert('Failed to add item: ' + (err.message || err));
+    } catch (e) {
+      console.error(e);
     } finally {
       setSavingNewItem(false);
     }
   };
 
+  // Promote Sourced Item from Discovery Pipeline to Master Catalog
+  const handlePromoteSourcedItem = async (sourced: SourcedDiscoveryItem) => {
+    const token = sessionStorage.getItem('gud_google_access_token');
+    const res = await HamperCatalogService.promoteSourcedItemToCatalog(sourced, sourced.sampleMoq || 30, token);
+    setMasterCatalog(res.updatedCatalog);
+    setSourcingPipeline(res.updatedPipeline);
+    alert(`✓ "${sourced.description}" promoted to Active Production Catalog!`);
+  };
+
+  // Create Project
   const handleCreateProject = () => {
     if (!projectName.trim() || !clientName.trim()) {
-      alert('Please enter Project Name and Client Name.');
+      alert('Please provide both Project Name and Client Name');
       return;
     }
-
     const proj: TajHamperProject = {
       id: `HMP-${Date.now().toString().slice(-4)}`,
-      projectName,
-      clientName,
+      projectName: projectName.trim(),
+      clientName: clientName.trim(),
       date: new Date().toISOString().split('T')[0],
+      targetBudget: targetBudgetInput,
+      orderQuantity: targetQtyInput,
+      selectedBoxId: 'BOX-1012',
       lineItems: [],
       otherExpenses: [],
       status: 'Planning'
@@ -204,27 +250,76 @@ export const HamperStudio: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  // Toggle item via Checkbox Catalog Picker
+  // Apply a curated tier directly into the active project
+  const handleApplyCuratedTier = (recipe: CuratedTierRecipe) => {
+    if (!activeProject) {
+      // Create project first
+      const proj: TajHamperProject = {
+        id: `HMP-${Date.now().toString().slice(-4)}`,
+        projectName: `${recipe.tierName} (${targetQtyInput} units)`,
+        clientName: 'Corporate Client',
+        date: new Date().toISOString().split('T')[0],
+        targetBudget: recipe.clientQuoteInclGst,
+        orderQuantity: targetQtyInput,
+        selectedBoxId: recipe.recommendedBox.id,
+        lineItems: recipe.lineItems.map(it => ({
+          id: `LINE-${Date.now()}-${it.catalogItem.id}`,
+          category: it.catalogItem.category,
+          description: it.catalogItem.description,
+          qty: it.qty,
+          ourUnitCost: it.catalogItem.ourUnitCost,
+          clientUnitCost: it.catalogItem.clientUnitCost || Math.round(it.catalogItem.ourUnitCost * 1.8),
+          gstRate: it.catalogItem.gstRate
+        })),
+        otherExpenses: [],
+        status: 'Planning'
+      };
+      const updated = [proj, ...projects];
+      setProjects(updated);
+      StorageEngine.setLocal(STORAGE_KEY, updated);
+      setActiveProject(proj);
+    } else {
+      const newLines: TajHamperLineItem[] = recipe.lineItems.map(it => ({
+        id: `LINE-${Date.now()}-${it.catalogItem.id}`,
+        category: it.catalogItem.category,
+        description: it.catalogItem.description,
+        qty: it.qty,
+        ourUnitCost: it.catalogItem.ourUnitCost,
+        clientUnitCost: it.catalogItem.clientUnitCost || Math.round(it.catalogItem.ourUnitCost * 1.8),
+        gstRate: it.catalogItem.gstRate
+      }));
+
+      updateProjectState({
+        ...activeProject,
+        selectedBoxId: recipe.recommendedBox.id,
+        targetBudget: recipe.clientQuoteInclGst,
+        lineItems: newLines
+      });
+    }
+
+    setStudioTab('workstation');
+  };
+
+  // Toggle item via Catalog Picker
   const handleToggleCatalogItem = (catItem: HamperCatalogItem, checked: boolean) => {
     if (!activeProject) return;
 
     if (checked) {
-      // Add item to active project
       const line: TajHamperLineItem = {
         id: `LINE-${Date.now()}-${catItem.id}`,
         category: catItem.category,
         description: catItem.description,
         qty: catItem.defaultQty || 1,
         ourUnitCost: catItem.ourUnitCost,
-        clientUnitCost: catItem.clientUnitCost || Math.round(catItem.ourUnitCost * 2), // Default 2x markup quote
+        clientUnitCost: catItem.clientUnitCost || Math.round(catItem.ourUnitCost * 1.8),
         gstRate: catItem.gstRate
       };
-      const updatedProj = { ...activeProject, lineItems: [...activeProject.lineItems, line] };
-      updateProjectState(updatedProj);
+      updateProjectState({ ...activeProject, lineItems: [...activeProject.lineItems, line] });
     } else {
-      // Remove item from active project
-      const updatedProj = { ...activeProject, lineItems: activeProject.lineItems.filter(l => l.description.toLowerCase() !== catItem.description.toLowerCase()) };
-      updateProjectState(updatedProj);
+      updateProjectState({ 
+        ...activeProject, 
+        lineItems: activeProject.lineItems.filter(l => l.description.toLowerCase() !== catItem.description.toLowerCase()) 
+      });
     }
   };
 
@@ -295,6 +390,7 @@ export const HamperStudio: React.FC = () => {
     let clientTotalCost = 0;
     let ourFinalCost = 0;
     let clientFinalCost = 0;
+    let totalVolumeUnits = 0;
 
     proj.lineItems.forEach(item => {
       const ourCost = item.qty * item.ourUnitCost;
@@ -306,9 +402,19 @@ export const HamperStudio: React.FC = () => {
       clientTotalCost += clientCost;
       ourFinalCost += (ourCost + ourGst);
       clientFinalCost += (clientCost + clientGst);
+
+      // Volume calculation
+      const catItem = masterCatalog.find(c => c.description.toLowerCase() === item.description.toLowerCase()) || {
+        description: item.description,
+        category: item.category,
+        ourUnitCost: item.ourUnitCost,
+        gstRate: item.gstRate,
+        defaultQty: 1,
+        id: ''
+      };
+      totalVolumeUnits += getItemVolumeUnits(catItem) * item.qty;
     });
 
-    // Expenses: Billable to client vs Absorbed internally
     const billableExpenses = proj.otherExpenses
       .filter(e => e.billableToClient !== false)
       .reduce((acc, e) => acc + e.amount, 0);
@@ -318,20 +424,17 @@ export const HamperStudio: React.FC = () => {
       .reduce((acc, e) => acc + e.amount, 0);
 
     const totalExpenses = billableExpenses + internalExpenses;
-
-    // Total Client Quoted Value includes items + billable logistics/freight
     const totalClientQuote = clientFinalCost + billableExpenses;
-
-    // Total Outflow / Out-of-pocket from our end = Our BOM Goods Cost + All internal & incurred expenses
-    // If an expense is billed to client, client pays us, but we also paid for it.
-    // If it's absorbed, client doesn't pay, we pay for it out of margin.
-    // Therefore: Net Profit = Total Revenue (Client Quote) - Our BOM Cost - Total Expenses Paid by Us
     const netProfit = totalClientQuote - ourFinalCost - totalExpenses;
     const grossMarginPercent = totalClientQuote > 0 ? Math.round((netProfit / totalClientQuote) * 10000) / 100 : 0;
 
+    // Box Capacity Check
+    const activeBox = STANDARD_BOX_SPECS.find(b => b.id === proj.selectedBoxId) || STANDARD_BOX_SPECS[0];
+    const capacityPercent = Math.min(Math.round((totalVolumeUnits / activeBox.maxVolumeUnits) * 100), 150);
+
     return {
-      ourTotalCost,
-      clientTotalCost,
+      ourTotalCost: Math.round(ourTotalCost * 100) / 100,
+      clientTotalCost: Math.round(clientTotalCost * 100) / 100,
       ourFinalCost: Math.round(ourFinalCost * 100) / 100,
       clientFinalCost: Math.round(clientFinalCost * 100) / 100,
       billableExpenses,
@@ -339,437 +442,824 @@ export const HamperStudio: React.FC = () => {
       totalExpenses,
       totalClientQuote: Math.round(totalClientQuote * 100) / 100,
       netProfit: Math.round(netProfit * 100) / 100,
-      grossMarginPercent
+      grossMarginPercent,
+      totalVolumeUnits: Math.round(totalVolumeUnits * 10) / 10,
+      activeBox,
+      capacityPercent
     };
   };
 
-  // Group master catalog by Category
-  const catalogByCategory = masterCatalog.reduce((acc, item) => {
-    acc[item.category] = acc[item.category] || [];
-    acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, HamperCatalogItem[]>);
-
   // Render Document Views if active
   if (viewMode === 'proposal' && activeProject) {
-    return <HamperProposalDocument project={activeProject} onBack={() => setViewMode('workstation')} />;
+    return <HamperProposalDocument project={activeProject} onBack={() => setViewMode('studio')} />;
   }
 
   if (viewMode === 'delivery' && activeProject) {
-    return <HamperDeliveryNoteDocument project={activeProject} onBack={() => setViewMode('workstation')} />;
+    return <HamperDeliveryNoteDocument project={activeProject} onBack={() => setViewMode('studio')} />;
   }
 
+  const activeMath = activeProject ? calculateProjectMath(activeProject) : null;
+
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div className="min-h-screen bg-[#090d16] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-8 font-sans">
+      
+      {/* ATELIER TOP HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-amber-500/15 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Gift className="w-7 h-7 text-purple-500" /> Corporate Hamper Studio & Master Catalog
+          <div className="flex items-center gap-2.5">
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[10px] font-bold uppercase tracking-widest">
+              Confectionery & Corporate Atelier
+            </span>
+            <span className="text-slate-500 text-xs">v3.0 Executive</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1.5 flex items-center gap-3">
+            <Gift className="w-8 h-8 text-amber-400" />
+            Hamper BOM Studio & Target-Cost Engine
           </h1>
-          <p className="text-slate-400 text-xs mt-1">
-            Pick & choose items via Checkbox Catalog Picker, calculate costs live, and export Customer Proposals & Delivery Notes.
+          <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-2xl">
+            Engineer custom gifting collections from client budgets, evaluate volumetric fit, track landed procurement costs, and generate live profit quotes.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setIsNewItemModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">
-            <Plus className="w-3.5 h-3.5 mr-1" /> + Add New Item to Catalog
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button 
+            onClick={handleSyncLiveCatalog} 
+            disabled={loadingSync} 
+            variant="outline" 
+            className="border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-xs h-9"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loadingSync ? 'animate-spin text-amber-400' : ''}`} /> 
+            Sync Sheet Catalog
           </Button>
-          <Button onClick={handleSyncLiveCatalog} disabled={loadingSync} variant="outline" className="text-slate-300 border-slate-700 text-xs">
-            <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loadingSync ? 'animate-spin' : ''}`} /> Sync Sheet Catalog
+
+          <Button 
+            onClick={() => setIsNewItemModalOpen(true)} 
+            className="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs font-semibold h-9"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1 text-amber-400" /> + Add Master SKU
           </Button>
-          <Button onClick={() => setIsModalOpen(true)} className="bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs">
-            <Plus className="w-4 h-4 mr-1" /> + New Hamper Project
+
+          <Button 
+            onClick={() => setIsModalOpen(true)} 
+            className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs shadow-lg shadow-amber-900/30 h-9"
+          >
+            <Plus className="w-4 h-4 mr-1 text-slate-950 stroke-[3]" /> + New Hamper Project
           </Button>
         </div>
       </div>
 
-      {/* Projects List / Empty State */}
-      {projects.length === 0 ? (
-        <Card className="bg-slate-900 border-slate-800 p-8 text-center text-slate-400">
-          <Gift className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <p className="font-semibold text-slate-300">No Hamper Projects Created</p>
-          <p className="text-xs text-slate-500 mt-1">Click below to create a new corporate hamper project and check off items from your master catalog.</p>
-          <div className="flex justify-center gap-3 mt-4">
-            <Button onClick={() => setIsNewItemModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs">
-              <Plus className="w-4 h-4 mr-1" /> + Add New Master Item
-            </Button>
-            <Button onClick={() => setIsModalOpen(true)} className="bg-purple-600 hover:bg-purple-500 text-white text-xs">
-              <Plus className="w-4 h-4 mr-1" /> + New Hamper Project
-            </Button>
+      {/* TARGET-BUDGET REVERSE COSTING BAR */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-[#121824] border border-amber-500/30 p-5 sm:p-6 shadow-xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-1.5 max-w-md">
+            <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs uppercase tracking-wider">
+              <Sparkles className="w-4 h-4" /> Client Target Budget Matcher
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-white">
+              Instant 3-Tier Proposal Generator
+            </h2>
+            <p className="text-xs text-slate-400">
+              Enter the client's budget per hamper (incl. GST). The engine will curate <strong>Basic</strong>, <strong>Better</strong>, and <strong>Premium</strong> tiers with verified margins.
+            </p>
           </div>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Projects Directory Sidebar */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Hamper Projects</h3>
-            {projects.map(p => {
-              const math = calculateProjectMath(p);
-              return (
-                <div 
-                  key={p.id}
-                  onClick={() => setActiveProject(p)}
-                  className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                    activeProject?.id === p.id 
-                      ? 'bg-purple-950/40 border-purple-600 text-slate-100' 
-                      : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300'
+
+          {/* Budget Input & Presets */}
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800">
+              <div className="px-3 py-1 text-xs text-slate-400 font-medium">Budget:</div>
+              <div className="relative">
+                <span className="absolute left-2.5 top-2 text-amber-400 font-bold text-sm">₹</span>
+                <input 
+                  type="number"
+                  value={targetBudgetInput}
+                  onChange={e => setTargetBudgetInput(Math.max(Number(e.target.value), 100))}
+                  className="w-28 pl-7 pr-2 py-1.5 bg-slate-900 border border-amber-500/40 rounded-lg text-white font-mono font-bold text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                />
+              </div>
+              <div className="text-[10px] text-slate-500 font-semibold uppercase pr-2">incl GST</div>
+            </div>
+
+            <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800">
+              <div className="px-3 py-1 text-xs text-slate-400 font-medium">Qty:</div>
+              <input 
+                type="number"
+                value={targetQtyInput}
+                onChange={e => setTargetQtyInput(Math.max(Number(e.target.value), 1))}
+                className="w-20 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono font-bold text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 text-center"
+              />
+            </div>
+
+            {/* Quick Presets */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              {[750, 1000, 1500, 2500].map(val => (
+                <button
+                  key={val}
+                  onClick={() => {
+                    setTargetBudgetInput(val);
+                    setStudioTab('tier_recommender');
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
+                    targetBudgetInput === val 
+                      ? 'bg-amber-500 text-slate-950 font-bold' 
+                      : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300'
                   }`}
                 >
-                  <div className="flex justify-between items-start">
-                    <span className="font-bold text-sm">{p.projectName}</span>
-                    <span className="text-[10px] font-mono bg-slate-800 text-purple-400 px-2 py-0.5 rounded">{p.id}</span>
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">Client: {p.clientName}</div>
-                  <div className="flex justify-between items-center mt-2 border-t border-slate-800/80 pt-2 font-mono text-xs">
-                    <span>Net Profit:</span>
-                    <span className="text-emerald-400 font-bold">₹{math.netProfit.toLocaleString('en-IN')} ({math.grossMarginPercent}%)</span>
-                  </div>
-                </div>
-              );
-            })}
+                  ₹{val}
+                </button>
+              ))}
+            </div>
+
+            <Button
+              onClick={() => setStudioTab('tier_recommender')}
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs h-10 px-4 shadow-md whitespace-nowrap"
+            >
+              <Sparkles className="w-4 h-4 mr-1.5 text-slate-950" /> Curate Tiers
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* STUDIO NAVIGATION TABS */}
+      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setStudioTab('workstation')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              studioTab === 'workstation'
+                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+            }`}
+          >
+            <Sliders className="w-4 h-4" /> Active Workstation & Canvas
+          </button>
+
+          <button
+            onClick={() => setStudioTab('tier_recommender')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              studioTab === 'tier_recommender'
+                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+            }`}
+          >
+            <Layers className="w-4 h-4" /> 3-Tier Budget Architectures (Basic / Better / Premium)
+          </button>
+
+          <button
+            onClick={() => setStudioTab('sourcing_pipeline')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              studioTab === 'sourcing_pipeline'
+                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+            }`}
+          >
+            <Compass className="w-4 h-4" /> Discovery & Procurement ({sourcingPipeline.length} SKUs)
+          </button>
+        </div>
+
+        {activeProject && (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={() => setViewMode('proposal')}
+              className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs"
+            >
+              <FileText className="w-3.5 h-3.5 mr-1" /> Export Formal Proposal
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setViewMode('delivery')}
+              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs"
+            >
+              <Truck className="w-3.5 h-3.5 mr-1" /> Delivery Note
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* TAB 1: 3-TIER COMPARISON MATRIX */}
+      {studioTab === 'tier_recommender' && (
+        <div className="space-y-6 animate-fade-in-up">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+            <div>
+              <h3 className="text-sm font-bold text-white">
+                Tier Comparison Matrix for Target Budget: ₹{targetBudgetInput.toLocaleString('en-IN')} incl. GST ({targetQtyInput} hampers)
+              </h3>
+              <p className="text-xs text-slate-400">
+                Pick the optimal balance for your client's executive tier or customize any recipe directly into your workstation.
+              </p>
+            </div>
+            <div className="text-xs text-slate-400 font-mono">
+              Total Order Revenue: <span className="text-amber-400 font-bold">₹{(targetBudgetInput * targetQtyInput).toLocaleString('en-IN')}</span>
+            </div>
           </div>
 
-          {/* Active Project Workstation */}
-          {activeProject && (
-            <div className="lg:col-span-2 space-y-6">
-              {/* Document Action Buttons */}
-              <div className="flex flex-wrap gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800 items-center justify-between">
-                <div className="flex flex-wrap gap-2">
-                  <Button onClick={() => setIsCatalogPickerOpen(true)} className="bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs">
-                    <CheckSquare className="w-4 h-4 mr-1" /> Pick Items via Catalog
-                  </Button>
-                  <Button onClick={() => setIsNewItemModalOpen(true)} variant="outline" className="text-emerald-400 border-emerald-700 hover:bg-emerald-950/50 text-xs">
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Add New Item to Catalog
-                  </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={() => setViewMode('proposal')} className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">
-                    <FileText className="w-4 h-4 mr-1" /> Proposal (PO)
-                  </Button>
-                  <Button onClick={() => setViewMode('delivery')} className="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
-                    <Truck className="w-4 h-4 mr-1" /> Delivery Note
-                  </Button>
-                </div>
-              </div>
-
-              {/* Financial Rollup Summary */}
-              {(() => {
-                const math = calculateProjectMath(activeProject);
-                return (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
-                    <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg">
-                      <div className="text-slate-500 text-[10px]">OUR BOM GOODS COST</div>
-                      <div className="text-slate-100 text-base font-bold mt-1">₹{math.ourFinalCost.toLocaleString('en-IN')}</div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">Incl. GST</div>
-                    </div>
-                    <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg">
-                      <div className="text-slate-500 text-[10px]">TOTAL CLIENT QUOTE</div>
-                      <div className="text-purple-400 text-base font-bold mt-1">₹{math.totalClientQuote.toLocaleString('en-IN')}</div>
-                      <div className="text-[10px] text-purple-300 mt-0.5">Items + Billable Services</div>
-                    </div>
-                    <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg">
-                      <div className="text-slate-500 text-[10px]">OUR EXPENSES (TRAVEL, ETC)</div>
-                      <div className="text-rose-400 text-base font-bold mt-1">₹{math.totalExpenses.toLocaleString('en-IN')}</div>
-                      <div className="text-[10px] text-rose-300 mt-0.5">₹{math.internalExpenses} absorbed / ₹{math.billableExpenses} billed</div>
-                    </div>
-                    <div className="bg-slate-900 border border-slate-800 p-3 rounded-lg">
-                      <div className="text-slate-500 text-[10px]">TRUE NET PROFIT (MARGIN)</div>
-                      <div className="text-emerald-400 text-base font-bold mt-1">₹{math.netProfit.toLocaleString('en-IN')} ({math.grossMarginPercent}%)</div>
-                      <div className="text-[10px] text-emerald-400 mt-0.5">After all expenses</div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Selected Items Table */}
-              <Card className="bg-slate-900 border-slate-800">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-100 flex items-center justify-between">
-                    <span>Selected Hamper Items ({activeProject.lineItems.length})</span>
-                    <span className="text-xs font-normal text-slate-400">Custom unit quote updates client final cost</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 text-xs">
-                  {activeProject.lineItems.length === 0 ? (
-                    <div className="p-6 text-center text-slate-500">
-                      No items checked. Click "Pick Items via Catalog" above to select components.
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left font-mono">
-                        <thead>
-                          <tr className="border-b border-slate-800 text-slate-400 text-[10px]">
-                            <th className="p-2">Cat</th>
-                            <th className="p-2">Description</th>
-                            <th className="p-2">Qty</th>
-                            <th className="p-2">Our Cost</th>
-                            <th className="p-2">Client Quote</th>
-                            <th className="p-2">Our Final</th>
-                            <th className="p-2">Client Final</th>
-                            <th className="p-2 text-right">Remove</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800 text-slate-300">
-                          {activeProject.lineItems.map(item => {
-                            const ourCost = item.qty * item.ourUnitCost;
-                            const clientCost = item.qty * item.clientUnitCost;
-                            const ourFinal = ourCost + (ourCost * item.gstRate / 100);
-                            const clientFinal = clientCost + (clientCost * item.gstRate / 100);
-                            return (
-                              <tr key={item.id}>
-                                <td className="p-2 text-purple-400 font-bold">{item.category}</td>
-                                <td className="p-2 font-sans font-semibold text-slate-200">{item.description}</td>
-                                <td className="p-2">
-                                  <input 
-                                    type="number" 
-                                    min="1" 
-                                    value={item.qty}
-                                    onChange={e => handleUpdateItemProperty(item.description, 'qty', Number(e.target.value))}
-                                    className="w-16 bg-slate-950 border border-slate-800 rounded px-1 text-center text-slate-100 font-mono"
-                                  />
-                                </td>
-                                <td className="p-2">₹{item.ourUnitCost}</td>
-                                <td className="p-2">
-                                  <input 
-                                    type="number" 
-                                    value={item.clientUnitCost}
-                                    onChange={e => handleUpdateItemProperty(item.description, 'clientUnitCost', Number(e.target.value))}
-                                    className="w-20 bg-slate-950 border border-slate-800 rounded px-1 text-purple-400 font-bold text-right"
-                                  />
-                                </td>
-                                <td className="p-2 font-bold">₹{Math.round(ourFinal)}</td>
-                                <td className="p-2 text-emerald-400 font-bold">₹{Math.round(clientFinal)}</td>
-                                <td className="p-2 text-right">
-                                  <button onClick={() => handleRemoveLineItem(item.id)} className="text-rose-400 hover:text-rose-300">
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Project Operational Expenses (Travel, Courier, Porter, Printing) */}
-              <Card className="bg-slate-900 border-slate-800">
-                <CardHeader className="pb-2">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                    <CardTitle className="text-sm font-bold text-slate-100">
-                      Project Expenses & Fulfillment Outflow (Travel, Courier, Porter)
-                    </CardTitle>
-                    <span className="text-[11px] text-amber-400 font-normal">
-                      Expenses from our end directly reduce net profit margin
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[generatedTiers.tiers.basic, generatedTiers.tiers.better, generatedTiers.tiers.premium].map(recipe => (
+              <div 
+                key={recipe.tier}
+                className={`relative rounded-2xl bg-gradient-to-b ${recipe.colorScheme.bg} border ${recipe.colorScheme.border} p-5 flex flex-col justify-between shadow-2xl transition-all hover:scale-[1.01]`}
+              >
+                <div>
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-white/10 text-slate-200">
+                      {recipe.badge}
+                    </span>
+                    <span className={`text-xs font-mono font-bold ${recipe.colorScheme.text}`}>
+                      {recipe.grossMarginPercent}% Margin
                     </span>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4 text-xs">
-                  {/* Quick Preset Buttons */}
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">Quick Presets:</span>
-                    <button 
-                      onClick={() => handleAddExpense({ desc: 'Travel & Local Delivery Logistics', amount: 300, category: 'Travel', billable: false })}
-                      className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] flex items-center gap-1"
-                    >
-                      🚗 Travel (₹300 - Our Expense)
-                    </button>
-                    <button 
-                      onClick={() => handleAddExpense({ desc: 'Courier / Temperature Express Transit', amount: 450, category: 'Courier', billable: false })}
-                      className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] flex items-center gap-1"
-                    >
-                      📦 Courier Transit (₹450)
-                    </button>
-                    <button 
-                      onClick={() => handleAddExpense({ desc: 'Porter Loading & Unloading', amount: 200, category: 'Porter', billable: false })}
-                      className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] flex items-center gap-1"
-                    >
-                      👷 Porter Charges (₹200)
-                    </button>
-                    <button 
-                      onClick={() => handleAddExpense({ desc: 'Client Gift Card & Logo Stamping', amount: 350, category: 'Printing', billable: true })}
-                      className="px-2 py-1 rounded bg-purple-950/60 hover:bg-purple-900 text-purple-300 border border-purple-700 text-[11px] flex items-center gap-1"
-                    >
-                      🏷️ Custom Print (₹350 - Bill to Client)
-                    </button>
+
+                  <h4 className="text-lg font-bold text-white">{recipe.tierName}</h4>
+                  <p className="text-xs text-slate-400 mt-1 min-h-[36px]">{recipe.tagline}</p>
+
+                  {/* Pricing Overview */}
+                  <div className="bg-slate-950/70 p-3.5 rounded-xl border border-white/5 my-4 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-slate-400">Client Quote:</span>
+                      <span className="text-base font-bold font-mono text-white">₹{recipe.clientQuoteInclGst.toLocaleString('en-IN')} <span className="text-[10px] text-slate-400 font-normal">incl GST</span></span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-slate-400">Our BOM Cost (with GST):</span>
+                      <span className="text-slate-300 font-mono">₹{recipe.ourBOMTotalWithGst.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="border-t border-slate-800 pt-2 flex justify-between items-center text-xs font-bold">
+                      <span className="text-slate-300">Net Profit / Hamper:</span>
+                      <span className="text-emerald-400 font-mono">₹{recipe.netProfit.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="text-[11px] text-right text-slate-400 font-mono">
+                      Project Profit ({targetQtyInput} units): <span className="text-emerald-300 font-bold">₹{(recipe.netProfit * targetQtyInput).toLocaleString('en-IN')}</span>
+                    </div>
                   </div>
 
-                  {/* Manual Expense Input Bar */}
-                  <div className="flex flex-wrap sm:flex-nowrap gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-800 items-center">
+                  {/* Packaging & Capacity */}
+                  <div className="mb-4 text-xs space-y-1.5">
+                    <div className="flex justify-between text-slate-400">
+                      <span>Packaging: <strong>{recipe.recommendedBox.name}</strong></span>
+                      <span className="font-mono">{recipe.capacityUtilizationPercent}% full</span>
+                    </div>
+                    <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full ${recipe.capacityUtilizationPercent > 100 ? 'bg-rose-500' : 'bg-emerald-400'}`}
+                        style={{ width: `${Math.min(recipe.capacityUtilizationPercent, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Components List */}
+                  <div className="space-y-1.5 mb-6">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Curated Components:</div>
+                    {recipe.lineItems.map((li, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b border-white/5 text-slate-300">
+                        <div className="truncate max-w-[200px]" title={li.catalogItem.description}>
+                          {li.qty}x {li.catalogItem.description}
+                        </div>
+                        <span className="text-slate-400 font-mono text-[11px]">₹{li.catalogItem.ourUnitCost}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => handleApplyCuratedTier(recipe)}
+                  className="w-full bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs py-2.5 shadow-md flex items-center justify-center gap-1.5"
+                >
+                  Apply {recipe.tier} Tier to Workstation <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: ACTIVE WORKSTATION & CANVAS */}
+      {studioTab === 'workstation' && (
+        <div className="space-y-6">
+          {projects.length === 0 ? (
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 space-y-4">
+              <Gift className="w-12 h-12 text-amber-400/60 mx-auto" />
+              <div>
+                <h3 className="text-lg font-bold text-white">No Corporate Hamper Projects Created Yet</h3>
+                <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+                  Start by using the Target-Budget Generator above to curate a 3-tier proposal, or click below to manually start a new project.
+                </p>
+              </div>
+              <div className="flex justify-center gap-3">
+                <Button onClick={() => setStudioTab('tier_recommender')} className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs">
+                  <Sparkles className="w-3.5 h-3.5 mr-1" /> Use Target Budget Generator
+                </Button>
+                <Button onClick={() => setIsModalOpen(true)} variant="outline" className="text-slate-300 border-slate-700 text-xs">
+                  + Create Blank Project
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* LEFT: PROJECT DIRECTORY & CLIENT DETAILS */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Client Projects</h3>
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="text-xs text-amber-400 hover:text-amber-300 font-semibold"
+                  >
+                    + New
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                  {projects.map(p => {
+                    const math = calculateProjectMath(p);
+                    const isSelected = activeProject?.id === p.id;
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => setActiveProject(p)}
+                        className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-amber-950/25 border-amber-500/50 shadow-md'
+                            : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 text-slate-300'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <span className="font-bold text-sm text-white">{p.projectName}</span>
+                          <span className="text-[10px] font-mono bg-slate-950 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
+                            {p.id}
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1">Client: <strong>{p.clientName}</strong></div>
+
+                        <div className="flex justify-between items-center mt-3 pt-2.5 border-t border-slate-800/70 font-mono text-xs">
+                          <span className="text-slate-400">Net Profit:</span>
+                          <span className="text-emerald-400 font-bold">₹{math.netProfit.toLocaleString('en-IN')} ({math.grossMarginPercent}%)</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Packaging Box Selection for Active Project */}
+                {activeProject && activeMath && (
+                  <div className="bg-[#121824] p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <Box className="w-3.5 h-3.5 text-amber-400" /> Container / Box Fit
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        {activeMath.totalVolumeUnits} / {activeMath.activeBox.maxVolumeUnits} units
+                      </span>
+                    </div>
+
                     <select
-                      value={newExpense.category}
-                      onChange={e => setNewExpense({ ...newExpense, category: e.target.value as any })}
-                      className="bg-slate-900 border border-slate-800 text-slate-200 rounded px-2 py-1 text-xs"
+                      value={activeProject.selectedBoxId || 'BOX-1012'}
+                      onChange={e => updateProjectState({ ...activeProject, selectedBoxId: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 font-medium"
                     >
-                      <option value="Travel">🚗 Travel</option>
-                      <option value="Courier">📦 Courier</option>
-                      <option value="Porter">👷 Porter</option>
-                      <option value="Printing">🏷️ Printing</option>
-                      <option value="Packaging">🎁 Packaging</option>
-                      <option value="Other">💼 Other</option>
+                      {STANDARD_BOX_SPECS.map(box => (
+                        <option key={box.id} value={box.id}>
+                          {box.name} ({box.dimensions}) - Max {box.maxVolumeUnits} units
+                        </option>
+                      ))}
                     </select>
 
-                    <input 
-                      type="text" 
-                      placeholder="Expense Description (e.g. Travel to Taj Marine Drive)" 
-                      value={newExpense.description}
-                      onChange={e => setNewExpense({ ...newExpense, description: e.target.value })}
-                      className="flex-1 bg-slate-900 border border-slate-800 text-slate-100 rounded px-2.5 py-1 text-xs"
-                    />
+                    {/* Volumetric Capacity Bar */}
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-slate-400">Volumetric Fill:</span>
+                        <span className={`font-bold font-mono ${
+                          activeMath.capacityPercent > 100 
+                            ? 'text-rose-400' 
+                            : activeMath.capacityPercent >= 70 
+                              ? 'text-emerald-400' 
+                              : 'text-amber-400'
+                        }`}>
+                          {activeMath.capacityPercent}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                        <div 
+                          className={`h-full transition-all duration-300 ${
+                            activeMath.capacityPercent > 100 
+                              ? 'bg-rose-500' 
+                              : activeMath.capacityPercent >= 70 
+                                ? 'bg-emerald-400' 
+                                : 'bg-amber-400'
+                          }`}
+                          style={{ width: `${Math.min(activeMath.capacityPercent, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        {activeMath.capacityPercent > 100 && '⚠️ Overfilled! Consider switching to a larger box (e.g. 10x12).'}
+                        {activeMath.capacityPercent >= 70 && activeMath.capacityPercent <= 100 && '✨ Ideal presentation fit. Snug and luxurious.'}
+                        {activeMath.capacityPercent < 70 && '💡 Box has extra room. Add shredded kraft paper or an extra snack pouch.'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                    <div className="relative">
-                      <span className="absolute left-2 top-1 text-slate-500 text-xs">₹</span>
-                      <input 
-                        type="number" 
-                        placeholder="Amount" 
-                        value={newExpense.amount || ''}
-                        onChange={e => setNewExpense({ ...newExpense, amount: Number(e.target.value) })}
-                        className="w-24 bg-slate-900 border border-slate-800 text-slate-100 rounded pl-5 pr-2 py-1 text-xs font-mono"
-                      />
+              {/* RIGHT: INTERACTIVE HAMPER CANVAS & BOM TABLE */}
+              {activeProject && activeMath && (
+                <div className="lg:col-span-2 space-y-6">
+                  
+                  {/* Financial KPI Summary Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-[#121824] p-3.5 rounded-xl border border-slate-800">
+                      <div className="text-[11px] text-slate-400 font-medium">Client Quote Total</div>
+                      <div className="text-lg font-bold font-mono text-white mt-1">₹{activeMath.totalClientQuote.toLocaleString('en-IN')}</div>
+                      <div className="text-[10px] text-slate-500">Incl. Taxes & Logistics</div>
                     </div>
 
-                    <label className="flex items-center gap-1 text-[11px] text-slate-300 cursor-pointer whitespace-nowrap bg-slate-900 px-2 py-1 rounded border border-slate-800">
-                      <input 
-                        type="checkbox" 
-                        checked={newExpense.billableToClient}
-                        onChange={e => setNewExpense({ ...newExpense, billableToClient: e.target.checked })}
-                        className="rounded text-purple-600 focus:ring-purple-500"
-                      />
-                      Bill to Client
-                    </label>
+                    <div className="bg-[#121824] p-3.5 rounded-xl border border-slate-800">
+                      <div className="text-[11px] text-slate-400 font-medium">Our Total Outflow</div>
+                      <div className="text-lg font-bold font-mono text-slate-300 mt-1">₹{(activeMath.ourFinalCost + activeMath.totalExpenses).toLocaleString('en-IN')}</div>
+                      <div className="text-[10px] text-slate-500">BOM + Expenses</div>
+                    </div>
 
-                    <Button size="sm" onClick={() => handleAddExpense()} className="bg-rose-600 hover:bg-rose-500 text-white text-xs whitespace-nowrap">
-                      + Add Expense
-                    </Button>
+                    <div className="bg-gradient-to-b from-emerald-950/30 to-[#121824] p-3.5 rounded-xl border border-emerald-500/30">
+                      <div className="text-[11px] text-emerald-400 font-medium">True Net Profit</div>
+                      <div className="text-lg font-bold font-mono text-emerald-300 mt-1">₹{activeMath.netProfit.toLocaleString('en-IN')}</div>
+                      <div className="text-[10px] text-emerald-400 font-bold">{activeMath.grossMarginPercent}% Net Margin</div>
+                    </div>
+
+                    <div className="bg-[#121824] p-3.5 rounded-xl border border-slate-800">
+                      <div className="text-[11px] text-slate-400 font-medium">Hamper Components</div>
+                      <div className="text-lg font-bold font-mono text-amber-400 mt-1">{activeProject.lineItems.length} SKUs</div>
+                      <div className="text-[10px] text-slate-500">{activeMath.totalVolumeUnits} volume units</div>
+                    </div>
                   </div>
 
-                  {/* Expenses List */}
-                  {activeProject.otherExpenses.length === 0 ? (
-                    <div className="text-center py-3 text-slate-500 border border-dashed border-slate-800 rounded">
-                      No operational expenses recorded yet. Click a quick preset or add travel/courier above.
+                  {/* Interactive Hamper Tray Canvas */}
+                  <div className="bg-[#121824] rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <div className="p-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                          <Box className="w-4 h-4 text-amber-400" />
+                          Hamper Assembly Canvas ({activeProject.lineItems.length} Items)
+                        </h3>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          Items inside {activeMath.activeBox.name}. Adjust quantities, costs, and client quote prices live.
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          size="sm"
+                          onClick={() => setIsCatalogPickerOpen(true)}
+                          className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs h-8"
+                        >
+                          <Plus className="w-3.5 h-3.5 mr-1" /> + Add Items from Catalog
+                        </Button>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="space-y-1.5">
-                      {activeProject.otherExpenses.map(e => (
-                        <div key={e.id} className="flex justify-between items-center bg-slate-950 p-2.5 rounded border border-slate-800 text-slate-300">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-semibold uppercase">
-                              {e.category || 'Other'}
-                            </span>
-                            <span className="font-medium text-slate-200">{e.description}</span>
+
+                    {/* Line Items Table */}
+                    {activeProject.lineItems.length === 0 ? (
+                      <div className="p-8 text-center text-slate-500 space-y-2">
+                        <Gift className="w-10 h-10 text-slate-700 mx-auto" />
+                        <p className="text-xs">No components in this hamper tray yet.</p>
+                        <Button
+                          size="sm"
+                          onClick={() => setIsCatalogPickerOpen(true)}
+                          className="bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs mt-2"
+                        >
+                          Open Component Picker
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-slate-800/80">
+                        {activeProject.lineItems.map(item => (
+                          <div key={item.id} className="p-3.5 hover:bg-slate-900/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded uppercase ${
+                                item.category === 'Chocolates' || item.category === 'Chocolate Box'
+                                  ? 'bg-amber-950/70 text-amber-300 border border-amber-800/60'
+                                  : item.category === 'Souvenir'
+                                    ? 'bg-purple-950/70 text-purple-300 border border-purple-800/60'
+                                    : item.category === 'Tins'
+                                      ? 'bg-orange-950/70 text-orange-300 border border-orange-800/60'
+                                      : 'bg-slate-800 text-slate-300 border border-slate-700'
+                              }`}>
+                                {item.category}
+                              </span>
+                              <div>
+                                <div className="text-xs font-semibold text-white">{item.description}</div>
+                                <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                                  Our Cost: ₹{item.ourUnitCost} + {item.gstRate}% GST | Total BOM: ₹{(item.qty * item.ourUnitCost).toFixed(2)}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Steppers & Client Quote Inputs */}
+                            <div className="flex items-center gap-4 self-end sm:self-auto">
+                              {/* Qty Stepper */}
+                              <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg overflow-hidden">
+                                <button
+                                  onClick={() => handleUpdateItemProperty(item.description, 'qty', Math.max(item.qty - 1, 1))}
+                                  className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-800 text-xs font-bold"
+                                >
+                                  -
+                                </button>
+                                <span className="px-2.5 py-1 text-xs font-mono font-bold text-white min-w-[28px] text-center">
+                                  {item.qty}
+                                </span>
+                                <button
+                                  onClick={() => handleUpdateItemProperty(item.description, 'qty', item.qty + 1)}
+                                  className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-800 text-xs font-bold"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              {/* Client Unit Cost */}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] text-slate-400">Quote ₹:</span>
+                                <input
+                                  type="number"
+                                  value={item.clientUnitCost}
+                                  onChange={e => handleUpdateItemProperty(item.description, 'clientUnitCost', Number(e.target.value))}
+                                  className="w-20 px-2 py-1 bg-slate-950 border border-slate-800 rounded text-xs font-mono font-bold text-purple-300 text-right focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                />
+                              </div>
+
+                              <button
+                                onClick={() => handleRemoveLineItem(item.id)}
+                                className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => handleToggleExpenseBillable(e.id)}
-                              className={`px-2 py-0.5 rounded text-[10px] font-semibold border transition-all ${
-                                e.billableToClient 
-                                  ? 'bg-purple-950/70 text-purple-300 border-purple-700' 
-                                  : 'bg-amber-950/60 text-amber-300 border-amber-800'
-                              }`}
-                              title="Click to toggle between Absorbed by Us and Billed to Client"
-                            >
-                              {e.billableToClient ? '✓ Billed to Client' : '🛡️ Absorbed by Us (Reduces Profit)'}
-                            </button>
+                  {/* Operational Expenses Section */}
+                  <div className="bg-[#121824] p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                          <Truck className="w-3.5 h-3.5 text-amber-400" /> Operational & Assembly Expenses
+                        </h4>
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          Logistics, porter, and delivery costs incurred from our end reduce your net margin.
+                        </p>
+                      </div>
 
-                            <span className="font-mono font-bold text-rose-400">₹{e.amount.toLocaleString('en-IN')}</span>
-
-                            <button onClick={() => handleRemoveExpense(e.id)} className="text-rose-400 hover:text-rose-300">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                      {/* Quick Presets */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => handleAddExpense({ desc: 'Local Travel / Delivery Delivery', amount: 300, category: 'Travel', billable: false })}
+                          className="px-2 py-1 rounded bg-slate-900 border border-amber-500/30 text-amber-300 hover:bg-slate-800 text-[11px] font-semibold"
+                        >
+                          + Travel (₹300 - Absorbed)
+                        </button>
+                        <button
+                          onClick={() => handleAddExpense({ desc: 'Courier Express Cargo', amount: 450, category: 'Courier', billable: true })}
+                          className="px-2 py-1 rounded bg-slate-900 border border-purple-500/30 text-purple-300 hover:bg-slate-800 text-[11px] font-semibold"
+                        >
+                          + Courier (₹450 - Billed)
+                        </button>
+                      </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    {/* Expenses List */}
+                    {activeProject.otherExpenses.length > 0 && (
+                      <div className="space-y-2">
+                        {activeProject.otherExpenses.map(exp => (
+                          <div key={exp.id} className="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 uppercase font-semibold">
+                                {exp.category || 'Other'}
+                              </span>
+                              <span className="text-slate-200">{exp.description}</span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => handleToggleExpenseBillable(exp.id)}
+                                className={`px-2 py-0.5 rounded text-[10px] font-semibold border transition-all ${
+                                  exp.billableToClient 
+                                    ? 'bg-purple-950/70 text-purple-300 border-purple-700' 
+                                    : 'bg-amber-950/60 text-amber-300 border-amber-800'
+                                }`}
+                              >
+                                {exp.billableToClient ? '✓ Billed to Client' : '🛡️ Absorbed by Us (Reduces Profit)'}
+                              </button>
+                              <span className="font-mono font-bold text-rose-400">₹{exp.amount}</span>
+                              <button onClick={() => handleRemoveExpense(exp.id)} className="text-slate-500 hover:text-rose-400">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* Checkbox Catalog Picker Modal */}
-      <Modal isOpen={isCatalogPickerOpen} onClose={() => setIsCatalogPickerOpen(false)} title="Master Hamper Catalog Checkbox Picker">
-        <div className="space-y-4 text-xs max-h-[70vh] overflow-y-auto pr-1">
-          <div className="flex justify-between items-center bg-slate-950 p-2.5 rounded border border-slate-800">
-            <p className="text-slate-400">Check off items from your master catalog to include them in <strong className="text-purple-400">{activeProject?.projectName}</strong>.</p>
-            <Button size="sm" onClick={() => { setIsCatalogPickerOpen(false); setIsNewItemModalOpen(true); }} className="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] whitespace-nowrap ml-2">
-              <Plus className="w-3.5 h-3.5 mr-1" /> + Create New Item
-            </Button>
-          </div>
-          
-          {Object.entries(catalogByCategory).map(([cat, items]) => (
-            <div key={cat} className="space-y-2 border-t border-slate-800 pt-3">
-              <h4 className="font-bold text-purple-400 uppercase text-[11px]">{cat} ({items.length})</h4>
-              <div className="space-y-1.5">
-                {items.map(item => {
-                  const isChecked = activeProject?.lineItems.some(l => l.description.toLowerCase() === item.description.toLowerCase());
-                  const activeLine = activeProject?.lineItems.find(l => l.description.toLowerCase() === item.description.toLowerCase());
-
-                  return (
-                    <div key={item.id} className={`flex items-center justify-between p-2.5 rounded border ${isChecked ? 'bg-purple-950/30 border-purple-800' : 'bg-slate-950 border-slate-800 hover:border-slate-700'}`}>
-                      <label className="flex items-center gap-2.5 cursor-pointer flex-1">
-                        <input 
-                          type="checkbox" 
-                          checked={isChecked || false}
-                          onChange={e => handleToggleCatalogItem(item, e.target.checked)}
-                          className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 bg-slate-900 border-slate-700"
-                        />
-                        <div>
-                          <div className="font-semibold text-slate-100">{item.description}</div>
-                          <div className="text-[10px] text-slate-500 font-mono">Our Unit Cost: ₹{item.ourUnitCost} • GST: {item.gstRate}% {item.shelfLife ? `• ${item.shelfLife}` : ''}</div>
-                        </div>
-                      </label>
-
-                      {isChecked && activeLine && (
-                        <div className="flex items-center gap-2 font-mono" onClick={e => e.stopPropagation()}>
-                          <div>
-                            <span className="text-[9px] text-slate-500 block">Qty</span>
-                            <input 
-                              type="number" 
-                              min="1" 
-                              value={activeLine.qty}
-                              onChange={e => handleUpdateItemProperty(item.description, 'qty', Number(e.target.value))}
-                              className="w-14 bg-slate-900 border border-slate-700 text-center text-slate-100 text-xs rounded"
-                            />
-                          </div>
-                          <div>
-                            <span className="text-[9px] text-slate-500 block">Quote Price</span>
-                            <input 
-                              type="number" 
-                              value={activeLine.clientUnitCost}
-                              onChange={e => handleUpdateItemProperty(item.description, 'clientUnitCost', Number(e.target.value))}
-                              className="w-16 bg-slate-900 border border-slate-700 text-right text-purple-400 font-bold text-xs rounded px-1"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+      {/* TAB 3: SOURCING & DISCOVERY PIPELINE */}
+      {studioTab === 'sourcing_pipeline' && (
+        <div className="space-y-6 animate-fade-in-up">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Compass className="w-4 h-4 text-amber-400" />
+                Discovery & Experimental Procurement Pipeline ({sourcingPipeline.length} Scouted Items)
+              </h3>
+              <p className="text-xs text-slate-400">
+                Live stream from your Google Sheet <code>'Discovery & Procurement'</code> tab. Review samples, landed costs, and graduate approved items into active production.
+              </p>
             </div>
-          ))}
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono">
+                {sourcingPipeline.filter(s => s.status === 'Approved').length} Approved for Catalog
+              </span>
+            </div>
+          </div>
 
-          <Button onClick={() => setIsCatalogPickerOpen(false)} className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 mt-4">
-            Done Selecting Items
+          {/* Sourcing Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sourcingPipeline.map(item => {
+              const isApproved = item.status === 'Approved';
+              const isInCatalog = masterCatalog.some(c => c.description.toLowerCase() === item.description.toLowerCase());
+
+              return (
+                <div 
+                  key={item.id}
+                  className={`p-4 rounded-xl border flex flex-col justify-between transition-all ${
+                    isApproved 
+                      ? 'bg-gradient-to-b from-emerald-950/20 to-[#121824] border-emerald-500/30' 
+                      : item.status === 'Rejected'
+                        ? 'bg-slate-950/40 border-slate-800/60 opacity-60'
+                        : 'bg-[#121824] border-slate-800'
+                  }`}
+                >
+                  <div>
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">
+                        {item.category}
+                      </span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
+                        item.status === 'Approved'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : item.status === 'Under Review'
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                            : item.status === 'Sample Ordered'
+                              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      }`}>
+                        {item.status}
+                      </span>
+                    </div>
+
+                    <h4 className="text-sm font-bold text-white">{item.description}</h4>
+                    <div className="text-xs text-slate-400 mt-1">Vendor: <strong>{item.vendorLead}</strong></div>
+
+                    {/* Cost Specs */}
+                    <div className="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800 my-3 grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-slate-500 text-[10px]">Est. Base Cost:</span>
+                        <div className="font-mono font-bold text-slate-200">₹{item.estUnitCost.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 text-[10px]">Landed (incl GST):</span>
+                        <div className="font-mono font-bold text-emerald-400">₹{item.landedUnitCost.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 text-[10px]">GST Rate:</span>
+                        <div className="font-mono text-slate-300">{item.gstRate}%</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 text-[10px]">Sample MOQ:</span>
+                        <div className="font-mono text-slate-300">{item.sampleMoq} units</div>
+                      </div>
+                    </div>
+
+                    {item.notes && (
+                      <p className="text-[11px] text-slate-400 italic mb-3">"{item.notes}"</p>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-2 border-t border-slate-800/80">
+                    {isInCatalog ? (
+                      <div className="flex items-center justify-center gap-1 text-emerald-400 text-xs font-semibold py-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> In Active Production Catalog
+                      </div>
+                    ) : isApproved ? (
+                      <Button
+                        onClick={() => handlePromoteSourcedItem(item)}
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs py-2"
+                      >
+                        📥 Graduate to Active Catalog
+                      </Button>
+                    ) : (
+                      <div className="text-center text-[11px] text-slate-500 py-1">
+                        {item.status === 'Under Review' ? 'Awaiting sample evaluation' : 'Sample testing in progress'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* CATALOG PICKER MODAL */}
+      <Modal isOpen={isCatalogPickerOpen} onClose={() => setIsCatalogPickerOpen(false)} title="Master Component Catalog Picker">
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Search catalog SKUs..."
+                value={catalogSearch}
+                onChange={e => setCatalogSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-amber-400"
+              />
+            </div>
+            <div className="flex items-center gap-1 overflow-x-auto">
+              {['All', 'Chocolates', 'Chocolate Box', 'Tins', 'Souvenir', 'Packaging'].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setCatalogCategoryFilter(cat)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-all ${
+                    catalogCategoryFilter === cat 
+                      ? 'bg-amber-500 text-slate-950' 
+                      : 'bg-slate-900 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="max-h-[400px] overflow-y-auto space-y-2 pr-1">
+            {masterCatalog
+              .filter(item => {
+                const matchSearch = item.description.toLowerCase().includes(catalogSearch.toLowerCase()) || item.category.toLowerCase().includes(catalogSearch.toLowerCase());
+                const matchCat = catalogCategoryFilter === 'All' || item.category === catalogCategoryFilter;
+                return matchSearch && matchCat;
+              })
+              .map(item => {
+                const isSelected = activeProject?.lineItems.some(l => l.description.toLowerCase() === item.description.toLowerCase());
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => handleToggleCatalogItem(item, !isSelected)}
+                    className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                      isSelected 
+                        ? 'bg-amber-950/25 border-amber-500/50 text-white' 
+                        : 'bg-slate-950 border-slate-800/80 hover:border-slate-700 text-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isSelected ? (
+                        <CheckSquare className="w-4 h-4 text-amber-400 shrink-0" />
+                      ) : (
+                        <Square className="w-4 h-4 text-slate-600 shrink-0" />
+                      )}
+                      <div>
+                        <div className="text-xs font-semibold">{item.description}</div>
+                        <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                          Category: {item.category} | Stock: {item.inStockQty ?? 'N/A'} | Vol: {getItemVolumeUnits(item)} units
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-mono font-bold text-xs text-white">₹{item.ourUnitCost}</div>
+                      <div className="text-[10px] text-slate-400">{item.gstRate}% GST</div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
+          <Button 
+            onClick={() => setIsCatalogPickerOpen(false)} 
+            className="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs py-2 mt-2"
+          >
+            Done Selecting Components
           </Button>
         </div>
       </Modal>
 
-      {/* Add New Master Item Modal (Appends to Google Sheet 'items' tab & local catalog) */}
-      <Modal isOpen={isNewItemModalOpen} onClose={() => setIsNewItemModalOpen(false)} title="Add New Item to Master Hamper Catalog">
+      {/* NEW ITEM MODAL */}
+      <Modal isOpen={isNewItemModalOpen} onClose={() => setIsNewItemModalOpen(false)} title="Create New Component SKU & Append to Google Sheet">
         <div className="space-y-4 text-xs">
-          <div className="p-3 bg-slate-950 border border-emerald-900/60 rounded-lg text-emerald-400 text-[11px] leading-relaxed">
-            ✨ This will add the item to your <strong>Master Catalog</strong> and automatically append a new row to the <strong>'items'</strong> tab in your Google Sheet (<span className="font-mono text-slate-300">hamper_cost_calculator.erp</span>).
-          </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-400 mb-1 font-semibold">Item Category</label>
+              <label className="block text-slate-400 mb-1 font-semibold">Category</label>
               <select
                 value={newItemForm.category}
                 onChange={e => {
@@ -864,18 +1354,18 @@ export const HamperStudio: React.FC = () => {
           <Button 
             onClick={handleAddNewCatalogItem} 
             disabled={savingNewItem}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 mt-2"
+            className="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2.5 mt-2"
           >
             {savingNewItem ? 'Saving & Appending to Google Sheet...' : '✓ Add Item & Append to Google Sheet'}
           </Button>
         </div>
       </Modal>
 
-      {/* New Project Modal */}
+      {/* NEW PROJECT MODAL */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Corporate Hamper Project">
         <div className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-400 mb-1">Project Name</label>
+            <label className="block text-slate-400 mb-1 font-semibold">Project / Event Name</label>
             <input 
               type="text" 
               placeholder="e.g. Taj Hotel Onam Hamper 2026"
@@ -885,21 +1375,21 @@ export const HamperStudio: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-slate-400 mb-1">Client Name</label>
+            <label className="block text-slate-400 mb-1 font-semibold">Client Name</label>
             <input 
               type="text" 
-              placeholder="e.g. Taj Malabar Resort"
+              placeholder="e.g. Taj Malabar Resort & Spa"
               value={clientName}
               onChange={e => setClientName(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100"
             />
           </div>
-          <Button onClick={handleCreateProject} className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-2">
-            Create Project & Open Checkbox Workstation
+          <Button onClick={handleCreateProject} className="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2.5">
+            Create Project & Open Atelier Workstation
           </Button>
         </div>
       </Modal>
     </div>
   );
 };
-
+export default HamperStudio;
