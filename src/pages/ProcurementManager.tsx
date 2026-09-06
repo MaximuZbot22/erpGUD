@@ -705,17 +705,24 @@ _Please confirm acceptance and target dispatch date._`;
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2E2E2E] pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2.5">
-            <Factory className="w-7 h-7 text-amber-500" /> Supplier Procurement & Scaria PO Studio
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-[#272727] text-neutral-300 border border-[#383838]">
+              Vendor Management
+            </span>
+            <span className="text-xs text-neutral-400 font-medium">B2B Purchase Orders & GRN</span>
+          </div>
+          <h1 className="text-xl font-bold text-white mt-1.5 flex items-center gap-2.5">
+            <Factory className="w-5 h-5 text-neutral-300" /> Supplier Procurement & Scaria PO Studio
           </h1>
-          <p className="text-slate-400 text-xs mt-1">
+          <p className="text-neutral-400 text-xs mt-1">
             Issue formal Purchase Orders to Scaria (Cochin Cocoa Products), packaging vendors, and hamper suppliers with Founder Signature & PDF export.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button 
+            variant="primary"
             onClick={() => {
               setPoForm({
                 poNumber: `PO-GUD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -741,23 +748,23 @@ _Please confirm acceptance and target dispatch date._`;
               });
               setIsPoModalOpen(true);
             }} 
-            className="bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-lg shadow-amber-950/50"
+            className="text-xs font-semibold px-3.5 py-2"
           >
-            <Plus className="w-4 h-4 mr-1.5" /> + Create Purchase Order
+            <Plus className="w-3.5 h-3.5 mr-1.5" /> Create Purchase Order
           </Button>
         </div>
       </div>
 
       {/* Preset Quick Actions Banner */}
-      <Card className="bg-gradient-to-r from-slate-900 via-amber-950/30 to-slate-900 border-amber-900/40 p-4">
+      <Card className="bg-[#1F1F1F] border-[#2E2E2E] p-4">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/20 text-amber-400">
-              <Sparkles className="w-6 h-6" />
+            <div className="p-2.5 bg-[#272727] rounded-lg border border-[#383838] text-neutral-300">
+              <Sparkles className="w-5 h-5 text-neutral-300" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-100">Multi-Case PO Engine (Scaria, 25g & 8g Flavors & Hampers)</h4>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h4 className="text-sm font-bold text-white">Multi-Case PO Engine (Scaria, 25g & 8g Flavors & Hampers)</h4>
+              <p className="text-xs text-neutral-400 mt-0.5">
                 Combine 7 x 25g flavors and 4 x 8g mini flavors in a single order, or create quantity-only POs for Scaria.
               </p>
             </div>
@@ -765,6 +772,7 @@ _Please confirm acceptance and target dispatch date._`;
           <div className="flex flex-wrap items-center gap-2">
             <Button 
               size="sm" 
+              variant="secondary"
               onClick={() => {
                 setPoForm(prev => ({
                   ...prev,
@@ -775,9 +783,9 @@ _Please confirm acceptance and target dispatch date._`;
                 }));
                 setIsPoModalOpen(true);
               }} 
-              className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow"
+              className="text-xs font-medium"
             >
-              ✨ Load All 11 Flavors (7 x 25g + 4 x 8g)
+              Load All 11 Flavors (7 x 25g + 4 x 8g)
             </Button>
           </div>
         </div>
@@ -786,18 +794,18 @@ _Please confirm acceptance and target dispatch date._`;
       {/* PO Status Filter & List */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-            <FileSpreadsheet className="w-4 h-4 text-amber-400" /> Purchase Orders Register ({filteredPOs.length})
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <FileSpreadsheet className="w-4 h-4 text-neutral-400" /> Purchase Orders Register ({filteredPOs.length})
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {['All', 'Sent', 'Confirmed', 'Partially Received', 'Fully Received'].map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`px-2.5 py-1 rounded text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   statusFilter === st 
-                    ? 'bg-amber-600 text-white font-bold' 
-                    : 'bg-slate-900 text-slate-400 hover:bg-slate-800'
+                    ? 'bg-white text-black font-semibold shadow-sm' 
+                    : 'bg-[#272727] text-neutral-400 hover:text-white border border-[#383838]'
                 }`}
               >
                 {st}
@@ -807,72 +815,77 @@ _Please confirm acceptance and target dispatch date._`;
         </div>
 
         {filteredPOs.length === 0 ? (
-          <Card className="bg-slate-900 border-slate-800 p-8 text-center text-slate-400">
-            <Factory className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="font-semibold text-slate-300">No Purchase Orders Found</p>
-            <p className="text-xs text-slate-500 mt-1">Create a new PO for Scaria (Cochin Cocoa Products) or packaging suppliers.</p>
-            <Button onClick={() => setIsPoModalOpen(true)} className="mt-4 bg-amber-600 hover:bg-amber-500 text-white text-xs">
-              <Plus className="w-4 h-4 mr-1" /> + Create Purchase Order
+          <Card className="bg-[#1F1F1F] border-[#2E2E2E] p-8 text-center text-neutral-400">
+            <Factory className="w-10 h-10 text-neutral-500 mx-auto mb-3" />
+            <p className="font-semibold text-neutral-200">No Purchase Orders Found</p>
+            <p className="text-xs text-neutral-400 mt-1">Create a new PO for Scaria (Cochin Cocoa Products) or packaging suppliers.</p>
+            <Button 
+              variant="primary" 
+              size="sm" 
+              onClick={() => setIsPoModalOpen(true)} 
+              className="mt-4 text-xs font-semibold"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1" /> Create Purchase Order
             </Button>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredPOs.map((po) => (
-              <Card key={po.id} className="bg-slate-900 border-slate-800 hover:border-amber-900/60 transition-all">
-                <CardHeader className="pb-3 border-b border-slate-800/60">
+              <Card key={po.id} className="bg-[#1F1F1F] border-[#2E2E2E] hover:border-[#3E3E3E] transition-all">
+                <CardHeader className="pb-3 border-b border-[#2E2E2E]">
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono text-amber-400 font-bold bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/60">
+                        <span className="text-xs font-mono text-neutral-200 font-bold bg-[#272727] px-2 py-0.5 rounded border border-[#383838]">
                           {po.poNumber}
                         </span>
-                        <span className="text-xs text-slate-400 font-mono">Date: {po.date}</span>
+                        <span className="text-xs text-neutral-400 font-mono">Date: {po.date}</span>
                       </div>
-                      <CardTitle className="text-base text-slate-100 mt-1.5 font-bold flex items-center gap-1.5">
-                        <Building2 className="w-4 h-4 text-amber-500" /> {po.supplierName}
+                      <CardTitle className="text-base text-white mt-1.5 font-bold flex items-center gap-1.5">
+                        <Building2 className="w-4 h-4 text-neutral-400" /> {po.supplierName}
                       </CardTitle>
                     </div>
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${
-                      po.status === 'Fully Received' ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800' :
-                      po.status === 'Partially Received' ? 'bg-cyan-950/80 text-cyan-400 border-cyan-800' :
-                      po.status === 'Sent' || po.status === 'Confirmed' ? 'bg-amber-950/80 text-amber-400 border-amber-800' :
-                      'bg-slate-800 text-slate-300 border-slate-700'
+                    <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-semibold border ${
+                      po.status === 'Fully Received' ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40' :
+                      po.status === 'Partially Received' ? 'bg-cyan-950/40 text-cyan-300 border-cyan-800/40' :
+                      po.status === 'Sent' || po.status === 'Confirmed' ? 'bg-amber-950/40 text-amber-300 border-amber-800/40' :
+                      'bg-[#272727] text-neutral-300 border-[#383838]'
                     }`}>
                       {po.status}
                     </span>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-3 space-y-3 text-xs text-slate-300">
+                <CardContent className="pt-3 space-y-3 text-xs text-neutral-300">
                   {/* Items Preview */}
-                  <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800/80 space-y-1">
-                    <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                  <div className="bg-[#181818] p-2.5 rounded-lg border border-[#2E2E2E] space-y-1">
+                    <div className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider mb-1">
                       Line Items ({po.items.length}):
                     </div>
                     {po.items.slice(0, 4).map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-slate-200">
+                      <div key={idx} className="flex justify-between text-neutral-200">
                         <span className="truncate max-w-[220px]">• {item.description}</span>
-                        <span className="font-mono text-slate-400">{item.qty} {item.unit} {po.showPricing ? `@ ₹${item.rate}` : ''}</span>
+                        <span className="font-mono text-neutral-400">{item.qty} {item.unit} {po.showPricing ? `@ ₹${item.rate}` : ''}</span>
                       </div>
                     ))}
                     {po.items.length > 4 && (
-                      <div className="text-[10px] text-amber-400 italic">
+                      <div className="text-[10px] text-neutral-400 italic">
                         + {po.items.length - 4} more line items...
                       </div>
                     )}
                   </div>
 
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-400">
-                      {po.showPaymentTerms ? <>Payment: <strong className="text-slate-200">{po.paymentTerms}</strong></> : <span className="italic">Payment Terms Omitted</span>}
+                    <span className="text-neutral-400">
+                      {po.showPaymentTerms ? <>Payment: <strong className="text-neutral-200">{po.paymentTerms}</strong></> : <span className="italic">Payment Terms Omitted</span>}
                     </span>
                     <div className="text-right">
                       {po.showPricing ? (
                         <>
-                          <span className="text-slate-400 block text-[10px]">Total PO Value (incl. GST)</span>
-                          <span className="text-base font-bold font-mono text-amber-400">₹{po.grandTotal.toLocaleString('en-IN')}</span>
+                          <span className="text-neutral-400 block text-[10px]">Total PO Value (incl. GST)</span>
+                          <span className="text-base font-bold font-mono text-white">₹{po.grandTotal.toLocaleString('en-IN')}</span>
                         </>
                       ) : (
-                        <span className="text-xs font-semibold text-cyan-400 bg-cyan-950/60 px-2 py-1 rounded border border-cyan-800/60">
+                        <span className="text-[11px] font-semibold text-neutral-300 bg-[#272727] px-2 py-0.5 rounded border border-[#383838]">
                           Quantity-Only PO
                         </span>
                       )}
@@ -880,38 +893,39 @@ _Please confirm acceptance and target dispatch date._`;
                   </div>
 
                   {/* Actions */}
-                  <div className="border-t border-slate-800/80 pt-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="border-t border-[#2E2E2E] pt-3 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Button 
                         size="sm" 
                         variant="secondary"
                         onClick={() => { setSelectedPo(po); setIsPdfModalOpen(true); }}
-                        className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200"
+                        className="text-xs"
                       >
-                        <Eye className="w-3.5 h-3.5 mr-1 text-amber-400" /> View PO PDF
+                        <Eye className="w-3.5 h-3.5 mr-1 text-neutral-300" /> View PO PDF
                       </Button>
                       <Button 
                         size="sm" 
                         variant="secondary"
                         onClick={() => { setSelectedPo(po); handleCopyTransmittal(); }}
-                        className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200"
+                        className="text-xs"
                       >
-                        <Copy className="w-3.5 h-3.5 mr-1 text-emerald-400" /> Copy WhatsApp
+                        <Copy className="w-3.5 h-3.5 mr-1 text-neutral-300" /> Copy WhatsApp
                       </Button>
                       <Button 
                         size="sm" 
                         variant="secondary"
                         onClick={() => handleDeletePo(po.id, po.poNumber)}
-                        className="text-xs bg-slate-800 hover:bg-rose-950/60 hover:text-rose-400 text-slate-400 border border-slate-700/60 hover:border-rose-800/60"
+                        className="text-xs text-neutral-400 hover:text-rose-400 hover:border-rose-900/40"
                         title="Delete Purchase Order"
                       >
-                        <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
 
                     {po.status !== 'Fully Received' && (
                       <Button 
                         size="sm" 
+                        variant="primary"
                         onClick={() => { 
                           setSelectedPo(po); 
                           setGrnForm(prev => ({
@@ -922,7 +936,7 @@ _Please confirm acceptance and target dispatch date._`;
                           }));
                           setIsGrnModalOpen(true); 
                         }} 
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
+                        className="text-xs font-semibold"
                       >
                         <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Log GRN & Stock
                       </Button>
@@ -936,35 +950,35 @@ _Please confirm acceptance and target dispatch date._`;
       </div>
 
       {/* GRN History Log */}
-      <div className="space-y-4 pt-4 border-t border-slate-800">
-        <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-          <Boxes className="w-4 h-4 text-emerald-400" /> Goods Received History (GRN & Batch Intake Log)
+      <div className="space-y-4 pt-4 border-t border-[#2E2E2E]">
+        <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+          <Boxes className="w-4 h-4 text-neutral-400" /> Goods Received History (GRN & Batch Intake Log)
         </h3>
         {grns.length === 0 ? (
-          <Card className="bg-slate-900 border-slate-800 p-6 text-center text-slate-400 text-xs">
+          <Card className="bg-[#1F1F1F] border-[#2E2E2E] p-6 text-center text-neutral-400 text-xs">
             No Goods Receipts logged yet. Receiving a PO registers a GRN and updates live stock batches.
           </Card>
         ) : (
           <div className="space-y-2">
             {grns.map(grn => (
-              <div key={grn.id} className="bg-slate-900 border border-slate-800 p-4 rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs">
+              <div key={grn.id} className="bg-[#1F1F1F] border border-[#2E2E2E] p-4 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-emerald-400 font-bold">{grn.grnNumber}</span>
-                    <span className="text-slate-400">PO: <strong className="text-amber-400">{grn.poNumber}</strong></span>
-                    <span className="text-slate-400">• Date: {grn.date}</span>
+                    <span className="font-mono text-white font-bold bg-[#272727] px-2 py-0.5 rounded border border-[#383838]">{grn.grnNumber}</span>
+                    <span className="text-neutral-400">PO: <strong className="text-neutral-200">{grn.poNumber}</strong></span>
+                    <span className="text-neutral-400">• Date: {grn.date}</span>
                   </div>
-                  <div className="text-slate-200 font-semibold mt-1 flex items-center gap-2">
+                  <div className="text-neutral-200 font-semibold mt-1 flex items-center gap-2">
                     <span>{grn.supplierName}</span>
-                    <span className="text-slate-400">|</span>
-                    <span className="font-mono text-cyan-400">Batch Registered: {grn.batchIdAssigned}</span>
+                    <span className="text-neutral-500">|</span>
+                    <span className="font-mono text-neutral-300">Batch Registered: {grn.batchIdAssigned}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 font-mono bg-slate-950 px-3 py-1.5 rounded border border-slate-800">
-                  <div>Ordered: <span className="text-slate-200 font-bold">{grn.qtyOrdered}</span></div>
-                  <div>Good: <span className="text-emerald-400 font-bold">{grn.qtyReceivedGood}</span></div>
-                  <div>Damaged: <span className="text-rose-400 font-bold">{grn.qtyDamaged}</span></div>
-                  <div>Shortage: <span className="text-amber-400 font-bold">{grn.qtyShortage}</span></div>
+                <div className="flex items-center gap-4 font-mono bg-[#181818] px-3 py-1.5 rounded-lg border border-[#2E2E2E]">
+                  <div>Ordered: <span className="text-white font-bold">{grn.qtyOrdered}</span></div>
+                  <div>Good: <span className="text-white font-bold">{grn.qtyReceivedGood}</span></div>
+                  <div>Damaged: <span className="text-rose-400/90 font-bold">{grn.qtyDamaged}</span></div>
+                  <div>Shortage: <span className="text-neutral-400 font-bold">{grn.qtyShortage}</span></div>
                 </div>
               </div>
             ))}
@@ -979,92 +993,92 @@ _Please confirm acceptance and target dispatch date._`;
         title="Create Supplier Purchase Order (PO Studio)"
         size="xl"
       >
-        <div className="space-y-5 text-xs text-slate-200 max-h-[80vh] overflow-y-auto pr-1">
+        <div className="space-y-5 text-xs text-neutral-200 max-h-[80vh] overflow-y-auto pr-1">
           {/* Header Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950 p-4 rounded-lg border border-slate-800">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#181818] p-4 rounded-xl border border-[#2E2E2E]">
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">PO Number</label>
+              <label className="block text-neutral-300 font-semibold mb-1">PO Number</label>
               <input 
                 type="text" 
                 value={poForm.poNumber}
                 onChange={e => setPoForm({ ...poForm, poNumber: e.target.value })}
-                className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-amber-400 font-mono font-bold"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white font-mono font-bold focus:outline-none focus:border-neutral-400"
               />
             </div>
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">PO Issue Date</label>
+              <label className="block text-neutral-300 font-semibold mb-1">PO Issue Date</label>
               <input 
                 type="date" 
                 value={poForm.date}
                 onChange={e => setPoForm({ ...poForm, date: e.target.value })}
-                className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-neutral-400"
               />
             </div>
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Expected Delivery Date</label>
+              <label className="block text-neutral-300 font-semibold mb-1">Expected Delivery Date</label>
               <input 
                 type="date" 
                 value={poForm.expectedDelivery}
                 onChange={e => setPoForm({ ...poForm, expectedDelivery: e.target.value })}
-                className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-neutral-400"
               />
             </div>
           </div>
 
           {/* PO Display & Formatting Controls */}
-          <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-3">
-            <h4 className="font-bold text-amber-400 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-              ⚙️ PO Display Options & Toggles
+          <div className="bg-[#181818] p-4 rounded-xl border border-[#2E2E2E] space-y-3">
+            <h4 className="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              PO Display Options & Toggles
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label className="flex items-center gap-2 cursor-pointer bg-slate-900 p-2.5 rounded border border-slate-800 hover:border-slate-700">
+              <label className="flex items-center gap-2.5 cursor-pointer bg-[#121212] p-2.5 rounded-lg border border-[#2E2E2E] hover:border-[#3E3E3E]">
                 <input 
                   type="checkbox" 
                   checked={poForm.showPricing}
                   onChange={e => setPoForm({ ...poForm, showPricing: e.target.checked })}
-                  className="rounded accent-amber-500 w-4 h-4"
+                  className="rounded accent-white w-4 h-4"
                 />
                 <div>
-                  <span className="font-bold text-slate-200 block text-xs">Include Rates & Amounts</span>
-                  <span className="text-[10px] text-slate-400 block">Uncheck for Quantity-Only PO</span>
+                  <span className="font-semibold text-white block text-xs">Include Rates & Amounts</span>
+                  <span className="text-[10px] text-neutral-400 block">Uncheck for Quantity-Only PO</span>
                 </div>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer bg-slate-900 p-2.5 rounded border border-slate-800 hover:border-slate-700">
+              <label className="flex items-center gap-2.5 cursor-pointer bg-[#121212] p-2.5 rounded-lg border border-[#2E2E2E] hover:border-[#3E3E3E]">
                 <input 
                   type="checkbox" 
                   checked={poForm.showPaymentTerms}
                   onChange={e => setPoForm({ ...poForm, showPaymentTerms: e.target.checked })}
-                  className="rounded accent-amber-500 w-4 h-4"
+                  className="rounded accent-white w-4 h-4"
                 />
                 <div>
-                  <span className="font-bold text-slate-200 block text-xs">Show Payment Terms</span>
-                  <span className="text-[10px] text-slate-400 block">Print terms box on PDF</span>
+                  <span className="font-semibold text-white block text-xs">Show Payment Terms</span>
+                  <span className="text-[10px] text-neutral-400 block">Print terms box on PDF</span>
                 </div>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer bg-slate-900 p-2.5 rounded border border-slate-800 hover:border-slate-700">
+              <label className="flex items-center gap-2.5 cursor-pointer bg-[#121212] p-2.5 rounded-lg border border-[#2E2E2E] hover:border-[#3E3E3E]">
                 <input 
                   type="checkbox" 
                   checked={poForm.showSla}
                   onChange={e => setPoForm({ ...poForm, showSla: e.target.checked })}
-                  className="rounded accent-amber-500 w-4 h-4"
+                  className="rounded accent-white w-4 h-4"
                 />
                 <div>
-                  <span className="font-bold text-slate-200 block text-xs">Mandatory Transit SLA</span>
-                  <span className="text-[10px] text-slate-400 block">Cold chain & quality rules</span>
+                  <span className="font-semibold text-white block text-xs">Mandatory Transit SLA</span>
+                  <span className="text-[10px] text-neutral-400 block">Cold chain & quality rules</span>
                 </div>
               </label>
             </div>
           </div>
 
           {/* Vendor Details */}
-          <div className="space-y-3 bg-slate-950 p-4 rounded-lg border border-slate-800">
+          <div className="space-y-3 bg-[#181818] p-4 rounded-xl border border-[#2E2E2E]">
             <div className="flex justify-between items-center">
-              <h4 className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <Building2 className="w-4 h-4 text-amber-400" /> Supplier / Vendor Profile
+              <h4 className="font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Building2 className="w-4 h-4 text-neutral-300" /> Supplier / Vendor Profile
               </h4>
-              <span className="text-[11px] text-slate-400">Quick Select Vendor:</span>
+              <span className="text-[11px] text-neutral-400">Quick Select Vendor:</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -1073,10 +1087,10 @@ _Please confirm acceptance and target dispatch date._`;
                   key={s.name}
                   type="button"
                   onClick={() => handleSelectVendor(s.name)}
-                  className={`p-2 rounded text-left border text-[11px] transition-all ${
+                  className={`p-2.5 rounded-lg text-left border text-[11px] transition-all ${
                     poForm.supplierName === s.name 
-                      ? 'bg-amber-950/80 border-amber-600 text-amber-300 font-bold' 
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                      ? 'bg-[#272727] border-neutral-400 text-white font-bold' 
+                      : 'bg-[#121212] border-[#2E2E2E] text-neutral-400 hover:text-white'
                   }`}
                 >
                   <div className="truncate font-semibold">{s.name}</div>
@@ -1087,30 +1101,30 @@ _Please confirm acceptance and target dispatch date._`;
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
               <div>
-                <label className="block text-slate-400 mb-1">Vendor Name</label>
+                <label className="block text-neutral-300 mb-1">Vendor Name</label>
                 <input 
                   type="text" 
                   value={poForm.supplierName}
                   onChange={e => setPoForm({ ...poForm, supplierName: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100 font-bold"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white font-semibold focus:outline-none focus:border-neutral-400"
                 />
               </div>
               <div>
-                <label className="block text-slate-400 mb-1">Contact Person & Phone</label>
+                <label className="block text-neutral-300 mb-1">Contact Person & Phone</label>
                 <input 
                   type="text" 
                   value={poForm.supplierContact}
                   onChange={e => setPoForm({ ...poForm, supplierContact: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-neutral-400"
                 />
               </div>
               <div className="col-span-2">
-                <label className="block text-slate-400 mb-1">Vendor Address & GSTIN</label>
+                <label className="block text-neutral-300 mb-1">Vendor Address & GSTIN</label>
                 <input 
                   type="text" 
                   value={poForm.supplierAddress}
                   onChange={e => setPoForm({ ...poForm, supplierAddress: e.target.value })}
-                  className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-slate-100"
+                  className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-neutral-400"
                   placeholder="Address & GSTIN..."
                 />
               </div>
@@ -1118,47 +1132,47 @@ _Please confirm acceptance and target dispatch date._`;
           </div>
 
           {/* Quick Preset Buttons for Line Items (Cumulative Adders) */}
-          <div className="space-y-2 border-t border-slate-800 pt-3">
+          <div className="space-y-2 border-t border-[#2E2E2E] pt-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h4 className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-amber-400" /> Line Items & Quantities ({poForm.items.length})
+              <h4 className="font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-neutral-300" /> Line Items & Quantities ({poForm.items.length})
               </h4>
               <button 
                 type="button" 
                 onClick={handleClearItems}
-                className="text-xs text-rose-400 hover:text-rose-300 underline"
+                className="text-xs text-neutral-400 hover:text-white underline"
               >
                 Clear Table
               </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button size="sm" onClick={handleAdd25gPack} className="bg-amber-950 border border-amber-800 text-amber-300 text-[11px] py-1">
+              <Button size="sm" variant="secondary" onClick={handleAdd25gPack} className="text-[11px] py-1 px-2.5">
                 + Add 7 x 25g Flavors
               </Button>
-              <Button size="sm" onClick={handleAdd8gPack} className="bg-amber-950 border border-amber-800 text-amber-300 text-[11px] py-1">
+              <Button size="sm" variant="secondary" onClick={handleAdd8gPack} className="text-[11px] py-1 px-2.5">
                 + Add 4 x 8g Minis
               </Button>
-              <Button size="sm" onClick={handleAddAll11Flavors} className="bg-amber-600 text-white font-bold text-[11px] py-1">
+              <Button size="sm" variant="secondary" onClick={handleAddAll11Flavors} className="text-[11px] py-1 px-2.5 font-semibold text-white">
                 + Add All 11 Flavors
               </Button>
-              <Button size="sm" onClick={handleAddHamperPack} className="bg-slate-800 border border-slate-700 text-slate-200 text-[11px] py-1">
+              <Button size="sm" variant="secondary" onClick={handleAddHamperPack} className="text-[11px] py-1 px-2.5">
                 + Add Hamper Items
               </Button>
-              <Button size="sm" onClick={handleAddCustomRow} className="bg-emerald-950 border border-emerald-800 text-emerald-300 text-[11px] py-1">
+              <Button size="sm" variant="secondary" onClick={handleAddCustomRow} className="text-[11px] py-1 px-2.5">
                 + Add Custom Row
               </Button>
             </div>
           </div>
 
           {/* Line Items Table */}
-          <div className="overflow-x-auto border border-slate-800 rounded-lg">
+          <div className="overflow-x-auto border border-[#2E2E2E] rounded-xl">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-950 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase">
+                <tr className="bg-[#181818] border-b border-[#2E2E2E] text-[11px] font-semibold text-neutral-400 uppercase">
                   <th className="p-2.5">Category</th>
                   <th className="p-2.5">Item Description</th>
-                  <th className="p-2.5">HSN (Optional)</th>
+                  <th className="p-2.5">HSN</th>
                   <th className="p-2.5 w-24">Qty</th>
                   <th className="p-2.5 w-20">Unit</th>
                   {poForm.showPricing && (
@@ -1171,14 +1185,14 @@ _Please confirm acceptance and target dispatch date._`;
                   <th className="p-2.5 text-center w-12">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 bg-slate-900/60">
+              <tbody className="divide-y divide-[#242424] bg-[#121212]">
                 {poForm.items.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-900">
+                  <tr key={item.id} className="hover:bg-[#181818]">
                     <td className="p-2">
                       <select 
                         value={item.category}
                         onChange={e => handleItemChange(item.id, 'category', e.target.value)}
-                        className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-200 text-xs"
+                        className="bg-[#181818] border border-[#2E2E2E] rounded-lg px-2 py-1 text-white text-xs focus:outline-none focus:border-neutral-400"
                       >
                         <option value="25g Chocolate">25g Chocolate</option>
                         <option value="8g Chocolate">8g Chocolate</option>
@@ -1193,7 +1207,7 @@ _Please confirm acceptance and target dispatch date._`;
                         type="text" 
                         value={item.description}
                         onChange={e => handleItemChange(item.id, 'description', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-100 text-xs font-semibold"
+                        className="w-full bg-[#181818] border border-[#2E2E2E] rounded-lg px-2 py-1 text-white text-xs font-semibold focus:outline-none focus:border-neutral-400"
                       />
                     </td>
                     <td className="p-2">
@@ -1201,7 +1215,7 @@ _Please confirm acceptance and target dispatch date._`;
                         type="text" 
                         value={item.hsnCode}
                         onChange={e => handleItemChange(item.id, 'hsnCode', e.target.value)}
-                        className="w-20 bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs font-mono"
+                        className="w-20 bg-[#181818] border border-[#2E2E2E] rounded-lg px-2 py-1 text-neutral-300 text-xs font-mono focus:outline-none focus:border-neutral-400"
                         placeholder="Optional"
                       />
                     </td>
@@ -1210,7 +1224,7 @@ _Please confirm acceptance and target dispatch date._`;
                         type="number" 
                         value={item.qty}
                         onChange={e => handleItemChange(item.id, 'qty', Number(e.target.value))}
-                        className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-amber-400 font-mono font-bold text-xs"
+                        className="w-full bg-[#181818] border border-[#2E2E2E] rounded-lg px-2 py-1 text-white font-mono font-bold text-xs focus:outline-none focus:border-neutral-400"
                       />
                     </td>
                     <td className="p-2">
@@ -1218,7 +1232,7 @@ _Please confirm acceptance and target dispatch date._`;
                         type="text" 
                         value={item.unit}
                         onChange={e => handleItemChange(item.id, 'unit', e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs"
+                        className="w-full bg-[#181818] border border-[#2E2E2E] rounded-lg px-2 py-1 text-neutral-300 text-xs focus:outline-none focus:border-neutral-400"
                       />
                     </td>
                     {poForm.showPricing && (
@@ -1228,14 +1242,14 @@ _Please confirm acceptance and target dispatch date._`;
                             type="number" 
                             value={item.rate}
                             onChange={e => handleItemChange(item.id, 'rate', Number(e.target.value))}
-                            className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-100 font-mono text-xs"
+                            className="w-full bg-[#181818] border border-[#2E2E2E] rounded-lg px-2 py-1 text-white font-mono text-xs focus:outline-none focus:border-neutral-400"
                           />
                         </td>
                         <td className="p-2">
                           <select 
                             value={item.gstRate}
                             onChange={e => handleItemChange(item.id, 'gstRate', Number(e.target.value))}
-                            className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-slate-300 text-xs font-mono"
+                            className="bg-[#181818] border border-[#2E2E2E] rounded-lg px-2 py-1 text-neutral-300 text-xs font-mono focus:outline-none focus:border-neutral-400"
                           >
                             <option value={5}>5%</option>
                             <option value={18}>18%</option>
@@ -1243,7 +1257,7 @@ _Please confirm acceptance and target dispatch date._`;
                             <option value={0}>0%</option>
                           </select>
                         </td>
-                        <td className="p-2 text-right font-mono font-bold text-amber-400 text-xs">
+                        <td className="p-2 text-right font-mono font-bold text-white text-xs">
                           ₹{item.total.toLocaleString('en-IN')}
                         </td>
                       </>
@@ -1252,7 +1266,7 @@ _Please confirm acceptance and target dispatch date._`;
                       <button 
                         type="button" 
                         onClick={() => handleRemoveItem(item.id)}
-                        className="text-rose-400 hover:text-rose-300 p-1"
+                        className="text-neutral-400 hover:text-rose-400 p-1"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -1266,59 +1280,60 @@ _Please confirm acceptance and target dispatch date._`;
           {/* Payment Terms & Instructions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Payment Terms (Fully Editable)</label>
+              <label className="block text-neutral-300 font-semibold mb-1">Payment Terms (Fully Editable)</label>
               <input 
                 type="text" 
                 value={poForm.paymentTerms}
                 onChange={e => setPoForm({ ...poForm, paymentTerms: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-neutral-400"
                 placeholder="e.g. 50% Advance, 50% on Delivery or Net 30 Days..."
               />
             </div>
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Founder Signatory Name</label>
+              <label className="block text-neutral-300 font-semibold mb-1">Founder Signatory Name</label>
               <input 
                 type="text" 
                 value={poForm.founderSignatureName}
                 onChange={e => setPoForm({ ...poForm, founderSignatureName: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100 font-semibold"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-2 text-white font-semibold focus:outline-none focus:border-neutral-400"
               />
             </div>
           </div>
 
           {poForm.showSla && (
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Mandatory Transit & Quality Instructions</label>
+              <label className="block text-neutral-300 font-semibold mb-1">Mandatory Transit & Quality Instructions</label>
               <textarea 
                 rows={3}
                 value={poForm.specialInstructions}
                 onChange={e => setPoForm({ ...poForm, specialInstructions: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 text-xs font-mono"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-2 text-neutral-200 text-xs font-mono focus:outline-none focus:border-neutral-400"
               />
             </div>
           )}
 
           {/* Total Summary Bar */}
-          <div className="bg-amber-950/40 border border-amber-800/80 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="bg-[#181818] border border-[#2E2E2E] p-4 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
               {poForm.showPricing ? (
                 <>
-                  <div className="text-xs text-slate-400 uppercase font-semibold">Subtotal: ₹{calculatedSubtotal.toLocaleString('en-IN')} + GST: ₹{calculatedGstTotal.toLocaleString('en-IN')}</div>
-                  <div className="text-lg font-bold text-amber-400 font-mono mt-0.5">
+                  <div className="text-xs text-neutral-400 uppercase font-semibold">Subtotal: ₹{calculatedSubtotal.toLocaleString('en-IN')} + GST: ₹{calculatedGstTotal.toLocaleString('en-IN')}</div>
+                  <div className="text-lg font-bold text-white font-mono mt-0.5">
                     GRAND TOTAL: ₹{calculatedGrandTotal.toLocaleString('en-IN')}
                   </div>
-                  <div className="text-[11px] text-slate-300 italic">{numberToWordsINR(calculatedGrandTotal)}</div>
+                  <div className="text-[11px] text-neutral-400 italic">{numberToWordsINR(calculatedGrandTotal)}</div>
                 </>
               ) : (
-                <div className="text-sm font-bold text-cyan-400 font-mono">
+                <div className="text-sm font-bold text-white font-mono">
                   QUANTITY-ONLY PURCHASE ORDER ({poForm.items.reduce((a, b) => a + b.qty, 0)} Total Units)
                 </div>
               )}
             </div>
 
             <Button 
+              variant="primary"
               onClick={handleSavePo} 
-              className="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-6 text-xs shadow-lg"
+              className="font-semibold py-2.5 px-6 text-xs"
             >
               <CheckCircle2 className="w-4 h-4 mr-1.5" /> Issue Purchase Order & Generate PDF
             </Button>
@@ -1332,74 +1347,74 @@ _Please confirm acceptance and target dispatch date._`;
         onClose={() => setIsGrnModalOpen(false)} 
         title={`Log Goods Receipt (GRN) for ${selectedPo?.poNumber}`}
       >
-        <div className="space-y-4 text-xs text-slate-200">
-          <div className="bg-slate-950 p-3 rounded border border-slate-800">
-            <div className="font-semibold text-slate-300">{selectedPo?.supplierName}</div>
-            <div className="text-slate-400 text-[11px] mt-0.5">Total Ordered Qty: <strong className="text-amber-400">{selectedPo?.items.reduce((a, b) => a + b.qty, 0)} units</strong></div>
+        <div className="space-y-4 text-xs text-neutral-200">
+          <div className="bg-[#181818] p-3 rounded-xl border border-[#2E2E2E]">
+            <div className="font-semibold text-white">{selectedPo?.supplierName}</div>
+            <div className="text-neutral-400 text-[11px] mt-0.5">Total Ordered Qty: <strong className="text-white">{selectedPo?.items.reduce((a, b) => a + b.qty, 0)} units</strong></div>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-slate-400 mb-1 font-semibold">Good Qty Received</label>
+              <label className="block text-neutral-300 mb-1 font-semibold">Good Qty Received</label>
               <input 
                 type="number" 
                 value={grnForm.qtyReceivedGood}
                 onChange={e => setGrnForm({ ...grnForm, qtyReceivedGood: Number(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-emerald-400 font-bold font-mono"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-2 text-white font-bold font-mono focus:outline-none focus:border-neutral-400"
               />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1 font-semibold">Damaged Qty</label>
+              <label className="block text-neutral-300 mb-1 font-semibold">Damaged Qty</label>
               <input 
                 type="number" 
                 value={grnForm.qtyDamaged}
                 onChange={e => setGrnForm({ ...grnForm, qtyDamaged: Number(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-rose-400 font-bold font-mono"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-2 text-rose-400 font-bold font-mono focus:outline-none focus:border-neutral-400"
               />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1 font-semibold">Shortage Qty</label>
+              <label className="block text-neutral-300 mb-1 font-semibold">Shortage Qty</label>
               <input 
                 type="number" 
                 value={grnForm.qtyShortage}
                 onChange={e => setGrnForm({ ...grnForm, qtyShortage: Number(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-amber-400 font-bold font-mono"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-2 text-neutral-300 font-bold font-mono focus:outline-none focus:border-neutral-400"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-400 mb-1 font-semibold">Assigned Batch ID (For Inventory)</label>
+            <label className="block text-neutral-300 mb-1 font-semibold">Assigned Batch ID (For Inventory)</label>
             <input 
               type="text" 
               value={grnForm.batchId}
               onChange={e => setGrnForm({ ...grnForm, batchId: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-cyan-400 font-mono font-bold"
+              className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-2 text-white font-mono font-bold focus:outline-none focus:border-neutral-400"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-400 mb-1">Manufacturing Date</label>
+              <label className="block text-neutral-300 mb-1">Manufacturing Date</label>
               <input 
                 type="date" 
                 value={grnForm.mfgDate}
                 onChange={e => setGrnForm({ ...grnForm, mfgDate: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-100"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-neutral-400"
               />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1">Expiry Date Guarantee</label>
+              <label className="block text-neutral-300 mb-1">Expiry Date Guarantee</label>
               <input 
                 type="date" 
                 value={grnForm.expiryDate}
                 onChange={e => setGrnForm({ ...grnForm, expiryDate: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-slate-100"
+                className="w-full bg-[#121212] border border-[#2E2E2E] rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-neutral-400"
               />
             </div>
           </div>
 
-          <Button onClick={handleCreateGrn} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 mt-2">
+          <Button variant="primary" onClick={handleCreateGrn} className="w-full font-semibold py-2.5 mt-2">
             <ShieldCheck className="w-4 h-4 mr-1.5" /> Confirm Goods Receipt & Ingest into Live Stock
           </Button>
         </div>
@@ -1415,13 +1430,14 @@ _Please confirm acceptance and target dispatch date._`;
         {selectedPo && (
           <div className="space-y-4">
             {/* Top Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-950 p-3 rounded border border-slate-800">
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-[#181818] p-3 rounded-xl border border-[#2E2E2E]">
               <div className="flex flex-wrap items-center gap-2">
                 <Button 
                   size="sm" 
+                  variant="primary"
                   onClick={handleDownloadPdf} 
                   disabled={pdfStatus === 'generating'}
-                  className="bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold"
+                  className="text-xs font-semibold"
                 >
                   {pdfStatus === 'generating' ? (
                     <RefreshCw className="w-4 h-4 mr-1.5 animate-spin" />
@@ -1430,26 +1446,26 @@ _Please confirm acceptance and target dispatch date._`;
                   )}
                   {pdfStatus === 'generating' ? 'Generating PDF...' : 'Download PDF Document'}
                 </Button>
-                <Button size="sm" variant="secondary" onClick={handlePrintPo} className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs">
+                <Button size="sm" variant="secondary" onClick={handlePrintPo} className="text-xs">
                   <Printer className="w-4 h-4 mr-1.5" /> Print PO
                 </Button>
                 <Button 
                   size="sm" 
                   variant="secondary"
                   onClick={() => setIsConsolidated(!isConsolidated)}
-                  className={`text-xs ${isConsolidated ? 'bg-amber-950/80 border border-amber-600 text-amber-300 font-bold' : 'bg-slate-800 text-slate-300'}`}
+                  className={`text-xs ${isConsolidated ? 'border-neutral-400 text-white font-semibold' : 'text-neutral-300'}`}
                   title="Toggle between consolidated flavor grouping and individual line items"
                 >
-                  <Sparkles className="w-3.5 h-3.5 mr-1 text-amber-400" />
-                  {isConsolidated ? '✨ Consolidated (1-Page)' : '📋 Itemized (All Rows)'}
+                  <Sparkles className="w-3.5 h-3.5 mr-1 text-neutral-300" />
+                  {isConsolidated ? 'Consolidated (1-Page)' : 'Itemized (All Rows)'}
                 </Button>
                 <Button 
                   size="sm" 
                   variant="secondary" 
                   onClick={() => selectedPo && handleDeletePo(selectedPo.id, selectedPo.poNumber)}
-                  className="bg-slate-800 hover:bg-rose-950/60 text-rose-400 text-xs border border-slate-700 hover:border-rose-800"
+                  className="text-neutral-400 hover:text-rose-400 text-xs"
                 >
-                  <Trash2 className="w-4 h-4 mr-1 text-rose-400" /> Delete PO
+                  <Trash2 className="w-4 h-4 mr-1" /> Delete PO
                 </Button>
               </div>
 
@@ -1457,15 +1473,15 @@ _Please confirm acceptance and target dispatch date._`;
                 size="sm" 
                 variant="secondary" 
                 onClick={handleCopyTransmittal}
-                className="bg-emerald-950 border border-emerald-800 text-emerald-300 text-xs hover:bg-emerald-900"
+                className="text-xs"
               >
-                {copySuccess ? <Check className="w-4 h-4 mr-1 text-emerald-400" /> : <Copy className="w-4 h-4 mr-1" />}
+                {copySuccess ? <Check className="w-4 h-4 mr-1 text-emerald-400" /> : <Copy className="w-4 h-4 mr-1 text-neutral-300" />}
                 {copySuccess ? 'Copied to Clipboard!' : 'Copy WhatsApp Transmittal'}
               </Button>
             </div>
 
             {/* Printable PDF Template Box */}
-            <div className="p-2 bg-slate-950 overflow-x-auto rounded border border-slate-800">
+            <div className="p-2 bg-[#121212] overflow-x-auto rounded-xl border border-[#2E2E2E]">
               <div 
                 ref={poPrintRef}
                 id="printable-document"
