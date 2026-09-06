@@ -154,12 +154,12 @@ const AppContent: React.FC = () => {
   // 1. Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f0eee9] dark:bg-slate-950 flex flex-col items-center justify-center space-y-4 select-none">
-        <div className="text-emerald-700 dark:text-emerald-450 p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-white dark:border-slate-800 animate-pulse">
+      <div className="min-h-screen bg-[#0f0f0f] flex flex-col items-center justify-center space-y-4 select-none">
+        <div className="text-white p-4 bg-[#1f1f1f] rounded-2xl shadow-md border border-[#2e2e2e] animate-pulse">
           <GudLogo size={48} />
         </div>
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-          <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#aaaaaa]">
+          <Loader2 className="w-4 h-4 animate-spin text-white" />
           <span>Authenticating GUD Credentials...</span>
         </div>
       </div>

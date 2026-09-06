@@ -112,10 +112,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
         }
       >
         {notifications.length === 0 ? (
-          <div className="text-center py-16 text-slate-500">
-            <Bell className="w-9 h-9 mx-auto mb-2 text-slate-600" />
-            <p className="text-xs font-semibold">All caught up!</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">No new system alerts or tasks.</p>
+          <div className="text-center py-16 text-[#888888]">
+            <Bell className="w-9 h-9 mx-auto mb-2 text-[#717171]" />
+            <p className="text-xs font-semibold text-white">All caught up!</p>
+            <p className="text-[11px] text-[#888888] mt-0.5">No new system alerts or tasks.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -131,12 +131,12 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
                 }}
                 className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all relative ${
                   n.read
-                    ? 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-850'
-                    : 'bg-emerald-950/20 border-emerald-900/60 text-slate-100 hover:bg-emerald-950/30'
+                    ? 'bg-[#181818] border-[#282828] text-[#aaaaaa] hover:bg-[#222222]'
+                    : 'bg-[#222222] border-[#383838] text-white hover:bg-[#2a2a2a]'
                 }`}
               >
                 {!n.read && (
-                  <span className="absolute top-3.5 right-3.5 w-2 h-2 bg-[#408d6d] rounded-full" />
+                  <span className="absolute top-3.5 right-3.5 w-2 h-2 bg-[#ff1e27] rounded-full" />
                 )}
 
                 <div className="pr-4 space-y-1">
@@ -146,10 +146,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearch, onNavigate }) => {
                     </span>
                     <StatusBadge status={n.priority} className="text-[8px] px-1 py-0 border-0" />
                   </div>
-                  <p className="text-slate-400 leading-relaxed font-medium">
+                  <p className="text-[#aaaaaa] leading-relaxed font-medium">
                     {n.message}
                   </p>
-                  <p className="text-[10px] text-slate-500 font-semibold mt-1">
+                  <p className="text-[10px] text-[#717171] font-semibold mt-1">
                     {formatTime(n.timestamp)}
                   </p>
                 </div>

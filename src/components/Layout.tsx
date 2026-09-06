@@ -16,7 +16,7 @@ export const Layout: React.FC<LayoutProps> = ({
   children
 }) => {
   return (
-    <div className="h-full flex overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="h-full flex overflow-hidden bg-[#0f0f0f]">
       {/* Sidebar - Collapsible */}
       <Sidebar currentPath={currentPath} onNavigate={onNavigate} />
 

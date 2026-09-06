@@ -47,14 +47,14 @@ export const Filters: React.FC<FiltersProps> = ({
   const hasActiveFilters = Object.values(values).some((val) => val !== '');
 
   return (
-    <div className="flex flex-wrap items-center gap-3 bg-slate-50/50 dark:bg-slate-900/35 p-3 rounded-lg border border-slate-100 dark:border-slate-800/80">
+    <div className="flex flex-wrap items-center gap-3 bg-[#181818] p-3 rounded-xl border border-[#2e2e2e]">
       
       {/* Global Text Search if there's a general field, or render fields */}
       {fields.map((field) => {
         if (field.type === 'text') {
           return (
             <div key={field.key} className="relative min-w-[200px] flex-1 max-w-sm">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#888888]">
                 <Search className="w-4 h-4" />
               </span>
               <input
@@ -62,12 +62,12 @@ export const Filters: React.FC<FiltersProps> = ({
                 placeholder={field.placeholder || searchPlaceholder}
                 value={values[field.key] || ''}
                 onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                className="w-full pl-9 pr-8 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full pl-9 pr-8 py-1.5 text-xs bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-white placeholder-[#888888]"
               />
               {(values[field.key]) && (
                 <button
                   onClick={() => handleFieldChange(field.key, '')}
-                  className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                  className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-[#888888] hover:text-white"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -82,7 +82,7 @@ export const Filters: React.FC<FiltersProps> = ({
               <select
                 value={values[field.key] || ''}
                 onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                className="w-full px-2.5 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-600 dark:text-slate-300"
+                className="w-full px-2.5 py-1.5 text-xs bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-white"
               >
                 <option value="">{field.label}</option>
                 {field.options?.map((opt) => (
@@ -98,12 +98,12 @@ export const Filters: React.FC<FiltersProps> = ({
         if (field.type === 'date') {
           return (
             <div key={field.key} className="min-w-[140px] flex items-center gap-1.5">
-              <span className="text-[10px] uppercase font-bold text-slate-400">{field.label}:</span>
+              <span className="text-[10px] uppercase font-bold text-[#aaaaaa]">{field.label}:</span>
               <input
                 type="date"
                 value={values[field.key] || ''}
                 onChange={(e) => handleFieldChange(field.key, e.target.value)}
-                className="px-2 py-1 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-600 dark:text-slate-300"
+                className="px-2 py-1 text-xs bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-white"
               />
             </div>
           );
@@ -117,7 +117,7 @@ export const Filters: React.FC<FiltersProps> = ({
           variant="ghost" 
           size="sm" 
           onClick={handleClear} 
-          className="text-slate-500 hover:text-slate-700 !py-1 text-xs font-semibold"
+          className="text-[#aaaaaa] hover:text-white !py-1 text-xs font-semibold"
           leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
         >
           Reset

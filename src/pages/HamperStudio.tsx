@@ -511,14 +511,16 @@ export const HamperStudio: React.FC = () => {
 
           <Button 
             onClick={() => setIsNewItemModalOpen(true)} 
-            className="bg-[#272727] hover:bg-[#383838] text-white border border-[#383838] text-xs font-medium h-9"
+            variant="secondary"
+            className="text-xs font-medium h-9"
           >
             <Plus className="w-3.5 h-3.5 mr-1 text-neutral-400" /> + Add Master SKU
           </Button>
 
           <Button 
             onClick={() => setIsModalOpen(true)} 
-            className="bg-[#f1f1f1] hover:bg-white text-[#0f0f0f] font-semibold text-xs h-9 px-4 rounded-xl shadow-sm tactile-press"
+            variant="primary"
+            className="text-xs h-9 px-4 rounded-xl shadow-sm"
           >
             <Plus className="w-4 h-4 mr-1 stroke-[2.5]" /> + New Hamper Project
           </Button>
@@ -637,15 +639,17 @@ export const HamperStudio: React.FC = () => {
           <div className="flex items-center gap-2">
             <Button
               size="sm"
+              variant="secondary"
               onClick={() => setViewMode('proposal')}
-              className="bg-[#272727] hover:bg-[#383838] text-white border border-[#383838] text-xs font-medium"
+              className="text-xs font-medium"
             >
               <FileText className="w-3.5 h-3.5 mr-1 text-neutral-400" /> Export Formal Proposal
             </Button>
             <Button
               size="sm"
+              variant="secondary"
               onClick={() => setViewMode('delivery')}
-              className="bg-[#272727] hover:bg-[#383838] text-neutral-300 border border-[#383838] text-xs font-medium"
+              className="text-xs font-medium"
             >
               <Truck className="w-3.5 h-3.5 mr-1 text-neutral-400" /> Delivery Note
             </Button>
@@ -730,7 +734,7 @@ export const HamperStudio: React.FC = () => {
                     </div>
                     <div className="w-full bg-[#121212] h-1.5 rounded-full overflow-hidden border border-[#282828]">
                       <div 
-                        className={`h-full ${recipe.capacityUtilizationPercent > 100 ? 'bg-rose-500' : 'bg-neutral-300'}`}
+                        className={`h-full ${recipe.capacityUtilizationPercent > 100 ? 'bg-amber-400' : 'bg-neutral-300'}`}
                         style={{ width: `${Math.min(recipe.capacityUtilizationPercent, 100)}%` }}
                       />
                     </div>
@@ -752,11 +756,8 @@ export const HamperStudio: React.FC = () => {
 
                 <Button
                   onClick={() => handleApplyCuratedTier(recipe)}
-                  className={`w-full text-xs py-2.5 rounded-xl font-semibold shadow-sm flex items-center justify-center gap-1.5 tactile-press ${
-                    recipe.tier === 'Better'
-                      ? 'bg-[#f1f1f1] hover:bg-white text-[#0f0f0f]'
-                      : 'bg-[#272727] hover:bg-[#383838] text-white border border-[#383838]'
-                  }`}
+                  variant={recipe.tier === 'Better' ? 'primary' : 'secondary'}
+                  className="w-full text-xs py-2.5 rounded-xl font-semibold shadow-sm flex items-center justify-center gap-1.5"
                 >
                   Apply {recipe.tier} Tier to Workstation <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
@@ -951,8 +952,9 @@ export const HamperStudio: React.FC = () => {
                         <p className="text-xs">No components in this hamper tray yet.</p>
                         <Button
                           size="sm"
+                          variant="secondary"
                           onClick={() => setIsCatalogPickerOpen(true)}
-                          className="bg-[#272727] hover:bg-[#383838] text-white text-xs mt-2 border border-[#383838]"
+                          className="text-xs mt-2"
                         >
                           Open Component Picker
                         </Button>

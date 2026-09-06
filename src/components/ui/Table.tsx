@@ -118,10 +118,10 @@ export function Table<T>({
         onMouseLeave={handleMouseLeaveOrUp}
         onMouseUp={handleMouseLeaveOrUp}
         onMouseMove={handleMouseMove}
-        className={`overflow-x-auto border border-slate-800/80 rounded-2xl shadow-xl shadow-black/40 bg-slate-900/80 backdrop-blur-md select-none ${isMouseDown ? 'cursor-grabbing' : 'cursor-grab'}`}
+        className={`overflow-x-auto border border-[#2e2e2e] rounded-2xl shadow-xl shadow-black/40 bg-[#1f1f1f] select-none ${isMouseDown ? 'cursor-grabbing' : 'cursor-grab'}`}
       >
         <table className="w-full border-collapse text-left text-xs">
-          <thead className="bg-slate-950/60 border-b border-slate-800/80 text-slate-400 uppercase font-semibold tracking-wider font-heading">
+          <thead className="bg-[#181818] border-b border-[#282828] text-[#aaaaaa] uppercase font-semibold tracking-wider font-heading">
             <tr>
               {/* Checkbox Column */}
               {onSelectionChange && (
@@ -130,7 +130,7 @@ export function Table<T>({
                     type="checkbox"
                     checked={data.length > 0 && selectedIds.length === data.length}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                    className="rounded border-[#383838] bg-[#121212] text-white focus:ring-white/20 cursor-pointer"
                   />
                 </th>
               )}
@@ -139,13 +139,13 @@ export function Table<T>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-5 py-3.5 ${col.sortable ? 'cursor-pointer select-none hover:bg-slate-800/50 hover:text-white transition-colors' : ''} ${col.className || ''}`}
+                  className={`px-5 py-3.5 ${col.sortable ? 'cursor-pointer select-none hover:bg-[#272727] hover:text-white transition-colors' : ''} ${col.className || ''}`}
                   onClick={() => col.sortable && handleSort(col.key)}
                 >
                   <div className="flex items-center gap-1.5">
                     <span>{col.header}</span>
                     {col.sortable && sortKey === col.key && (
-                      sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-emerald-400" /> : <ChevronDown className="w-3.5 h-3.5 text-emerald-400" />
+                      sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-white" /> : <ChevronDown className="w-3.5 h-3.5 text-white" />
                     )}
                   </div>
                 </th>
@@ -156,19 +156,19 @@ export function Table<T>({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-slate-800/60 text-slate-200">
+          <tbody className="divide-y divide-[#282828] text-neutral-200">
             {loading ? (
               <tr>
-                <td colSpan={columns.length + (onSelectionChange ? 1 : 0) + (rowActions ? 1 : 0)} className="py-12 text-center text-slate-400 dark:text-slate-500">
+                <td colSpan={columns.length + (onSelectionChange ? 1 : 0) + (rowActions ? 1 : 0)} className="py-12 text-center text-[#aaaaaa]">
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Loading database records...</span>
                   </div>
                 </td>
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (onSelectionChange ? 1 : 0) + (rowActions ? 1 : 0)} className="py-12 text-center text-slate-400 dark:text-slate-550">
+                <td colSpan={columns.length + (onSelectionChange ? 1 : 0) + (rowActions ? 1 : 0)} className="py-12 text-center text-[#aaaaaa]">
                   No records found.
                 </td>
               </tr>
@@ -180,7 +180,7 @@ export function Table<T>({
                 return (
                   <tr 
                     key={rowId}
-                    className={`hover:bg-slate-50/50 dark:hover:bg-slate-800/25 transition-all ${isSelected ? 'bg-emerald-50/20 dark:bg-emerald-950/10' : ''}`}
+                    className={`hover:bg-[#272727]/50 transition-all ${isSelected ? 'bg-[#272727]' : ''}`}
                   >
                     {/* Checkbox Column */}
                     {onSelectionChange && (
@@ -189,7 +189,7 @@ export function Table<T>({
                           type="checkbox"
                           checked={isSelected}
                           onChange={(e) => handleSelectRow(rowId, e.target.checked)}
-                          className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                          className="rounded border-[#383838] bg-[#121212] text-white focus:ring-white/20"
                         />
                       </td>
                     )}
@@ -208,9 +208,9 @@ export function Table<T>({
                           variant="ghost"
                           size="xs"
                           onClick={() => setActiveActionMenuIdx(activeActionMenuIdx === idx ? null : idx)}
-                          className="rounded-full !p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800"
+                          className="rounded-full !p-1.5 hover:bg-[#272727]"
                         >
-                          <MoreHorizontal className="w-4 h-4 text-slate-500" />
+                          <MoreHorizontal className="w-4 h-4 text-[#aaaaaa]" />
                         </Button>
                         
                         {activeActionMenuIdx === idx && (
@@ -222,7 +222,7 @@ export function Table<T>({
                             />
                             
                             {/* Dropdown Menu */}
-                            <div className="absolute right-6 mt-1 w-36 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-md shadow-lg py-1.5 z-20 text-left">
+                            <div className="absolute right-6 mt-1 w-36 bg-[#1f1f1f] border border-[#2e2e2e] rounded-xl shadow-lg py-1.5 z-20 text-left">
                               {rowActions(row).map((action, actionIdx) => (
                                 <button
                                   key={actionIdx}
@@ -230,10 +230,10 @@ export function Table<T>({
                                     action.onClick();
                                     setActiveActionMenuIdx(null);
                                   }}
-                                  className={`w-full px-4 py-1.5 text-left text-xs ${
+                                  className={`w-full px-4 py-1.5 text-left text-xs transition-colors ${
                                     action.danger 
-                                      ? 'text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20' 
-                                      : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-850'
+                                      ? 'text-rose-400 hover:bg-rose-950/30' 
+                                      : 'text-neutral-200 hover:bg-[#272727]'
                                   }`}
                                 >
                                   {action.label}
@@ -254,11 +254,11 @@ export function Table<T>({
 
       {/* Pagination Footer */}
       {pagination && totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-1 text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-1 text-[#aaaaaa]">
           <div className="text-xs">
-            Showing <span className="font-semibold text-slate-800 dark:text-white">{startRange}</span> to{' '}
-            <span className="font-semibold text-slate-800 dark:text-white">{endRange}</span> of{' '}
-            <span className="font-semibold text-slate-800 dark:text-white">{pagination.totalCount}</span> entries
+            Showing <span className="font-semibold text-white">{startRange}</span> to{' '}
+            <span className="font-semibold text-white">{endRange}</span> of{' '}
+            <span className="font-semibold text-white">{pagination.totalCount}</span> entries
           </div>
 
           <div className="flex items-center gap-1.5">
@@ -267,7 +267,7 @@ export function Table<T>({
               size="xs"
               disabled={pagination.currentPage === 1}
               onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
-              className="!p-1.5"
+              className="!p-1.5 border-[#383838] bg-[#272727] text-neutral-200 hover:bg-[#383838]"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -284,8 +284,8 @@ export function Table<T>({
                   onClick={() => pagination.onPageChange(pageNum)}
                   className={`w-7.5 h-7.5 !p-0 ${
                     isCurrent 
-                      ? 'bg-emerald-700 hover:bg-emerald-800' 
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+                      ? 'bg-[#f1f1f1] text-[#0f0f0f] font-bold' 
+                      : 'border-[#383838] bg-[#272727] text-neutral-200 hover:bg-[#383838]'
                   }`}
                 >
                   {pageNum}
@@ -298,7 +298,7 @@ export function Table<T>({
               size="xs"
               disabled={pagination.currentPage === totalPages}
               onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
-              className="!p-1.5"
+              className="!p-1.5 border-[#383838] bg-[#272727] text-neutral-200 hover:bg-[#383838]"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>

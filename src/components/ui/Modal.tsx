@@ -69,35 +69,35 @@ export const Modal: React.FC<ModalProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(4, 7, 13, 0.82)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
           zIndex: 99998,
         }}
       />
 
-      {/* Centered Modal Content Card with Apple Spring */}
+      {/* Centered Modal Content Card with Spring Animation */}
       <div 
-        className={`relative w-full ${sizes[size]} bg-slate-900/95 border border-slate-700/80 rounded-2xl p-6 shadow-2xl shadow-black/80 z-[99999] text-left overflow-hidden flex flex-col max-h-[90vh] animate-spring-in`}
+        className={`relative w-full ${sizes[size]} bg-[#1f1f1f] border border-[#2e2e2e] rounded-2xl p-6 shadow-2xl shadow-black/90 z-[99999] text-left overflow-hidden flex flex-col max-h-[90vh] animate-spring-in`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 mb-4 flex-shrink-0">
+        <div className="flex items-center justify-between border-b border-[#282828] pb-4 mb-4 flex-shrink-0">
           <h3 className="text-base font-bold text-white tracking-wide font-heading">
             {title}
           </h3>
-          <Button variant="ghost" size="xs" onClick={onClose} className="rounded-full !p-1.5 text-slate-400 hover:text-white">
+          <Button variant="ghost" size="xs" onClick={onClose} className="rounded-full !p-1.5 text-[#aaaaaa] hover:text-white hover:bg-[#272727]">
             <X className="w-5 h-5" />
           </Button>
         </div>
 
         {/* Scrollable Body */}
-        <div className="text-xs text-slate-300 overflow-y-auto flex-1 space-y-4">
+        <div className="text-xs text-neutral-200 overflow-y-auto flex-1 space-y-4">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="mt-5 flex items-center justify-end gap-3 border-t border-slate-800/80 pt-4 flex-shrink-0">
+          <div className="mt-5 flex items-center justify-end gap-3 border-t border-[#282828] pt-4 flex-shrink-0">
             {footer}
           </div>
         )}

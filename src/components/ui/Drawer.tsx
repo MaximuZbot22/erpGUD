@@ -59,7 +59,7 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const drawerContent = (
     <div style={{ position: 'fixed', inset: 0, zIndex: 99999, overflow: 'hidden' }}>
-      {/* 1. FIXED VIEWPORT BACKDROP OVERLAY (Always covers current screen view with dark blur) */}
+      {/* 1. FIXED VIEWPORT BACKDROP OVERLAY */}
       <div
         onClick={onClose}
         style={{
@@ -69,7 +69,7 @@ export const Drawer: React.FC<DrawerProps> = ({
           right: 0,
           bottom: 0,
           zIndex: 99998,
-          backgroundColor: animateIn ? 'rgba(2, 6, 23, 0.82)' : 'rgba(2, 6, 23, 0)',
+          backgroundColor: animateIn ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0)',
           backdropFilter: animateIn ? 'blur(8px)' : 'none',
           WebkitBackdropFilter: animateIn ? 'blur(8px)' : 'none',
           transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -77,7 +77,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         }}
       />
 
-      {/* 2. FIXED VIEWPORT PANEL (Pinned directly to browser viewport window) */}
+      {/* 2. FIXED VIEWPORT PANEL */}
       <div
         style={{
           position: 'fixed',
@@ -90,9 +90,9 @@ export const Drawer: React.FC<DrawerProps> = ({
           zIndex: 99999,
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: '#0c111d',
-          borderLeft: '1px solid #1e293b',
-          boxShadow: '-20px 0 60px rgba(0, 0, 0, 0.75)',
+          backgroundColor: '#1f1f1f',
+          borderLeft: '1px solid #2e2e2e',
+          boxShadow: '-20px 0 60px rgba(0, 0, 0, 0.85)',
           transform: animateIn ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
@@ -101,27 +101,27 @@ export const Drawer: React.FC<DrawerProps> = ({
         <div
           style={{
             padding: '18px 24px',
-            borderBottom: '1px solid #1e293b',
+            borderBottom: '1px solid #282828',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexShrink: 0,
-            backgroundColor: '#0f172a',
+            backgroundColor: '#181818',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{
-              width: '10px',
-              height: '10px',
+              width: '8px',
+              height: '8px',
               borderRadius: '9999px',
-              backgroundColor: '#408d6d',
-              boxShadow: '0 0 10px rgba(64, 141, 109, 0.6)'
+              backgroundColor: '#4ade80',
+              boxShadow: '0 0 8px rgba(74, 222, 128, 0.5)'
             }} />
             <h2 style={{
               margin: 0,
-              fontSize: '15px',
+              fontSize: '14px',
               fontWeight: 700,
-              color: '#f8fafc',
+              color: '#ffffff',
               letterSpacing: '0.01em',
             }}>
               {title}
@@ -131,18 +131,19 @@ export const Drawer: React.FC<DrawerProps> = ({
             variant="ghost" 
             size="xs" 
             onClick={onClose} 
-            className="rounded-full !p-1.5 text-slate-400 hover:text-white hover:bg-slate-800"
+            className="rounded-full !p-1.5 text-[#aaaaaa] hover:text-white hover:bg-[#272727]"
           >
             <X className="w-5 h-5" />
           </Button>
         </div>
 
-        {/* Inner Scrollable Body (Independent scroll inside drawer) */}
+        {/* Inner Scrollable Body */}
         <div
           style={{
             flex: 1,
             overflowY: 'auto',
             padding: '24px',
+            color: '#f1f1f1',
           }}
         >
           {children}
@@ -153,8 +154,8 @@ export const Drawer: React.FC<DrawerProps> = ({
           <div
             style={{
               padding: '16px 24px',
-              borderTop: '1px solid #1e293b',
-              backgroundColor: '#0f172a',
+              borderTop: '1px solid #282828',
+              backgroundColor: '#181818',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',

@@ -986,11 +986,11 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
         {/* Module Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white flex items-center gap-2">
-              <FileSpreadsheet className="w-6 h-6 text-emerald-750 dark:text-emerald-450" />
+            <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <FileSpreadsheet className="w-5 h-5 text-neutral-300" />
               <span className="capitalize">{moduleId} CRM Portal</span>
             </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#aaaaaa] mt-0.5">
               Live bi-directional synchronization with Google Sheets. Updates save instantly.
             </p>
           </div>
@@ -1002,7 +1002,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                 <Button
                   type="button"
                   size="xs"
-                  className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
+                  variant="primary"
                   onClick={async () => {
                     if (!googleToken) return;
                     setSyncing(true);
@@ -1050,12 +1050,12 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                   }}
                   disabled={syncing}
                 >
-                  <Sparkles className="w-3.5 h-3.5 mr-1 animate-pulse" />
+                  <Sparkles className="w-3.5 h-3.5 mr-1" />
                   {syncing ? 'Pushing...' : `Push ${((seedDataV2 as any)[activeTab] || []).length} Rows to Sheet`}
                 </Button>
               </div>
             ) : (
-              <Button type="button" variant="outline" size="xs" onClick={signInWithGoogle} className="border-amber-300 text-amber-800 dark:text-amber-450">
+              <Button type="button" variant="outline" size="xs" onClick={signInWithGoogle} className="border-[#383838] bg-[#272727] text-neutral-200 hover:bg-[#333333]">
                 Authenticate Sheets API
               </Button>
             )}
@@ -1063,6 +1063,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
               type="button"
               variant="outline"
               size="xs"
+              className="border-[#383838] bg-[#272727] text-neutral-200 hover:bg-[#333333]"
               onClick={() => {
                 setSheetLoading(true);
                 const activeSheetId = getSpreadsheetIdForModule(moduleId);
@@ -1090,32 +1091,32 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
 
         {/* Module Guide Banner */}
         {moduleGuides[moduleId] && (
-          <div className="bg-gradient-to-r from-emerald-50/40 to-teal-50/20 dark:from-emerald-950/5 dark:to-teal-950/5 border border-emerald-100/80 dark:border-emerald-900/30 rounded-xl p-3.5 relative overflow-hidden transition-all duration-200">
+          <div className="bg-[#181818] border border-[#2e2e2e] rounded-xl p-3.5 relative overflow-hidden transition-all duration-200">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-2.5">
-                <div className="p-1 bg-emerald-100/50 dark:bg-emerald-900/30 rounded-lg text-emerald-800 dark:text-emerald-400 mt-0.5">
-                  <Info className="w-4 h-4" />
+                <div className="p-1.5 bg-[#272727] border border-[#383838] rounded-lg text-white mt-0.5">
+                  <Info className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  <h4 className="text-xs font-bold text-white">
                     {moduleId.toUpperCase()} Guidance Guide
                   </h4>
-                  <p className="text-[11px] text-slate-550 dark:text-slate-400 mt-0.5 leading-relaxed">
+                  <p className="text-[11px] text-[#aaaaaa] mt-0.5 leading-relaxed">
                     {moduleGuides[moduleId].purpose}
                   </p>
                   
                   {showGuide && (
-                    <div className="mt-3 space-y-2 border-t border-slate-100/80 dark:border-slate-850 pt-2.5">
+                    <div className="mt-3 space-y-2 border-t border-[#282828] pt-2.5">
                       <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
                         {moduleGuides[moduleId].tabs.map((tab, idx) => (
                           <div key={idx} className="text-[11px] leading-tight">
-                            <span className="font-bold text-slate-700 dark:text-slate-300">📄 {tab.name}</span>
-                            <span className="text-slate-500 dark:text-slate-400"> — {tab.desc}</span>
+                            <span className="font-bold text-neutral-200">📄 {tab.name}</span>
+                            <span className="text-[#aaaaaa]"> — {tab.desc}</span>
                           </div>
                         ))}
                       </div>
                       {moduleGuides[moduleId].tip && (
-                        <p className="text-[10px] text-emerald-850 dark:text-emerald-400 bg-emerald-50/30 dark:bg-emerald-950/20 p-2 rounded-lg border border-emerald-100/20 dark:border-emerald-900/20 font-medium">
+                        <p className="text-[10px] text-neutral-300 bg-[#222222] p-2 rounded-lg border border-[#333333] font-medium">
                           💡 <b>Operational Tip:</b> {moduleGuides[moduleId].tip}
                         </p>
                       )}
@@ -1126,7 +1127,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
               
               <button
                 onClick={() => setShowGuide(!showGuide)}
-                className="text-[10px] font-bold text-emerald-700 dark:text-emerald-450 hover:underline px-2 py-0.5 border border-emerald-250/50 dark:border-emerald-800/80 rounded flex-shrink-0"
+                className="text-[10px] font-semibold text-[#aaaaaa] hover:text-white px-2 py-0.5 border border-[#383838] bg-[#272727] rounded flex-shrink-0 tactile-press"
               >
                 {showGuide ? 'Hide Details' : 'Show Details'}
               </button>
@@ -1136,7 +1137,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
 
         {/* Tab Switcher Navigation (Google Sheets mimic) */}
         {tabs.length > 0 && (
-          <div className="border-b border-slate-800/80 flex items-center gap-1 overflow-x-auto pb-px scrollbar-none">
+          <div className="border-b border-[#282828] flex items-center gap-1 overflow-x-auto pb-px scrollbar-none">
             {tabs.map((tab) => (
               <button
                 key={tab}
@@ -1147,8 +1148,8 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                 }}
                 className={`px-4 py-2.5 text-xs font-semibold whitespace-nowrap border-b-2 tactile-press cursor-pointer ${
                   activeTab === tab 
-                    ? 'border-amber-400 text-amber-300 font-bold bg-amber-500/10 rounded-t-lg'
-                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 rounded-t-lg'
+                    ? 'border-white text-white font-bold bg-[#272727] rounded-t-lg'
+                    : 'border-transparent text-[#aaaaaa] hover:text-white hover:bg-[#1f1f1f] rounded-t-lg'
                 }`}
               >
                 {tab}
@@ -1160,7 +1161,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
         {/* CRM Tools: Search and Action Row */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-[#888888] pointer-events-none">
               <Search className="w-4 h-4" />
             </span>
             <input
@@ -1168,16 +1169,16 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
               placeholder={`Search in ${activeTab || 'sheet'}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-850 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-700 dark:text-slate-200 placeholder-slate-400"
+              className="w-full pl-9 pr-4 py-2 text-xs bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-white placeholder-[#888888]"
             />
           </div>
-          <div className="flex items-center gap-1 bg-slate-950 p-1 border border-slate-800 rounded-lg flex-shrink-0">
+          <div className="flex items-center gap-1 bg-[#141414] p-1 border border-[#2e2e2e] rounded-lg flex-shrink-0">
             <button
               onClick={() => handleSetViewMode('table')}
               className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all duration-150 cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-[#408d6d] text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#272727] text-white border border-[#383838] shadow-sm'
+                  : 'text-[#aaaaaa] hover:text-white'
               }`}
             >
               🗃️ Table View
@@ -1186,8 +1187,8 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
               onClick={() => handleSetViewMode('cards')}
               className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all duration-150 cursor-pointer ${
                 viewMode === 'cards'
-                  ? 'bg-[#408d6d] text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#272727] text-white border border-[#383838] shadow-sm'
+                  : 'text-[#aaaaaa] hover:text-white'
               }`}
             >
               🖼️ Card View
@@ -1196,6 +1197,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
           {googleToken && headers.length > 0 && (
             <Button
               type="button"
+              variant="primary"
               onClick={() => {
                 const initialVals = new Array(headers.length).fill('');
                 const mappedKey = (moduleId === 'sales' || moduleId === 'customers') ? 'orders' : ((moduleId === 'production' || moduleId === 'procurement' || moduleId === 'packaging' || moduleId === 'products' || moduleId === 'vendors') ? 'supply-chain' : moduleId);
@@ -1233,7 +1235,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
         </div>
 
         {/* CRM Main Grid Table Card */}
-        <Card className="overflow-hidden border border-slate-100 dark:border-slate-850">
+        <Card className="overflow-hidden border border-[#2e2e2e] bg-[#1f1f1f]">
           <CardContent className="p-0">
             {dynamicColumns.length > 0 ? (
               viewMode === 'table' ? (
@@ -1254,7 +1256,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
               ) : (
                 /* Card View Mode */
                 sheetLoading ? (
-                  <div className="py-12 text-center text-xs text-slate-400">
+                  <div className="py-12 text-center text-xs text-[#aaaaaa]">
                     Loading records in Card view...
                   </div>
                 ) : (
@@ -1269,9 +1271,6 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                       ) || '';
 
                       const lowerStatus = statusVal.toLowerCase();
-                      const statusBorder = lowerStatus.includes('paid') || lowerStatus.includes('active') || lowerStatus.includes('delivered') ? 'border-l-4 border-l-emerald-500 bg-gradient-to-br from-emerald-50/20 to-transparent dark:from-emerald-950/20' :
-                                           lowerStatus.includes('pending') || lowerStatus.includes('progress') ? 'border-l-4 border-l-amber-500 bg-gradient-to-br from-amber-50/20 to-transparent dark:from-amber-950/20' :
-                                           'border-l-4 border-l-indigo-500';
 
                       return (
                         <a
@@ -1280,11 +1279,11 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => { e.preventDefault(); setSelectedRow(row); }}
-                          className={`luxury-card bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between space-y-3 shadow-sm ${statusBorder} cursor-pointer hover:border-[#408d6d] hover:shadow-md transition-all no-underline`}
+                          className="bg-[#181818] border border-[#282828] rounded-xl p-4 flex flex-col justify-between space-y-3 shadow-sm cursor-pointer hover:border-[#444444] hover:bg-[#222222] transition-all no-underline tactile-press"
                         >
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded uppercase">
+                              <span className="text-[10px] font-mono font-bold text-neutral-300 bg-[#272727] border border-[#383838] px-2 py-0.5 rounded uppercase">
                                 {idVal}
                               </span>
                               {statusVal && (
@@ -1296,23 +1295,23 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                               )}
                             </div>
                             
-                            <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">
+                            <h4 className="text-xs font-bold text-white line-clamp-1">
                               {titleVal}
                             </h4>
                             
                             {subVal && (
-                              <p className="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                              <p className="text-[11px] text-[#aaaaaa] line-clamp-2 leading-relaxed">
                                 {subVal}
                               </p>
                             )}
                           </div>
                           
                           {extraVal && (
-                            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                            <div className="pt-2 border-t border-[#282828] flex items-center justify-between">
+                              <span className="text-[10px] font-semibold text-[#888888]">
                                 {headers[3] || 'Category'}:
                               </span>
-                              <span className="text-[10px] font-bold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">
+                              <span className="text-[10px] font-bold text-neutral-200 truncate max-w-[120px]">
                                 {extraVal}
                               </span>
                             </div>
@@ -1324,23 +1323,23 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                 )
               )
             ) : (
-              <div className="py-12 text-center text-xs text-slate-405">
+              <div className="py-12 text-center text-xs text-[#aaaaaa]">
                 {sheetLoading ? 'Discovering spreadsheet structure...' : 'No columns detected. Verify this sheet tab is not empty.'}
               </div>
             )}
             
             {!sheetLoading && filteredRows.length === 0 && sheetRows.length > 0 && (
-              <div className="py-8 text-center text-xs text-slate-400">
+              <div className="py-8 text-center text-xs text-[#aaaaaa]">
                 No matching results found for search term "{searchTerm}".
               </div>
             )}
 
             {!googleToken && (
-              <div className="p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-850 flex flex-col items-center justify-center text-center space-y-3">
-                <span className="text-xs text-slate-500 max-w-sm">
+              <div className="p-6 bg-[#181818] border-t border-[#282828] flex flex-col items-center justify-center text-center space-y-3">
+                <span className="text-xs text-[#aaaaaa] max-w-sm">
                   You are currently logged in anonymously. To read and write directly to your live Google Sheets, click the button below to authorize.
                 </span>
-                <Button type="button" size="sm" onClick={signInWithGoogle}>
+                <Button type="button" size="sm" variant="primary" onClick={signInWithGoogle}>
                   Connect Google Workspace
                 </Button>
               </div>
@@ -1359,16 +1358,16 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
               <Button variant="ghost" size="sm" onClick={() => setSelectedRow(null)}>
                 Cancel
               </Button>
-              <Button onClick={handleEditRowSave} loading={syncing} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+              <Button onClick={handleEditRowSave} loading={syncing} size="sm" variant="primary">
                 Save Changes
               </Button>
             </>
           }
         >
           <div className="space-y-5 text-xs">
-            <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/40 rounded-lg text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
-              <span>Modifying record in tab: <strong className="font-mono">{activeTab}</strong></span>
-              <span className="text-[10px] font-mono bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded font-bold">ROW #{selectedRow?._rowNumber}</span>
+            <div className="p-3 bg-[#181818] border border-[#2e2e2e] rounded-lg text-[#aaaaaa] flex items-center justify-between">
+              <span>Modifying record in tab: <strong className="font-mono text-white">{activeTab}</strong></span>
+              <span className="text-[10px] font-mono bg-[#272727] text-white border border-[#383838] px-2 py-0.5 rounded font-bold">ROW #{selectedRow?._rowNumber}</span>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1391,9 +1390,9 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                 
                 return (
                   <div key={header} className="space-y-1.5">
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    <label className="block text-[11px] font-semibold text-[#aaaaaa] uppercase tracking-wide">
                       {header.replace(/_/g, ' ')}
-                      {isPrimaryId && <span className="ml-2 text-[9px] text-emerald-500 font-mono">PRIMARY KEY</span>}
+                      {isPrimaryId && <span className="ml-2 text-[9px] text-[#888888] font-mono">PRIMARY KEY</span>}
                     </label>
 
                     {isPrimaryId ? (
@@ -1402,7 +1401,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                         type="text"
                         value={editValues[idx] || ''}
                         readOnly
-                        className="w-full px-3 py-2.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-lg text-xs text-emerald-800 dark:text-emerald-300 font-mono font-bold cursor-not-allowed"
+                        className="w-full px-3 py-2.5 bg-[#181818] border border-[#333333] rounded-lg text-xs text-neutral-300 font-mono font-bold cursor-not-allowed"
                       />
                     ) : isForeignCustomer ? (
                       /* FOREIGN KEY: Customer_ID dropdown */
@@ -1413,7 +1412,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setEditValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Customer --</option>
                         {sheetRows.length > 0 && activeTab !== 'Customer_Master' ? (
@@ -1447,7 +1446,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setEditValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Vendor --</option>
                         {seedDataV2.Vendor_Master.map(v => (
@@ -1465,7 +1464,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setEditValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Purchase Order --</option>
                         {seedDataV2.Purchase_Orders.map(p => (
@@ -1483,7 +1482,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setEditValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Order --</option>
                         {seedDataV2.Orders_Log.map(o => (
@@ -1501,7 +1500,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setEditValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Select --</option>
                         {schemaDropdownOptions.map(opt => (
@@ -1518,7 +1517,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setEditValues(nextVals);
                         }}
-                        className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2.5 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       />
                     )}
                   </div>
@@ -1539,16 +1538,16 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
               <Button variant="ghost" size="sm" onClick={() => setIsAddOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleAddRowSave} loading={syncing} size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+              <Button onClick={handleAddRowSave} loading={syncing} size="sm" variant="primary">
                 Append Record
               </Button>
             </>
           }
         >
           <div className="space-y-5 text-xs">
-            <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/40 rounded-lg text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
-              <span>Appending to sheet tab: <strong className="font-mono">{activeTab}</strong></span>
-              <span className="text-[10px] font-mono bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded font-bold">AUTO-ID GENERATED</span>
+            <div className="p-3 bg-[#181818] border border-[#2e2e2e] rounded-lg text-[#aaaaaa] flex items-center justify-between">
+              <span>Appending to sheet tab: <strong className="font-mono text-white">{activeTab}</strong></span>
+              <span className="text-[10px] font-mono bg-[#272727] text-white border border-[#383838] px-2 py-0.5 rounded font-bold">AUTO-ID GENERATED</span>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1571,9 +1570,9 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                 
                 return (
                   <div key={header} className="space-y-1.5">
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
+                    <label className="block text-[11px] font-semibold text-[#aaaaaa] uppercase tracking-wide">
                       {header.replace(/_/g, ' ')}
-                      {isPrimaryId && <span className="ml-2 text-[9px] text-emerald-500 font-mono">AUTO-GENERATED</span>}
+                      {isPrimaryId && <span className="ml-2 text-[9px] text-[#888888] font-mono">AUTO-GENERATED</span>}
                     </label>
 
                     {isPrimaryId ? (
@@ -1582,7 +1581,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                         type="text"
                         value={newRowValues[idx] || ''}
                         readOnly
-                        className="w-full px-3 py-2.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-lg text-xs text-emerald-800 dark:text-emerald-300 font-mono font-bold cursor-not-allowed"
+                        className="w-full px-3 py-2.5 bg-[#181818] border border-[#333333] rounded-lg text-xs text-neutral-300 font-mono font-bold cursor-not-allowed"
                       />
                     ) : isForeignCustomer ? (
                       /* FOREIGN KEY: Customer_ID dropdown with auto-fill */
@@ -1606,7 +1605,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           
                           setNewRowValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Customer --</option>
                         {seedDataV2.Customer_Master.map(c => (
@@ -1624,7 +1623,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setNewRowValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Vendor --</option>
                         {seedDataV2.Vendor_Master.map(v => (
@@ -1642,7 +1641,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setNewRowValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Purchase Order --</option>
                         {seedDataV2.Purchase_Orders.map(p => (
@@ -1660,7 +1659,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setNewRowValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Choose Order --</option>
                         {seedDataV2.Orders_Log.map(o => (
@@ -1678,7 +1677,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setNewRowValues(nextVals);
                         }}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       >
                         <option value="">-- Select --</option>
                         {schemaDropdownOptions.map(opt => (
@@ -1696,7 +1695,7 @@ export const ModuleView: React.FC<ModuleViewProps> = ({ moduleId }) => {
                           nextVals[idx] = e.target.value;
                           setNewRowValues(nextVals);
                         }}
-                        className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 dark:bg-slate-950 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-xs text-slate-900 dark:text-slate-100 font-medium"
+                        className="w-full px-3 py-2.5 bg-[#121212] border border-[#383838] rounded-lg focus:outline-none focus:border-white text-xs text-white font-medium"
                       />
                     )}
                   </div>

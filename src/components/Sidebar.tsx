@@ -5,6 +5,7 @@ import { MODULE_REGISTRY } from '../services/modules';
 import { DynamicIcon } from './ui/DynamicIcon';
 import { StatusBadge } from './ui/StatusBadge';
 import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 // GUD Chocolates Vector Logo Component
 export const GudLogo: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 28 }) => (
@@ -258,29 +259,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
             <div className="flex justify-between items-center w-full">
               <button
                 onClick={signOutUser}
-                className="px-3.5 py-1.5 bg-red-600 hover:bg-red-750 text-white rounded-lg text-xs font-bold transition-all"
+                className="px-3.5 py-1.5 bg-[#cc0000] hover:bg-red-700 text-white rounded-xl text-xs font-semibold transition-all tactile-press"
               >
                 Sign Out / Log Out
               </button>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setIsProfileOpen(false)}
-                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all"
               >
                 Close
-              </button>
+              </Button>
             </div>
           }
         >
-          <div className="space-y-4 text-slate-700 dark:text-slate-200 text-xs">
-            <div className="flex items-center gap-3 pb-3 border-b border-slate-105 dark:border-slate-800">
-              <div className="w-12 h-12 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+          <div className="space-y-4 text-neutral-200 text-xs">
+            <div className="flex items-center gap-3 pb-3 border-b border-[#282828]">
+              <div className="w-12 h-12 rounded-full bg-[#383838] text-white flex items-center justify-center font-bold text-lg shadow-sm border border-[#444444]">
                 {profile.displayName ? profile.displayName.charAt(0).toUpperCase() : profile.email.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                <h4 className="font-bold text-sm text-white">
                   {profile.displayName || 'GUD Member'}
                 </h4>
-                <p className="text-[10px] text-emerald-800 dark:text-emerald-450 font-bold uppercase tracking-wider mt-0.5">
+                <p className="text-[10px] text-[#aaaaaa] font-semibold uppercase tracking-wider mt-0.5">
                   {profile.role}
                 </p>
               </div>
@@ -288,23 +290,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPath, onNavigate }) => 
 
             <div className="space-y-2">
               <p>
-                <strong>Email Address:</strong> <span className="font-mono text-slate-500 dark:text-slate-400">{profile.email}</span>
+                <strong className="text-white">Email Address:</strong> <span className="font-mono text-[#aaaaaa]">{profile.email}</span>
               </p>
               <p>
-                <strong>Account ID:</strong> <span className="font-mono text-slate-400">{profile.uid}</span>
+                <strong className="text-white">Account ID:</strong> <span className="font-mono text-[#aaaaaa]">{profile.uid}</span>
               </p>
               {user?.metadata.lastSignInTime && (
                 <p>
-                  <strong>Last Login Time:</strong> <span className="text-slate-500 dark:text-slate-400">{new Date(user.metadata.lastSignInTime).toLocaleString()}</span>
+                  <strong className="text-white">Last Login Time:</strong> <span className="text-[#aaaaaa]">{new Date(user.metadata.lastSignInTime).toLocaleString()}</span>
                 </p>
               )}
             </div>
 
             <div className="space-y-1 pt-2">
-              <strong className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Access Permissions</strong>
-              <div className="flex flex-wrap gap-1 max-h-[120px] overflow-y-auto p-1.5 bg-slate-50 dark:bg-slate-950 rounded-lg border border-slate-100 dark:border-slate-850">
+              <strong className="block text-[10px] uppercase font-bold text-[#aaaaaa] tracking-wider">Access Permissions</strong>
+              <div className="flex flex-wrap gap-1 max-h-[120px] overflow-y-auto p-2 bg-[#121212] rounded-xl border border-[#2e2e2e]">
                 {profile.permissions.map(perm => (
-                  <span key={perm} className="text-[9px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 font-mono">
+                  <span key={perm} className="text-[9px] bg-[#272727] border border-[#383838] px-2 py-0.5 rounded text-neutral-300 font-mono">
                     {perm}
                   </span>
                 ))}
