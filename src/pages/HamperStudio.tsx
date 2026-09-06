@@ -460,20 +460,34 @@ export const HamperStudio: React.FC = () => {
 
   const activeMath = activeProject ? calculateProjectMath(activeProject) : null;
 
+  const getItemThumbnail = (desc: string, category: string) => {
+    const d = desc.toLowerCase();
+    if (d.includes('almond')) return '/images/brand/prod_almond_art.png';
+    if (d.includes('peanut')) return '/images/brand/prod_peanut_art.png';
+    if (d.includes('orange')) return '/images/brand/prod_orange_art.png';
+    if (d.includes('lemon')) return '/images/brand/prod_lemon_art.png';
+    if (d.includes('sea salt') || d.includes('seasalt')) return '/images/brand/prod_almond_noir.png';
+    if (d.includes('mocha')) return '/images/brand/prod_peanut_royale.png';
+    if (d.includes('house boat') || d.includes('souvenir') || category === 'Souvenir') return '/images/brand/kerala_heritage_hamper.jpg';
+    if (d.includes('tin') || d.includes('chips') || category === 'Tins') return '/images/brand/artisan_bars_showcase.jpg';
+    if (category === 'Chocolate Box' || category === 'Packaging') return '/images/brand/luxury_hamper_showcase.jpg';
+    return '/images/brand/gud_showcase.jpg';
+  };
+
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-8 font-sans">
+    <div className="min-h-screen bg-[#070b14] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-8 font-sans">
       
       {/* ATELIER TOP HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-amber-500/15 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-800 pb-6">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 text-[10px] font-bold uppercase tracking-widest">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-widest">
               Confectionery & Corporate Atelier
             </span>
             <span className="text-slate-500 text-xs">v3.0 Executive</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1.5 flex items-center gap-3">
-            <Gift className="w-8 h-8 text-amber-400" />
+            <Gift className="w-8 h-8 text-emerald-400" />
             Hamper BOM Studio & Target-Cost Engine
           </h1>
           <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-2xl">
@@ -486,33 +500,33 @@ export const HamperStudio: React.FC = () => {
             onClick={handleSyncLiveCatalog} 
             disabled={loadingSync} 
             variant="outline" 
-            className="border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-xs h-9"
+            className="border-slate-800 bg-slate-900/80 hover:bg-slate-800 text-slate-300 text-xs h-9"
           >
-            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loadingSync ? 'animate-spin text-amber-400' : ''}`} /> 
+            <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loadingSync ? 'animate-spin text-emerald-400' : ''}`} /> 
             Sync Sheet Catalog
           </Button>
 
           <Button 
             onClick={() => setIsNewItemModalOpen(true)} 
-            className="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs font-semibold h-9"
+            className="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-semibold h-9"
           >
-            <Plus className="w-3.5 h-3.5 mr-1 text-amber-400" /> + Add Master SKU
+            <Plus className="w-3.5 h-3.5 mr-1 text-emerald-400" /> + Add Master SKU
           </Button>
 
           <Button 
             onClick={() => setIsModalOpen(true)} 
-            className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs shadow-lg shadow-amber-900/30 h-9"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/50 h-9"
           >
-            <Plus className="w-4 h-4 mr-1 text-slate-950 stroke-[3]" /> + New Hamper Project
+            <Plus className="w-4 h-4 mr-1 stroke-[3]" /> + New Hamper Project
           </Button>
         </div>
       </div>
 
       {/* TARGET-BUDGET REVERSE COSTING BAR */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-[#121824] border border-amber-500/30 p-5 sm:p-6 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-[#0b101d] border border-slate-800 p-5 sm:p-6 shadow-xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1.5 max-w-md">
-            <div className="flex items-center gap-2 text-amber-400 font-semibold text-xs uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs uppercase tracking-wider">
               <Sparkles className="w-4 h-4" /> Client Target Budget Matcher
             </div>
             <h2 className="text-lg sm:text-xl font-bold text-white">
@@ -525,27 +539,27 @@ export const HamperStudio: React.FC = () => {
 
           {/* Budget Input & Presets */}
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800">
+            <div className="flex items-center gap-2 bg-[#060911] p-1.5 rounded-xl border border-slate-800">
               <div className="px-3 py-1 text-xs text-slate-400 font-medium">Budget:</div>
               <div className="relative">
-                <span className="absolute left-2.5 top-2 text-amber-400 font-bold text-sm">₹</span>
+                <span className="absolute left-2.5 top-2 text-emerald-400 font-bold text-sm">₹</span>
                 <input 
                   type="number"
                   value={targetBudgetInput}
                   onChange={e => setTargetBudgetInput(Math.max(Number(e.target.value), 100))}
-                  className="w-28 pl-7 pr-2 py-1.5 bg-slate-900 border border-amber-500/40 rounded-lg text-white font-mono font-bold text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                  className="w-28 pl-7 pr-2 py-1.5 bg-[#0e1424] border border-slate-700 rounded-lg text-white font-mono font-bold text-sm focus:outline-none focus:border-emerald-500"
                 />
               </div>
               <div className="text-[10px] text-slate-500 font-semibold uppercase pr-2">incl GST</div>
             </div>
 
-            <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800">
+            <div className="flex items-center gap-2 bg-[#060911] p-1.5 rounded-xl border border-slate-800">
               <div className="px-3 py-1 text-xs text-slate-400 font-medium">Qty:</div>
               <input 
                 type="number"
                 value={targetQtyInput}
                 onChange={e => setTargetQtyInput(Math.max(Number(e.target.value), 1))}
-                className="w-20 px-2 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono font-bold text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 text-center"
+                className="w-20 px-2 py-1.5 bg-[#0e1424] border border-slate-700 rounded-lg text-white font-mono font-bold text-sm focus:outline-none focus:border-emerald-500 text-center"
               />
             </div>
 
@@ -558,10 +572,10 @@ export const HamperStudio: React.FC = () => {
                     setTargetBudgetInput(val);
                     setStudioTab('tier_recommender');
                   }}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all ${
                     targetBudgetInput === val 
-                      ? 'bg-amber-500 text-slate-950 font-bold' 
-                      : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300'
+                      ? 'bg-emerald-600 text-white font-bold shadow-sm' 
+                      : 'bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300'
                   }`}
                 >
                   ₹{val}
@@ -571,22 +585,22 @@ export const HamperStudio: React.FC = () => {
 
             <Button
               onClick={() => setStudioTab('tier_recommender')}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs h-10 px-4 shadow-md whitespace-nowrap"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-10 px-4 shadow-md whitespace-nowrap"
             >
-              <Sparkles className="w-4 h-4 mr-1.5 text-slate-950" /> Curate Tiers
+              <Sparkles className="w-4 h-4 mr-1.5" /> Curate Tiers
             </Button>
           </div>
         </div>
       </div>
 
       {/* STUDIO NAVIGATION TABS */}
-      <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-3">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           <button
             onClick={() => setStudioTab('workstation')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
               studioTab === 'workstation'
-                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
+                ? 'bg-[#0f172a] text-emerald-400 border border-emerald-500/40 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
             }`}
           >
@@ -595,20 +609,20 @@ export const HamperStudio: React.FC = () => {
 
           <button
             onClick={() => setStudioTab('tier_recommender')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
               studioTab === 'tier_recommender'
-                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
+                ? 'bg-[#0f172a] text-emerald-400 border border-emerald-500/40 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
             }`}
           >
-            <Layers className="w-4 h-4" /> 3-Tier Budget Architectures (Basic / Better / Premium)
+            <Layers className="w-4 h-4" /> 3-Tier Budget Architectures
           </button>
 
           <button
             onClick={() => setStudioTab('sourcing_pipeline')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
               studioTab === 'sourcing_pipeline'
-                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
+                ? 'bg-[#0f172a] text-emerald-400 border border-emerald-500/40 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
             }`}
           >
@@ -621,14 +635,14 @@ export const HamperStudio: React.FC = () => {
             <Button
               size="sm"
               onClick={() => setViewMode('proposal')}
-              className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs"
+              className="bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-300 border border-emerald-500/30 text-xs"
             >
               <FileText className="w-3.5 h-3.5 mr-1" /> Export Formal Proposal
             </Button>
             <Button
               size="sm"
               onClick={() => setViewMode('delivery')}
-              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs"
+              className="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs"
             >
               <Truck className="w-3.5 h-3.5 mr-1" /> Delivery Note
             </Button>
@@ -638,8 +652,8 @@ export const HamperStudio: React.FC = () => {
 
       {/* TAB 1: 3-TIER COMPARISON MATRIX */}
       {studioTab === 'tier_recommender' && (
-        <div className="space-y-6 animate-fade-in-up">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0c111d] p-4 rounded-xl border border-slate-800">
             <div>
               <h3 className="text-sm font-bold text-white">
                 Tier Comparison Matrix for Target Budget: ₹{targetBudgetInput.toLocaleString('en-IN')} incl. GST ({targetQtyInput} hampers)
@@ -649,7 +663,7 @@ export const HamperStudio: React.FC = () => {
               </p>
             </div>
             <div className="text-xs text-slate-400 font-mono">
-              Total Order Revenue: <span className="text-amber-400 font-bold">₹{(targetBudgetInput * targetQtyInput).toLocaleString('en-IN')}</span>
+              Total Order Revenue: <span className="text-emerald-400 font-bold">₹{(targetBudgetInput * targetQtyInput).toLocaleString('en-IN')}</span>
             </div>
           </div>
 
@@ -660,8 +674,23 @@ export const HamperStudio: React.FC = () => {
                 className={`relative rounded-2xl bg-gradient-to-b ${recipe.colorScheme.bg} border ${recipe.colorScheme.border} p-5 flex flex-col justify-between shadow-2xl transition-all hover:scale-[1.01]`}
               >
                 <div>
+                  {/* Hero Showcase Image */}
+                  {recipe.image && (
+                    <div className="w-full h-40 rounded-xl overflow-hidden mb-4 border border-white/10 relative group">
+                      <img 
+                        src={recipe.image} 
+                        alt={recipe.tierName} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                      <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white uppercase tracking-wider bg-slate-950/80 px-2 py-0.5 rounded border border-white/20">
+                        {recipe.recommendedBox.name}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-950/80 border border-white/10 text-slate-200">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-700 text-slate-200">
                       {recipe.badge}
                     </span>
                     <span className={`text-xs font-mono font-bold ${recipe.colorScheme.text}`}>
@@ -673,7 +702,7 @@ export const HamperStudio: React.FC = () => {
                   <p className="text-xs text-slate-400 mt-1 min-h-[36px]">{recipe.tagline}</p>
 
                   {/* Pricing Overview */}
-                  <div className="bg-slate-950/70 p-3.5 rounded-xl border border-white/5 my-4 space-y-2">
+                  <div className="bg-[#080c14] p-3.5 rounded-xl border border-slate-800/80 my-4 space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-slate-400">Client Quote:</span>
                       <span className="text-base font-bold font-mono text-white">₹{recipe.clientQuoteInclGst.toLocaleString('en-IN')} <span className="text-[10px] text-slate-400 font-normal">incl GST</span></span>
@@ -709,7 +738,7 @@ export const HamperStudio: React.FC = () => {
                   <div className="space-y-1.5 mb-6">
                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Curated Components:</div>
                     {recipe.lineItems.map((li, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b border-white/5 text-slate-300">
+                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b border-slate-800/60 text-slate-300">
                         <div className="truncate max-w-[200px]" title={li.catalogItem.description}>
                           {li.qty}x {li.catalogItem.description}
                         </div>
@@ -721,7 +750,7 @@ export const HamperStudio: React.FC = () => {
 
                 <Button
                   onClick={() => handleApplyCuratedTier(recipe)}
-                  className="w-full bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs py-2.5 shadow-md flex items-center justify-center gap-1.5"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 shadow-md flex items-center justify-center gap-1.5"
                 >
                   Apply {recipe.tier} Tier to Workstation <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
@@ -735,8 +764,8 @@ export const HamperStudio: React.FC = () => {
       {studioTab === 'workstation' && (
         <div className="space-y-6">
           {projects.length === 0 ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 space-y-4">
-              <Gift className="w-12 h-12 text-amber-400/60 mx-auto" />
+            <div className="bg-[#0c111d] border border-slate-800 rounded-2xl p-12 text-center text-slate-400 space-y-4">
+              <Gift className="w-12 h-12 text-emerald-400/60 mx-auto" />
               <div>
                 <h3 className="text-lg font-bold text-white">No Corporate Hamper Projects Created Yet</h3>
                 <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
@@ -744,7 +773,7 @@ export const HamperStudio: React.FC = () => {
                 </p>
               </div>
               <div className="flex justify-center gap-3">
-                <Button onClick={() => setStudioTab('tier_recommender')} className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs">
+                <Button onClick={() => setStudioTab('tier_recommender')} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
                   <Sparkles className="w-3.5 h-3.5 mr-1" /> Use Target Budget Generator
                 </Button>
                 <Button onClick={() => setIsModalOpen(true)} variant="outline" className="text-slate-300 border-slate-700 text-xs">
@@ -761,7 +790,7 @@ export const HamperStudio: React.FC = () => {
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Client Projects</h3>
                   <button 
                     onClick={() => setIsModalOpen(true)}
-                    className="text-xs text-amber-400 hover:text-amber-300 font-semibold"
+                    className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold"
                   >
                     + New
                   </button>
@@ -777,19 +806,19 @@ export const HamperStudio: React.FC = () => {
                         onClick={() => setActiveProject(p)}
                         className={`p-4 rounded-xl border cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-amber-950/25 border-amber-500/50 shadow-md'
-                            : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 text-slate-300'
+                            ? 'bg-[#0c1524] border-emerald-500/80 shadow-md'
+                            : 'bg-[#0c111d] border-slate-800 hover:border-slate-700 text-slate-300'
                         }`}
                       >
                         <div className="flex justify-between items-start">
                           <span className="font-bold text-sm text-white">{p.projectName}</span>
-                          <span className="text-[10px] font-mono bg-slate-950 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">
+                          <span className="text-[10px] font-mono bg-slate-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
                             {p.id}
                           </span>
                         </div>
                         <div className="text-xs text-slate-400 mt-1">Client: <strong>{p.clientName}</strong></div>
 
-                        <div className="flex justify-between items-center mt-3 pt-2.5 border-t border-slate-800/70 font-mono text-xs">
+                        <div className="flex justify-between items-center mt-3 pt-2.5 border-t border-slate-800 font-mono text-xs">
                           <span className="text-slate-400">Net Profit:</span>
                           <span className="text-emerald-400 font-bold">₹{math.netProfit.toLocaleString('en-IN')} ({math.grossMarginPercent}%)</span>
                         </div>
@@ -800,10 +829,10 @@ export const HamperStudio: React.FC = () => {
 
                 {/* Packaging Box Selection for Active Project */}
                 {activeProject && activeMath && (
-                  <div className="bg-[#121824] p-4 rounded-xl border border-slate-800 space-y-3">
+                  <div className="bg-[#0c111d] p-4 rounded-xl border border-slate-800 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                        <Box className="w-3.5 h-3.5 text-amber-400" /> Container / Box Fit
+                        <Box className="w-3.5 h-3.5 text-emerald-400" /> Container / Box Fit
                       </span>
                       <span className="text-[10px] font-mono text-slate-400">
                         {activeMath.totalVolumeUnits} / {activeMath.activeBox.maxVolumeUnits} units
@@ -813,7 +842,7 @@ export const HamperStudio: React.FC = () => {
                     <select
                       value={activeProject.selectedBoxId || 'BOX-1012'}
                       onChange={e => updateProjectState({ ...activeProject, selectedBoxId: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 font-medium"
+                      className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 font-medium focus:outline-none focus:border-emerald-500"
                     >
                       {STANDARD_BOX_SPECS.map(box => (
                         <option key={box.id} value={box.id}>
@@ -864,37 +893,37 @@ export const HamperStudio: React.FC = () => {
                   
                   {/* Financial KPI Summary Cards */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="bg-[#121824] p-3.5 rounded-xl border border-slate-800">
+                    <div className="bg-[#0c111d] p-3.5 rounded-xl border border-slate-800">
                       <div className="text-[11px] text-slate-400 font-medium">Client Quote Total</div>
                       <div className="text-lg font-bold font-mono text-white mt-1">₹{activeMath.totalClientQuote.toLocaleString('en-IN')}</div>
                       <div className="text-[10px] text-slate-500">Incl. Taxes & Logistics</div>
                     </div>
 
-                    <div className="bg-[#121824] p-3.5 rounded-xl border border-slate-800">
+                    <div className="bg-[#0c111d] p-3.5 rounded-xl border border-slate-800">
                       <div className="text-[11px] text-slate-400 font-medium">Our Total Outflow</div>
                       <div className="text-lg font-bold font-mono text-slate-300 mt-1">₹{(activeMath.ourFinalCost + activeMath.totalExpenses).toLocaleString('en-IN')}</div>
                       <div className="text-[10px] text-slate-500">BOM + Expenses</div>
                     </div>
 
-                    <div className="bg-gradient-to-b from-emerald-950/30 to-[#121824] p-3.5 rounded-xl border border-emerald-500/30">
+                    <div className="bg-gradient-to-b from-emerald-950/40 to-[#0c111d] p-3.5 rounded-xl border border-emerald-500/40">
                       <div className="text-[11px] text-emerald-400 font-medium">True Net Profit</div>
                       <div className="text-lg font-bold font-mono text-emerald-300 mt-1">₹{activeMath.netProfit.toLocaleString('en-IN')}</div>
                       <div className="text-[10px] text-emerald-400 font-bold">{activeMath.grossMarginPercent}% Net Margin</div>
                     </div>
 
-                    <div className="bg-[#121824] p-3.5 rounded-xl border border-slate-800">
+                    <div className="bg-[#0c111d] p-3.5 rounded-xl border border-slate-800">
                       <div className="text-[11px] text-slate-400 font-medium">Hamper Components</div>
-                      <div className="text-lg font-bold font-mono text-amber-400 mt-1">{activeProject.lineItems.length} SKUs</div>
+                      <div className="text-lg font-bold font-mono text-emerald-400 mt-1">{activeProject.lineItems.length} SKUs</div>
                       <div className="text-[10px] text-slate-500">{activeMath.totalVolumeUnits} volume units</div>
                     </div>
                   </div>
 
                   {/* Interactive Hamper Tray Canvas */}
-                  <div className="bg-[#121824] rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                  <div className="bg-[#0c111d] rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                     <div className="p-4 bg-slate-950/60 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                          <Box className="w-4 h-4 text-amber-400" />
+                          <Box className="w-4 h-4 text-emerald-400" />
                           Hamper Assembly Canvas ({activeProject.lineItems.length} Items)
                         </h3>
                         <p className="text-[11px] text-slate-400 mt-0.5">
@@ -906,7 +935,7 @@ export const HamperStudio: React.FC = () => {
                         <Button 
                           size="sm"
                           onClick={() => setIsCatalogPickerOpen(true)}
-                          className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs h-8"
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs h-8 shadow-sm"
                         >
                           <Plus className="w-3.5 h-3.5 mr-1" /> + Add Items from Catalog
                         </Button>
@@ -921,29 +950,28 @@ export const HamperStudio: React.FC = () => {
                         <Button
                           size="sm"
                           onClick={() => setIsCatalogPickerOpen(true)}
-                          className="bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs mt-2"
+                          className="bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs mt-2"
                         >
                           Open Component Picker
                         </Button>
                       </div>
                     ) : (
-                      <div className="divide-y divide-slate-800/80">
+                      <div className="divide-y divide-slate-800">
                         {activeProject.lineItems.map(item => (
                           <div key={item.id} className="p-3.5 hover:bg-slate-900/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
-                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded uppercase ${
-                                item.category === 'Chocolates' || item.category === 'Chocolate Box'
-                                  ? 'bg-amber-950/70 text-amber-300 border border-amber-800/60'
-                                  : item.category === 'Souvenir'
-                                    ? 'bg-purple-950/70 text-purple-300 border border-purple-800/60'
-                                    : item.category === 'Tins'
-                                      ? 'bg-orange-950/70 text-orange-300 border border-orange-800/60'
-                                      : 'bg-slate-800 text-slate-300 border border-slate-700'
-                              }`}>
-                                {item.category}
-                              </span>
+                              <img 
+                                src={getItemThumbnail(item.description, item.category)} 
+                                alt={item.description}
+                                className="w-10 h-10 rounded-lg object-cover bg-slate-950 border border-slate-800 shrink-0" 
+                              />
                               <div>
-                                <div className="text-xs font-semibold text-white">{item.description}</div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[9px] font-semibold px-2 py-0.5 rounded uppercase bg-slate-800 text-slate-300 border border-slate-700">
+                                    {item.category}
+                                  </span>
+                                  <span className="text-xs font-semibold text-white">{item.description}</span>
+                                </div>
                                 <div className="text-[11px] text-slate-400 font-mono mt-0.5">
                                   Our Cost: ₹{item.ourUnitCost} + {item.gstRate}% GST | Total BOM: ₹{(item.qty * item.ourUnitCost).toFixed(2)}
                                 </div>
@@ -951,12 +979,12 @@ export const HamperStudio: React.FC = () => {
                             </div>
 
                             {/* Steppers & Client Quote Inputs */}
-                            <div className="flex items-center gap-4 self-end sm:self-auto">
+                            <div className="flex items-center gap-3 self-end sm:self-auto">
                               {/* Qty Stepper */}
-                              <div className="flex items-center bg-slate-950 border border-slate-800 rounded-lg overflow-hidden">
+                              <div className="flex items-center bg-[#060911] border border-slate-700 rounded-lg overflow-hidden">
                                 <button
                                   onClick={() => handleUpdateItemProperty(item.description, 'qty', Math.max(item.qty - 1, 1))}
-                                  className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-800 text-xs font-bold"
+                                  className="px-2.5 py-1 text-slate-400 hover:text-white hover:bg-slate-800 text-xs font-bold"
                                 >
                                   -
                                 </button>
@@ -965,7 +993,7 @@ export const HamperStudio: React.FC = () => {
                                 </span>
                                 <button
                                   onClick={() => handleUpdateItemProperty(item.description, 'qty', item.qty + 1)}
-                                  className="px-2 py-1 text-slate-400 hover:text-white hover:bg-slate-800 text-xs font-bold"
+                                  className="px-2.5 py-1 text-slate-400 hover:text-white hover:bg-slate-800 text-xs font-bold"
                                 >
                                   +
                                 </button>
@@ -973,18 +1001,18 @@ export const HamperStudio: React.FC = () => {
 
                               {/* Client Unit Cost */}
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] text-slate-400">Quote ₹:</span>
+                                <span className="text-[10px] text-slate-400 font-medium">Quote ₹:</span>
                                 <input
                                   type="number"
                                   value={item.clientUnitCost}
                                   onChange={e => handleUpdateItemProperty(item.description, 'clientUnitCost', Number(e.target.value))}
-                                  className="w-20 px-2 py-1 bg-slate-950 border border-slate-800 rounded text-xs font-mono font-bold text-purple-300 text-right focus:outline-none focus:ring-1 focus:ring-amber-400"
+                                  className="w-20 px-2 py-1 bg-[#060911] border border-slate-700 rounded-lg text-xs font-mono font-bold text-emerald-300 text-right focus:outline-none focus:border-emerald-500"
                                 />
                               </div>
 
                               <button
                                 onClick={() => handleRemoveLineItem(item.id)}
-                                className="text-slate-500 hover:text-rose-400 p-1 transition-colors"
+                                className="text-slate-500 hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -996,11 +1024,11 @@ export const HamperStudio: React.FC = () => {
                   </div>
 
                   {/* Operational Expenses Section */}
-                  <div className="bg-[#121824] p-5 rounded-2xl border border-slate-800 space-y-4">
-                    <div className="flex justify-between items-center">
+                  <div className="bg-[#0c111d] p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                          <Truck className="w-3.5 h-3.5 text-amber-400" /> Operational & Assembly Expenses
+                          <Truck className="w-3.5 h-3.5 text-emerald-400" /> Operational & Assembly Expenses
                         </h4>
                         <p className="text-[11px] text-slate-400 mt-0.5">
                           Logistics, porter, and delivery costs incurred from our end reduce your net margin.
@@ -1010,14 +1038,14 @@ export const HamperStudio: React.FC = () => {
                       {/* Quick Presets */}
                       <div className="flex items-center gap-1.5">
                         <button
-                          onClick={() => handleAddExpense({ desc: 'Local Travel / Delivery Delivery', amount: 300, category: 'Travel', billable: false })}
-                          className="px-2 py-1 rounded bg-slate-900 border border-amber-500/30 text-amber-300 hover:bg-slate-800 text-[11px] font-semibold"
+                          onClick={() => handleAddExpense({ desc: 'Local Travel / Delivery', amount: 300, category: 'Travel', billable: false })}
+                          className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 hover:bg-slate-800 text-[11px] font-semibold"
                         >
                           + Travel (₹300 - Absorbed)
                         </button>
                         <button
                           onClick={() => handleAddExpense({ desc: 'Courier Express Cargo', amount: 450, category: 'Courier', billable: true })}
-                          className="px-2 py-1 rounded bg-slate-900 border border-purple-500/30 text-purple-300 hover:bg-slate-800 text-[11px] font-semibold"
+                          className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 hover:bg-slate-800 text-[11px] font-semibold"
                         >
                           + Courier (₹450 - Billed)
                         </button>
@@ -1028,7 +1056,7 @@ export const HamperStudio: React.FC = () => {
                     {activeProject.otherExpenses.length > 0 && (
                       <div className="space-y-2">
                         {activeProject.otherExpenses.map(exp => (
-                          <div key={exp.id} className="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs">
+                          <div key={exp.id} className="flex justify-between items-center bg-[#060911] p-2.5 rounded-lg border border-slate-800 text-xs">
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 uppercase font-semibold">
                                 {exp.category || 'Other'}
@@ -1039,16 +1067,16 @@ export const HamperStudio: React.FC = () => {
                             <div className="flex items-center gap-3">
                               <button
                                 onClick={() => handleToggleExpenseBillable(exp.id)}
-                                className={`px-2 py-0.5 rounded text-[10px] font-semibold border transition-all ${
+                                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-semibold border transition-all ${
                                   exp.billableToClient 
-                                    ? 'bg-purple-950/70 text-purple-300 border-purple-700' 
-                                    : 'bg-amber-950/60 text-amber-300 border-amber-800'
+                                    ? 'bg-emerald-950/70 text-emerald-300 border-emerald-700' 
+                                    : 'bg-slate-800 text-slate-300 border-slate-700'
                                 }`}
                               >
                                 {exp.billableToClient ? '✓ Billed to Client' : '🛡️ Absorbed by Us (Reduces Profit)'}
                               </button>
                               <span className="font-mono font-bold text-rose-400">₹{exp.amount}</span>
-                              <button onClick={() => handleRemoveExpense(exp.id)} className="text-slate-500 hover:text-rose-400">
+                              <button onClick={() => handleRemoveExpense(exp.id)} className="text-slate-500 hover:text-rose-400 p-1">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -1066,11 +1094,11 @@ export const HamperStudio: React.FC = () => {
 
       {/* TAB 3: SOURCING & DISCOVERY PIPELINE */}
       {studioTab === 'sourcing_pipeline' && (
-        <div className="space-y-6 animate-fade-in-up">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0c111d] p-4 rounded-xl border border-slate-800">
             <div>
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Compass className="w-4 h-4 text-amber-400" />
+                <Compass className="w-4 h-4 text-emerald-400" />
                 Discovery & Experimental Procurement Pipeline ({sourcingPipeline.length} Scouted Items)
               </h3>
               <p className="text-xs text-slate-400">
@@ -1095,10 +1123,10 @@ export const HamperStudio: React.FC = () => {
                   key={item.id}
                   className={`p-4 rounded-xl border flex flex-col justify-between transition-all ${
                     isApproved 
-                      ? 'bg-gradient-to-b from-emerald-950/20 to-[#121824] border-emerald-500/30' 
+                      ? 'bg-gradient-to-b from-emerald-950/20 to-[#0c111d] border-emerald-500/30' 
                       : item.status === 'Rejected'
                         ? 'bg-slate-950/40 border-slate-800/60 opacity-60'
-                        : 'bg-[#121824] border-slate-800'
+                        : 'bg-[#0c111d] border-slate-800'
                   }`}
                 >
                   <div>
@@ -1123,7 +1151,7 @@ export const HamperStudio: React.FC = () => {
                     <div className="text-xs text-slate-400 mt-1">Vendor: <strong>{item.vendorLead}</strong></div>
 
                     {/* Cost Specs */}
-                    <div className="bg-slate-950/80 p-2.5 rounded-lg border border-slate-800 my-3 grid grid-cols-2 gap-2 text-xs">
+                    <div className="bg-[#060911] p-2.5 rounded-lg border border-slate-800 my-3 grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <span className="text-slate-500 text-[10px]">Est. Base Cost:</span>
                         <div className="font-mono font-bold text-slate-200">₹{item.estUnitCost.toFixed(2)}</div>
@@ -1148,7 +1176,7 @@ export const HamperStudio: React.FC = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-2 border-t border-slate-800/80">
+                  <div className="pt-2 border-t border-slate-800">
                     {isInCatalog ? (
                       <div className="flex items-center justify-center gap-1 text-emerald-400 text-xs font-semibold py-1">
                         <CheckCircle2 className="w-3.5 h-3.5" /> In Active Production Catalog
@@ -1156,7 +1184,7 @@ export const HamperStudio: React.FC = () => {
                     ) : isApproved ? (
                       <Button
                         onClick={() => handlePromoteSourcedItem(item)}
-                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs py-2"
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2"
                       >
                         📥 Graduate to Active Catalog
                       </Button>
@@ -1184,7 +1212,7 @@ export const HamperStudio: React.FC = () => {
                 placeholder="Search catalog SKUs..."
                 value={catalogSearch}
                 onChange={e => setCatalogSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:ring-1 focus:ring-amber-400"
+                className="w-full pl-9 pr-3 py-1.5 bg-[#060911] border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
             <div className="flex items-center gap-1 overflow-x-auto">
@@ -1194,7 +1222,7 @@ export const HamperStudio: React.FC = () => {
                   onClick={() => setCatalogCategoryFilter(cat)}
                   className={`px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-all ${
                     catalogCategoryFilter === cat 
-                      ? 'bg-amber-500 text-slate-950' 
+                      ? 'bg-emerald-600 text-white' 
                       : 'bg-slate-900 text-slate-400 hover:text-white'
                   }`}
                 >
@@ -1219,16 +1247,21 @@ export const HamperStudio: React.FC = () => {
                     onClick={() => handleToggleCatalogItem(item, !isSelected)}
                     className={`p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
                       isSelected 
-                        ? 'bg-amber-950/25 border-amber-500/50 text-white' 
-                        : 'bg-slate-950 border-slate-800/80 hover:border-slate-700 text-slate-300'
+                        ? 'bg-[#0c1524] border-emerald-500/80 text-white' 
+                        : 'bg-[#060911] border-slate-800 hover:border-slate-700 text-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       {isSelected ? (
-                        <CheckSquare className="w-4 h-4 text-amber-400 shrink-0" />
+                        <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
                       ) : (
                         <Square className="w-4 h-4 text-slate-600 shrink-0" />
                       )}
+                      <img 
+                        src={getItemThumbnail(item.description, item.category)} 
+                        alt={item.description} 
+                        className="w-8 h-8 rounded-md object-cover bg-slate-950 border border-slate-800 shrink-0" 
+                      />
                       <div>
                         <div className="text-xs font-semibold">{item.description}</div>
                         <div className="text-[10px] text-slate-400 font-mono mt-0.5">
@@ -1247,7 +1280,7 @@ export const HamperStudio: React.FC = () => {
 
           <Button 
             onClick={() => setIsCatalogPickerOpen(false)} 
-            className="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs py-2 mt-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 mt-2"
           >
             Done Selecting Components
           </Button>
@@ -1268,7 +1301,7 @@ export const HamperStudio: React.FC = () => {
                   const defaultShelf = (cat === 'Chocolates' || cat === 'Chocolate Box') ? '6 Months' : 'N/A (Non-perishable)';
                   setNewItemForm({ ...newItemForm, category: cat, gstRate: defaultGst, shelfLife: defaultShelf });
                 }}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100"
+                className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500"
               >
                 <option value="Packaging">Packaging (Rigid Boxes, Bags, Shredded Paper)</option>
                 <option value="Chocolates">Chocolates (Bars & Confections)</option>
@@ -1284,7 +1317,7 @@ export const HamperStudio: React.FC = () => {
               <select
                 value={newItemForm.gstRate}
                 onChange={e => setNewItemForm({ ...newItemForm, gstRate: Number(e.target.value) as 5 | 18 })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100 font-mono"
+                className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
               >
                 <option value={5}>5% GST (Confectionery / Food items)</option>
                 <option value={18}>18% GST (Packaging, Boxes, Souvenirs & Services)</option>
@@ -1299,7 +1332,7 @@ export const HamperStudio: React.FC = () => {
               placeholder="e.g. Handmade Terracotta Diya / Gourmet Cashew Tin 150g"
               value={newItemForm.description}
               onChange={e => setNewItemForm({ ...newItemForm, description: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100"
+              className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500"
             />
           </div>
 
@@ -1311,7 +1344,7 @@ export const HamperStudio: React.FC = () => {
                 placeholder="45"
                 value={newItemForm.ourUnitCost || ''}
                 onChange={e => setNewItemForm({ ...newItemForm, ourUnitCost: Number(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100 font-mono"
+                className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -1322,7 +1355,7 @@ export const HamperStudio: React.FC = () => {
                 placeholder="90"
                 value={newItemForm.clientUnitCost || ''}
                 onChange={e => setNewItemForm({ ...newItemForm, clientUnitCost: Number(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-purple-400 font-bold font-mono"
+                className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-emerald-400 font-bold font-mono focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
@@ -1335,7 +1368,7 @@ export const HamperStudio: React.FC = () => {
                 placeholder="e.g. 6 Months / N/A (Non-perishable)"
                 value={newItemForm.shelfLife}
                 onChange={e => setNewItemForm({ ...newItemForm, shelfLife: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100 text-xs"
+                className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 text-xs focus:outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -1346,7 +1379,7 @@ export const HamperStudio: React.FC = () => {
                 placeholder="50"
                 value={newItemForm.inStockQty || ''}
                 onChange={e => setNewItemForm({ ...newItemForm, inStockQty: Number(e.target.value) })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100 font-mono text-xs"
+                className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 font-mono text-xs focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
@@ -1354,7 +1387,7 @@ export const HamperStudio: React.FC = () => {
           <Button 
             onClick={handleAddNewCatalogItem} 
             disabled={savingNewItem}
-            className="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2.5 mt-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 mt-2 shadow-sm"
           >
             {savingNewItem ? 'Saving & Appending to Google Sheet...' : '✓ Add Item & Append to Google Sheet'}
           </Button>
@@ -1371,7 +1404,7 @@ export const HamperStudio: React.FC = () => {
               placeholder="e.g. Taj Hotel Onam Hamper 2026"
               value={projectName}
               onChange={e => setProjectName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100"
+              className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500"
             />
           </div>
           <div>
@@ -1381,10 +1414,10 @@ export const HamperStudio: React.FC = () => {
               placeholder="e.g. Taj Malabar Resort & Spa"
               value={clientName}
               onChange={e => setClientName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-100"
+              className="w-full bg-[#060911] border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500"
             />
           </div>
-          <Button onClick={handleCreateProject} className="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2.5">
+          <Button onClick={handleCreateProject} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 shadow-sm">
             Create Project & Open Atelier Workstation
           </Button>
         </div>

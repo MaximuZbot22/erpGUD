@@ -23,12 +23,12 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl select-none tactile-press cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none';
   
   const variants = {
-    primary: 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/40 border border-emerald-500/30',
-    secondary: 'bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 border border-slate-700/70',
-    gold: 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold shadow-md shadow-amber-950/30 border border-amber-400/40',
-    outline: 'bg-transparent border border-slate-700/80 hover:bg-slate-800/60 text-slate-200 hover:text-white',
-    danger: 'bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-950/40 border border-rose-500/30',
-    ghost: 'bg-transparent hover:bg-slate-800/60 text-slate-300 hover:text-white border border-transparent',
+    primary: 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm border border-emerald-500/40',
+    secondary: 'bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700',
+    gold: 'bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow-sm border border-emerald-400/30',
+    outline: 'bg-transparent border border-slate-700 hover:bg-slate-800 text-slate-200 hover:text-white',
+    danger: 'bg-rose-600 hover:bg-rose-500 text-white shadow-sm border border-rose-500/30',
+    ghost: 'bg-transparent hover:bg-slate-800 text-slate-300 hover:text-white border border-transparent',
   };
 
   const sizes = {

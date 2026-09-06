@@ -89,28 +89,25 @@
   animation: fadeInUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Glass card styling */
+/* Crisp, modern luxury panels - zero muddy blur or blurry overlays */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d1321;
+  border: 1px solid #1e293b;
 }
 
 .glass-panel-luxury {
-  background: radial-gradient(circle at top left, rgba(212, 175, 55, 0.04), transparent 60%), rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 175, 55, 0.15);
+  background: #0d1321;
+  border: 1px solid #334155;
 }
 
 /* Premium Card hover */
 .luxury-card {
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease, box-shadow 200ms ease;
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, box-shadow 160ms ease;
 }
 .luxury-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(212, 175, 55, 0.2);
+  border-color: #475569;
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.7);
 }
 
 /* ════════════════════════════════════════════════════════════════ */

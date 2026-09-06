@@ -35,6 +35,7 @@ export interface CuratedTierRecipe {
   netProfit: number;
   grossMarginPercent: number;
   badge: string;
+  image?: string;
   colorScheme: {
     bg: string;
     border: string;
@@ -119,18 +120,19 @@ export class HamperPricingEngine {
 
     const basicTier = this.calculateTierMetrics(
       'Basic',
-      'Essential Hamper',
-      'High-margin crowd pleaser with artisan confections & traditional bag packaging',
+      'Essential Confectionery Bag',
+      'High-margin crowd pleaser with artisan confections & traditional handcrafted bag',
       basicBox,
       basicItems,
       targetBudgetInclGst * 0.75, // Target 75% of budget
       absorbedExpensesPerHamper,
       'Value Pick (~45% Margin)',
+      '/images/brand/artisan_bars_showcase.jpg',
       {
-        bg: 'from-amber-950/30 to-slate-900',
-        border: 'border-amber-700/40',
-        text: 'text-amber-300',
-        accent: 'bg-amber-500'
+        bg: 'from-slate-900 to-[#0d1321]',
+        border: 'border-slate-800',
+        text: 'text-slate-300',
+        accent: 'bg-slate-700'
       }
     );
 
@@ -155,18 +157,19 @@ export class HamperPricingEngine {
 
     const betterTier = this.calculateTierMetrics(
       'Better',
-      'Signature Heritage Hamper',
-      'The executive standard: Luxury rigid box, assorted confections, and handcrafted souvenir',
+      'Signature Heritage Rigid Box',
+      'The executive standard: Luxury rigid box, assorted confections, and handcrafted Kerala souvenir',
       betterBox,
       betterItems,
       targetBudgetInclGst, // Exact client target
       absorbedExpensesPerHamper,
       'Most Popular (Balanced)',
+      '/images/brand/luxury_hamper_showcase.jpg',
       {
-        bg: 'from-emerald-950/30 to-slate-900',
-        border: 'border-emerald-600/50',
-        text: 'text-emerald-300',
-        accent: 'bg-emerald-500'
+        bg: 'from-emerald-950/20 via-slate-900 to-[#0d1321]',
+        border: 'border-emerald-500/40',
+        text: 'text-emerald-400',
+        accent: 'bg-emerald-600'
       }
     );
 
@@ -193,18 +196,19 @@ export class HamperPricingEngine {
 
     const premiumTier = this.calculateTierMetrics(
       'Premium',
-      'Connoisseur Luxury Hamper',
-      'VIP Tier: 8-Piece Luxury Box, Rosewood Houseboat, Gourmet Tins & Bespoke Packaging',
+      'Connoisseur Royal VIP Hamper',
+      'VIP Tier: 8-Piece Luxury Box, Rosewood Houseboat, Gourmet Tins & Bespoke Handcrafted Presentation',
       premiumBox,
       premiumItems,
       Math.max(targetBudgetInclGst * 1.35, 1250), // 35% upsell tier
       absorbedExpensesPerHamper,
       'VIP Luxury Upgrade',
+      '/images/brand/kerala_heritage_hamper.jpg',
       {
-        bg: 'from-purple-950/40 to-slate-900',
-        border: 'border-purple-600/50',
-        text: 'text-purple-300',
-        accent: 'bg-purple-500'
+        bg: 'from-slate-900 via-[#0a1512] to-[#0d1321]',
+        border: 'border-emerald-400/50',
+        text: 'text-emerald-300',
+        accent: 'bg-emerald-500'
       }
     );
 
@@ -228,6 +232,7 @@ export class HamperPricingEngine {
     suggestedClientQuoteInclGst: number,
     absorbedExpenses: number,
     badge: string,
+    image: string,
     colorScheme: { bg: string; border: string; text: string; accent: string }
   ): CuratedTierRecipe {
     let ourBOMGoodsCost = 0;
@@ -267,6 +272,7 @@ export class HamperPricingEngine {
       netProfit,
       grossMarginPercent,
       badge,
+      image,
       colorScheme
     };
   }

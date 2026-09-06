@@ -840,63 +840,63 @@ CIN: U72200KL2015PTC039279
   return (
     <div className="space-y-6 pb-20">
       {/* Top Banner (Hidden on Print) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl border border-amber-500/20 shadow-xl print:hidden glass-panel-luxury">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0f172a] p-5 rounded-2xl border border-slate-800 shadow-lg print:hidden">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-heading">
+            <span className="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-heading">
               GUD Billing Engine
             </span>
-            <span className="text-xs text-slate-400">GST Compliant Billing</span>
+            <span className="text-xs text-slate-400">GST 5% & 18% Multi-Tier</span>
           </div>
-          <h1 className="text-2xl font-bold text-white mt-1 font-heading">
+          <h1 className="text-xl font-bold text-white mt-1 font-heading">
             Invoice Studio & Generator
           </h1>
-          <p className="text-xs text-slate-300/80 mt-1">
-            Build bespoke invoices with flavor counters, custom pricing, Google Drive export, and live Google Sheets sync.
+          <p className="text-xs text-slate-400 mt-0.5">
+            Create wholesale invoices, customize pricing presets, export PDF & Drive documents, and sync to Google Sheets.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {draftSavedAlert && (
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-full animate-fade-in-up flex items-center gap-1">
-              <span>💾</span> Draft Saved (Auto)
+            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-md flex items-center gap-1">
+              <span>💾</span> Saved
             </span>
           )}
-          <Button variant="ghost" size="sm" onClick={handleClearToBlankForm} className="text-xs text-rose-400 hover:bg-rose-500/10 border border-rose-500/20">
+          <Button variant="ghost" size="sm" onClick={handleClearToBlankForm} className="text-xs text-rose-400 hover:bg-rose-500/10 border border-slate-800">
             <Trash2 className="w-3.5 h-3.5" />
             <span>Clear</span>
           </Button>
           {!googleToken && (
-            <Button variant="outline" size="sm" onClick={signInWithGoogle} className="text-xs border-amber-500/30 text-amber-300 hover:bg-amber-500/10">
+            <Button variant="outline" size="sm" onClick={signInWithGoogle} className="text-xs border-slate-700 text-slate-300 hover:text-white">
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Connect Drive</span>
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={handleSaveToGoogleDocs} disabled={exportingDocs} className="text-xs border-slate-700/80">
+          <Button variant="outline" size="sm" onClick={handleSaveToGoogleDocs} disabled={exportingDocs} className="text-xs border-slate-700 text-slate-300 hover:text-white">
             <FolderPlus className="w-3.5 h-3.5" />
             <span>{exportingDocs ? 'Saving...' : 'Save to Drive'}</span>
           </Button>
           <Button 
-            variant="gold"
+            variant="primary"
             size="sm" 
             onClick={handleDownloadPdf} 
             disabled={pdfStatus === 'generating'} 
-            className="text-xs"
+            className="text-xs font-bold"
           >
             <Download className={`w-3.5 h-3.5 ${pdfStatus === 'generating' ? 'animate-spin' : ''}`} />
             <span>{pdfStatus === 'generating' ? 'Generating PDF...' : 'Download PDF'}</span>
           </Button>
-          <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs border-slate-700/80">
+          <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs border-slate-700 text-slate-300 hover:text-white">
             <Printer className="w-3.5 h-3.5" />
             <span>Print</span>
           </Button>
           {invoiceMode === 'new' ? (
-            <Button variant="primary" size="sm" onClick={handleSaveAndPushOrder} disabled={saving} className="text-xs">
+            <Button variant="secondary" size="sm" onClick={handleSaveAndPushOrder} disabled={saving} className="text-xs border-slate-700 text-emerald-400">
               <Save className="w-3.5 h-3.5" />
               <span>{saving ? 'Syncing...' : 'Save & Log'}</span>
             </Button>
           ) : (
-            <span className="px-3 py-1.5 text-[11px] font-bold text-amber-300 bg-amber-500/10 rounded-xl border border-amber-500/30">
+            <span className="px-3 py-1.5 text-[11px] font-bold text-slate-300 bg-slate-800 rounded-lg border border-slate-700">
               📋 From-Sheet Mode
             </span>
           )}
@@ -1126,28 +1126,40 @@ CIN: U72200KL2015PTC039279
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
               {/* Rate Presets & Custom Input */}
-              <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="bg-[#090e1a] p-3 rounded-xl border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-slate-700 dark:text-slate-300">Unit Rate (₹/bar)</span>
-                  <div className="flex items-center gap-1">
+                  <span className="font-semibold text-slate-300">Unit Rate (₹/bar)</span>
+                  <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => setBarUnitPrice(150)}
-                      className="px-2 py-0.5 text-[10px] rounded bg-slate-200 dark:bg-slate-700 font-medium hover:bg-slate-300"
+                      className={`px-2.5 py-1 text-[11px] rounded-lg font-mono font-semibold transition-colors ${
+                        barUnitPrice === 150 
+                          ? 'bg-emerald-600 text-white shadow-sm' 
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      }`}
                     >
                       Std ₹150
                     </button>
                     <button
                       type="button"
                       onClick={() => setBarUnitPrice(130)}
-                      className="px-2 py-0.5 text-[10px] rounded bg-amber-100 dark:bg-amber-900 text-amber-900 dark:text-amber-200 font-medium hover:bg-amber-200"
+                      className={`px-2.5 py-1 text-[11px] rounded-lg font-mono font-semibold transition-colors ${
+                        barUnitPrice === 130 
+                          ? 'bg-emerald-600 text-white shadow-sm' 
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      }`}
                     >
                       BNI ₹130
                     </button>
                     <button
                       type="button"
                       onClick={() => setBarUnitPrice(120)}
-                      className="px-2 py-0.5 text-[10px] rounded bg-emerald-100 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200 font-medium hover:bg-emerald-200"
+                      className={`px-2.5 py-1 text-[11px] rounded-lg font-mono font-semibold transition-colors ${
+                        barUnitPrice === 120 
+                          ? 'bg-emerald-600 text-white shadow-sm' 
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      }`}
                     >
                       GVQ ₹120
                     </button>
@@ -1157,46 +1169,49 @@ CIN: U72200KL2015PTC039279
                   type="number"
                   value={barUnitPrice}
                   onChange={e => setBarUnitPrice(Number(e.target.value))}
-                  className="w-full rounded border border-slate-300 dark:border-slate-700 p-1.5 text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                  className="w-full rounded-lg border border-slate-700 p-1.5 text-xs bg-slate-950 text-white font-mono font-semibold focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
-              {/* 7 Flavors Grid — direct number input for quick entry */}
+              {/* 7 Flavors Grid — crisp, high-contrast steppers with product visual */}
               <div className="space-y-2">
                 {[
-                  { key: 'almond', label: 'Almond Noir' },
-                  { key: 'peanut', label: 'Peanut Royale' },
-                  { key: 'orange', label: 'Orange Sunset' },
-                  { key: 'lemon', label: 'Sun-Kissed Lemon' },
-                  { key: 'seaSalt', label: 'Indian Sea Salt' },
-                  { key: 'mocha', label: 'Midnight Mocha' },
-                  { key: 'jackfruit', label: 'Malabar Jackfruit' },
-                ].map(({ key, label }) => {
+                  { key: 'almond', label: 'Almond Noir', img: '/images/brand/prod_almond_art.png' },
+                  { key: 'peanut', label: 'Peanut Royale', img: '/images/brand/prod_peanut_art.png' },
+                  { key: 'orange', label: 'Orange Sunset', img: '/images/brand/prod_orange_art.png' },
+                  { key: 'lemon', label: 'Sun-Kissed Lemon', img: '/images/brand/prod_lemon_art.png' },
+                  { key: 'seaSalt', label: 'Indian Sea Salt', img: '/images/brand/prod_almond_noir.png' },
+                  { key: 'mocha', label: 'Midnight Mocha', img: '/images/brand/prod_peanut_royale.png' },
+                  { key: 'jackfruit', label: 'Malabar Jackfruit', img: '/images/brand/prod_orange_sunset.png' },
+                ].map(({ key, label, img }) => {
                   const fk = key as keyof FlavorCounts;
                   return (
-                    <div key={key} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60">
-                      <span className="font-medium text-slate-800 dark:text-slate-200 flex-1">{label}</span>
-                      <div className="flex items-center gap-1.5">
+                    <div key={key} className="flex items-center justify-between p-2.5 rounded-xl bg-[#090e1a] border border-slate-800 hover:border-slate-700 transition-colors">
+                      <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                        <img src={img} alt={label} className="w-7 h-7 object-contain rounded-md bg-slate-950 p-0.5 border border-slate-800 shrink-0" />
+                        <span className="font-semibold text-slate-200 text-xs truncate">{label}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
                           onClick={() => adjustFlavor(fk, -1)}
-                          className="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-300"
+                          className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 font-bold active:scale-95 transition-transform"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-3.5 h-3.5" />
                         </button>
                         <input
                           type="number"
                           min="0"
                           value={flavors[fk]}
                           onChange={e => setFlavors(prev => ({ ...prev, [fk]: Math.max(0, parseInt(e.target.value) || 0) }))}
-                          className="w-14 text-center font-bold font-mono text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 text-xs"
+                          className="w-12 text-center font-bold font-mono text-white bg-slate-950 border border-slate-700 rounded-lg py-1 text-xs focus:outline-none focus:border-emerald-500"
                         />
                         <button
                           type="button"
                           onClick={() => adjustFlavor(fk, 1)}
-                          className="w-6 h-6 rounded bg-emerald-600 text-white flex items-center justify-center font-bold hover:bg-emerald-700"
+                          className="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -1207,94 +1222,95 @@ CIN: U72200KL2015PTC039279
           </Card>
 
           {/* Interactive Boxes & Hampers Counters & Custom Rates */}
+          {/* Interactive Boxes & Hampers Counters & Custom Rates */}
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">Boxes & Gift Hampers (Editable Rates)</CardTitle>
+            <CardHeader className="pb-3 border-b border-slate-800">
+              <CardTitle className="text-sm font-semibold text-white">Boxes & Gift Hampers (Editable Rates)</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 text-xs">
+            <CardContent className="space-y-3 text-xs pt-3">
               {/* Gift Hamper */}
-              <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="p-3 rounded-xl bg-[#090e1a] border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-800 dark:text-slate-200">Gift Hamper</div>
+                  <div className="font-semibold text-slate-200">Gift Hamper</div>
                   <div className="flex items-center gap-1.5">
                     <button type="button" onClick={() => setHamperQty(Math.max(0, hamperQty - 1))}
-                      className="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold hover:bg-slate-300">
-                      <Minus className="w-3 h-3" />
+                      className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center font-bold text-slate-300 active:scale-95 transition-transform">
+                      <Minus className="w-3.5 h-3.5" />
                     </button>
                     <input type="number" min="0" value={hamperQty}
                       onChange={e => setHamperQty(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-14 text-center font-bold font-mono bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 text-xs text-slate-900 dark:text-slate-100" />
+                      className="w-12 text-center font-bold font-mono bg-slate-950 border border-slate-700 rounded-lg py-1 text-xs text-white" />
                     <button type="button" onClick={() => setHamperQty(hamperQty + 1)}
-                      className="w-6 h-6 rounded bg-emerald-600 text-white flex items-center justify-center font-bold hover:bg-emerald-700">
-                      <Plus className="w-3 h-3" />
+                      className="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
+                      <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">Rate (₹/Hamper):</span>
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-850">
+                  <span className="text-slate-400 font-medium">Rate (₹/Hamper):</span>
                   <input
                     type="number"
                     value={hamperUnitPrice}
                     onChange={e => setHamperUnitPrice(Number(e.target.value))}
-                    className="w-28 rounded border border-slate-300 dark:border-slate-700 p-1 text-right font-mono text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                    className="w-28 rounded-lg border border-slate-700 p-1 text-right font-mono text-xs bg-slate-950 text-white focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               {/* 6-Piece Box */}
-              <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="p-3 rounded-xl bg-[#090e1a] border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-800 dark:text-slate-200">6-Piece Box</div>
+                  <div className="font-semibold text-slate-200">6-Piece Box</div>
                   <div className="flex items-center gap-1.5">
                     <button type="button" onClick={() => setBox6Qty(Math.max(0, box6Qty - 1))}
-                      className="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold hover:bg-slate-300">
-                      <Minus className="w-3 h-3" />
+                      className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center font-bold text-slate-300 active:scale-95 transition-transform">
+                      <Minus className="w-3.5 h-3.5" />
                     </button>
                     <input type="number" min="0" value={box6Qty}
                       onChange={e => setBox6Qty(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-14 text-center font-bold font-mono bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 text-xs text-slate-900 dark:text-slate-100" />
+                      className="w-12 text-center font-bold font-mono bg-slate-950 border border-slate-700 rounded-lg py-1 text-xs text-white" />
                     <button type="button" onClick={() => setBox6Qty(box6Qty + 1)}
-                      className="w-6 h-6 rounded bg-emerald-600 text-white flex items-center justify-center font-bold hover:bg-emerald-700">
-                      <Plus className="w-3 h-3" />
+                      className="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
+                      <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">Rate (₹/box):</span>
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-850">
+                  <span className="text-slate-400 font-medium">Rate (₹/box):</span>
                   <input
                     type="number"
                     value={box6UnitPrice}
                     onChange={e => setBox6UnitPrice(Number(e.target.value))}
-                    className="w-28 rounded border border-slate-300 dark:border-slate-700 p-1 text-right font-mono text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                    className="w-28 rounded-lg border border-slate-700 p-1 text-right font-mono text-xs bg-slate-950 text-white focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               {/* 8-Piece Box */}
-              <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+              <div className="p-3 rounded-xl bg-[#090e1a] border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="font-bold text-slate-800 dark:text-slate-200">8-Piece Box</div>
+                  <div className="font-semibold text-slate-200">8-Piece Box</div>
                   <div className="flex items-center gap-1.5">
                     <button type="button" onClick={() => setBox8Qty(Math.max(0, box8Qty - 1))}
-                      className="w-6 h-6 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold hover:bg-slate-300">
-                      <Minus className="w-3 h-3" />
+                      className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center font-bold text-slate-300 active:scale-95 transition-transform">
+                      <Minus className="w-3.5 h-3.5" />
                     </button>
                     <input type="number" min="0" value={box8Qty}
                       onChange={e => setBox8Qty(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-14 text-center font-bold font-mono bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-0.5 text-xs text-slate-900 dark:text-slate-100" />
+                      className="w-12 text-center font-bold font-mono bg-slate-950 border border-slate-700 rounded-lg py-1 text-xs text-white" />
                     <button type="button" onClick={() => setBox8Qty(box8Qty + 1)}
-                      className="w-6 h-6 rounded bg-emerald-600 text-white flex items-center justify-center font-bold hover:bg-emerald-700">
-                      <Plus className="w-3 h-3" />
+                      className="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-sm">
+                      <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">Rate (₹/box):</span>
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-850">
+                  <span className="text-slate-400 font-medium">Rate (₹/box):</span>
                   <input
                     type="number"
                     value={box8UnitPrice}
                     onChange={e => setBox8UnitPrice(Number(e.target.value))}
-                    className="w-28 rounded border border-slate-300 dark:border-slate-700 p-1 text-right font-mono text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                    className="w-28 rounded-lg border border-slate-700 p-1 text-right font-mono text-xs bg-slate-950 text-white focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
