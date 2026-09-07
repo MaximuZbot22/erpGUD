@@ -40,6 +40,53 @@ export const HamperDeliveryNoteDocument: React.FC<DeliveryNoteProps> = ({ projec
     }
   };
 
+  // Consolidate 25g bars into a single line item for compact packing list presentation
+  const consolidatedItems: Array<{
+    id: string;
+    category: string;
+    description: string;
+    qty: number;
+  }> = [];
+
+  const flavorBars: typeof project.lineItems = [];
+
+  project.lineItems.forEach(item => {
+    const d = item.description.toLowerCase();
+    const is25g = d.includes('(25g)') || d.includes('25 grm') || d.includes('25g') || 
+      ['sea salt', 'jackfruit', 'almond noir', 'orange sunset', 'mocha', 'lemon', 'peanut royale'].some(f => d.includes(f));
+
+    if (is25g && item.category === 'Chocolates') {
+      flavorBars.push(item);
+    } else {
+      consolidatedItems.push({
+        id: item.id,
+        category: item.category,
+        description: item.description,
+        qty: item.qty
+      });
+    }
+  });
+
+  if (flavorBars.length > 0) {
+    const totalBarsQty = flavorBars.reduce((sum, b) => sum + b.qty, 0);
+    const flavorBreakdown = flavorBars
+      .filter(b => b.qty > 0)
+      .map(b => {
+        const cleanName = b.description.replace(/\(25g\)/i, '').replace(/25 grm/i, '').trim();
+        return `${cleanName} x ${b.qty}`;
+      })
+      .join(', ');
+
+    consolidatedItems.unshift({
+      id: 'CONSOLIDATED-25G-BARS',
+      category: 'Chocolates',
+      description: flavorBars.length === 1 && flavorBars[0].qty > 0
+        ? flavorBars[0].description
+        : `25g Artisan Chocolate Bars (${flavorBreakdown})`,
+      qty: totalBarsQty
+    });
+  }
+
   const totalItemsCount = project.lineItems.reduce((acc, i) => acc + i.qty, 0);
 
   return (
@@ -65,60 +112,60 @@ export const HamperDeliveryNoteDocument: React.FC<DeliveryNoteProps> = ({ projec
       </div>
 
       {/* Printable A4 Delivery Note Sheet */}
-      <div ref={printRef} className="bg-white text-slate-900 p-10 rounded-xl shadow-2xl space-y-8 font-sans border border-slate-200 text-sm max-w-[794px] mx-auto box-border print:p-0 print:shadow-none print:border-none print:rounded-none">
+      <div ref={printRef} className="bg-white text-slate-900 p-8 rounded-xl shadow-2xl space-y-6 font-sans border border-slate-200 text-xs max-w-[794px] mx-auto box-border print:p-0 print:shadow-none print:border-none print:rounded-none">
         {/* Header */}
-        <div className="flex justify-between items-start border-b border-slate-200 pb-6">
+        <div className="flex justify-between items-start border-b border-slate-200 pb-4">
           <div>
-            <div className="flex items-center gap-2 text-emerald-800 font-bold text-2xl">
-              <GudLogo size={36} /> GUDORIA FOOD INNOVATIONS
+            <div className="flex items-center gap-2 text-emerald-800 font-bold text-xl">
+              <GudLogo size={32} /> GUDORIA FOOD INNOVATIONS
             </div>
-            <p className="text-xs text-slate-700 font-bold mt-1">Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038</p>
-            <p className="text-xs text-slate-500">Ph: 09544809992 • Email: gudchocolates@gmail.com</p>
+            <p className="text-[11px] text-slate-700 font-bold mt-1">Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038</p>
+            <p className="text-[11px] text-slate-500">Ph: 09544809992 • Email: gudchocolates@gmail.com</p>
           </div>
           <div className="text-right">
-            <h2 className="text-xl font-bold text-blue-900 uppercase tracking-wide">Hamper Delivery Note</h2>
-            <div className="text-xs font-mono text-slate-600 mt-1">Challan #: DEL-NOTE-{project.id}</div>
-            <div className="text-xs text-slate-500">Dispatch Date: {new Date().toISOString().split('T')[0]}</div>
+            <h2 className="text-lg font-bold text-blue-900 uppercase tracking-wide">Hamper Delivery Note</h2>
+            <div className="text-[11px] font-mono text-slate-600 mt-0.5">Challan #: DEL-NOTE-{project.id}</div>
+            <div className="text-[11px] text-slate-500">Dispatch Date: {new Date().toISOString().split('T')[0]}</div>
           </div>
         </div>
 
         {/* Delivery Details */}
-        <div className="grid grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+        <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-xs">
           <div>
             <div className="text-slate-400 uppercase font-bold text-[10px]">DELIVERED TO (CLIENT):</div>
-            <div className="text-base font-bold text-slate-900 mt-1">{project.clientName}</div>
-            <div className="text-slate-600">Corporate Delivery Address / Site</div>
+            <div className="text-sm font-bold text-slate-900 mt-0.5">{project.clientName}</div>
+            <div className="text-slate-600 text-[11px]">Corporate Delivery Address / Site</div>
           </div>
           <div>
             <div className="text-slate-400 uppercase font-bold text-[10px]">SHIPMENT DETAILS:</div>
-            <div className="text-base font-bold text-blue-900 mt-1">{project.projectName}</div>
-            <div className="text-slate-600">Total Packaged Units: <strong>{totalItemsCount} items / components</strong></div>
+            <div className="text-sm font-bold text-blue-900 mt-0.5">{project.projectName}</div>
+            <div className="text-slate-600 text-[11px]">Total Packaged Units: <strong>{totalItemsCount} items / components</strong></div>
           </div>
         </div>
 
         {/* Itemized Delivery Packing List */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <h3 className="font-bold text-slate-800 uppercase tracking-wider text-xs flex items-center gap-2">
             <PackageCheck className="w-4 h-4 text-blue-600" /> Dispatched Packing List & Component Verification
           </h3>
           <table className="w-full text-left border-collapse border border-slate-200 text-xs">
             <thead>
               <tr className="bg-blue-50 border-b border-slate-200 text-blue-950 font-bold">
-                <th className="p-3 border-r border-slate-200">#</th>
-                <th className="p-3 border-r border-slate-200">Category</th>
-                <th className="p-3 border-r border-slate-200">Item Description</th>
-                <th className="p-3 border-r border-slate-200 text-center">Dispatched Qty</th>
-                <th className="p-3 text-center">Verification Status</th>
+                <th className="py-2 px-3 border-r border-slate-200 text-center w-8">#</th>
+                <th className="py-2 px-3 border-r border-slate-200 w-24">Category</th>
+                <th className="py-2 px-3 border-r border-slate-200">Item Description</th>
+                <th className="py-2 px-3 border-r border-slate-200 text-center w-28">Dispatched Qty</th>
+                <th className="py-2 px-3 text-center w-36">Verification Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-800">
-              {project.lineItems.map((item, idx) => (
+              {consolidatedItems.map((item, idx) => (
                 <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="p-3 border-r border-slate-200 text-center font-mono">{idx + 1}</td>
-                  <td className="p-3 border-r border-slate-200 font-semibold text-blue-900">{item.category}</td>
-                  <td className="p-3 border-r border-slate-200">{item.description}</td>
-                  <td className="p-3 border-r border-slate-200 text-center font-bold text-base font-mono">{item.qty}</td>
-                  <td className="p-3 text-center font-semibold text-emerald-700">✓ Packed & Verified</td>
+                  <td className="py-2 px-3 border-r border-slate-200 text-center font-mono">{idx + 1}</td>
+                  <td className="py-2 px-3 border-r border-slate-200 font-semibold text-blue-900">{item.category}</td>
+                  <td className="py-2 px-3 border-r border-slate-200 font-medium">{item.description}</td>
+                  <td className="py-2 px-3 border-r border-slate-200 text-center font-bold font-mono">{item.qty}</td>
+                  <td className="py-2 px-3 text-center font-semibold text-emerald-700">✓ Packed & Verified</td>
                 </tr>
               ))}
             </tbody>

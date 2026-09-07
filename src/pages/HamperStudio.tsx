@@ -56,11 +56,74 @@ export interface TajHamperProject {
   notes?: string;
 }
 
+export const FLAVOR_CONFIG = [
+  { name: 'Indian Sea Salt (25g)', short: 'Sea Salt', sku: 'CAT-02-SEASALT', color: 'text-cyan-400', img: '/images/brand/prod_seasalt_art.png' },
+  { name: 'Malabar Jackfruit (25g)', short: 'Jackfruit', sku: 'CAT-02-JACKFRUIT', color: 'text-yellow-400', img: '/images/brand/prod_jackfruit_art.png' },
+  { name: 'Almond Noir (25g)', short: 'Almond', sku: 'CAT-02-ALMOND', color: 'text-amber-400', img: '/images/brand/prod_almond_art.png' },
+  { name: 'Orange Sunset (25g)', short: 'Orange', sku: 'CAT-02-ORANGE', color: 'text-orange-400', img: '/images/brand/prod_orange_art.png' },
+  { name: 'Mocha (25g)', short: 'Mocha', sku: 'CAT-02-MOCHA', color: 'text-amber-600', img: '/images/brand/prod_mocha_art.png' },
+  { name: 'Sun-Kissed Lemon (25g)', short: 'Lemon', sku: 'CAT-02-LEMON', color: 'text-lime-400', img: '/images/brand/prod_lemon_art.png' },
+  { name: 'Peanut Royale (25g)', short: 'Peanut', sku: 'CAT-02-PEANUT', color: 'text-stone-300', img: '/images/brand/prod_peanut_art.png' }
+];
+
+export const migrateProjectLegacyItems = (proj: TajHamperProject): TajHamperProject => {
+  let dirty = false;
+  const newLines: TajHamperLineItem[] = [];
+
+  for (const item of proj.lineItems) {
+    const d = item.description.toLowerCase();
+    const isLegacyComposite = d.includes('indian seasalt') && d.includes('malabar jackfruit');
+    const isGenericBar = d === '25 grm bar' || d === '25g bar';
+
+    if (isLegacyComposite || isGenericBar) {
+      dirty = true;
+      const qtyToDistribute = item.qty || 1;
+      const defaultFlavors = [
+        'Indian Sea Salt (25g)',
+        'Malabar Jackfruit (25g)',
+        'Almond Noir (25g)',
+        'Orange Sunset (25g)',
+        'Mocha (25g)'
+      ];
+
+      for (let i = 0; i < qtyToDistribute; i++) {
+        const flvName = defaultFlavors[i % defaultFlavors.length];
+        const existingInNew = newLines.find(l => l.description === flvName);
+        if (existingInNew) {
+          existingInNew.qty += 1;
+        } else {
+          newLines.push({
+            id: `LINE-${Date.now()}-${i}-${flvName.replace(/[^a-zA-Z0-9]/g, '')}`,
+            category: 'Chocolates',
+            description: flvName,
+            qty: 1,
+            ourUnitCost: 55,
+            clientUnitCost: item.clientUnitCost || 99,
+            gstRate: 5
+          });
+        }
+      }
+    } else {
+      newLines.push(item);
+    }
+  }
+
+  if (dirty) {
+    return { ...proj, lineItems: newLines };
+  }
+  return proj;
+};
+
 const STORAGE_KEY = 'gud_taj_hamper_projects_v2';
 
 export const HamperStudio: React.FC = () => {
   const [projects, setProjects] = useState<TajHamperProject[]>(() => {
-    return StorageEngine.getLocal<TajHamperProject[]>(STORAGE_KEY, []);
+    const list = StorageEngine.getLocal<TajHamperProject[]>(STORAGE_KEY, []);
+    const migrated = list.map(migrateProjectLegacyItems);
+    if (JSON.stringify(list) !== JSON.stringify(migrated)) {
+      StorageEngine.setLocal(STORAGE_KEY, migrated);
+    }
+    return migrated;
   });
 
   const [masterCatalog, setMasterCatalog] = useState<HamperCatalogItem[]>(() => {
@@ -73,7 +136,8 @@ export const HamperStudio: React.FC = () => {
 
   const [activeProject, setActiveProject] = useState<TajHamperProject | null>(() => {
     const list = StorageEngine.getLocal<TajHamperProject[]>(STORAGE_KEY, []);
-    return list.length > 0 ? list[0] : null;
+    const migrated = list.map(migrateProjectLegacyItems);
+    return migrated.length > 0 ? migrated[0] : null;
   });
 
   const [studioTab, setStudioTab] = useState<'workstation' | 'tier_recommender' | 'sourcing_pipeline'>('workstation');
@@ -141,6 +205,35 @@ export const HamperStudio: React.FC = () => {
     'Peanut Royale (25g)': 0
   });
   const [barCustomizerOpen, setBarCustomizerOpen] = useState(false);
+
+  // Sync selectedBars state when activeProject changes
+  useEffect(() => {
+    if (!activeProject) return;
+    const initialCounts: Record<string, number> = {
+      'Indian Sea Salt (25g)': 0,
+      'Malabar Jackfruit (25g)': 0,
+      'Almond Noir (25g)': 0,
+      'Orange Sunset (25g)': 0,
+      'Mocha (25g)': 0,
+      'Sun-Kissed Lemon (25g)': 0,
+      'Peanut Royale (25g)': 0
+    };
+
+    let hasAny25g = false;
+    activeProject.lineItems.forEach(item => {
+      const matched = FLAVOR_CONFIG.find(
+        f => f.name.toLowerCase() === item.description.toLowerCase()
+      );
+      if (matched) {
+        initialCounts[matched.name] = (initialCounts[matched.name] || 0) + item.qty;
+        hasAny25g = true;
+      }
+    });
+
+    if (hasAny25g) {
+      setSelectedBars(initialCounts);
+    }
+  }, [activeProject?.id]);
 
   // Compute active custom bar list from state
   const activeCustomBars = Object.entries(selectedBars)
@@ -343,6 +436,87 @@ export const HamperStudio: React.FC = () => {
     }
   };
 
+  // Synchronize 25g flavor qty changes with active project in real-time
+  const handleUpdateFlavorQty = (flavorName: string, newQty: number) => {
+    const updatedQty = Math.max(newQty, 0);
+    const nextBars = { ...selectedBars, [flavorName]: updatedQty };
+    setSelectedBars(nextBars);
+
+    if (activeProject) {
+      const existingIndex = activeProject.lineItems.findIndex(
+        l => l.description.toLowerCase() === flavorName.toLowerCase()
+      );
+
+      let updatedLineItems = [...activeProject.lineItems];
+
+      if (updatedQty === 0) {
+        if (existingIndex !== -1) {
+          updatedLineItems.splice(existingIndex, 1);
+        }
+      } else {
+        if (existingIndex !== -1) {
+          updatedLineItems[existingIndex] = {
+            ...updatedLineItems[existingIndex],
+            qty: updatedQty
+          };
+        } else {
+          const newLine: TajHamperLineItem = {
+            id: `LINE-${Date.now()}-${flavorName.replace(/[^a-zA-Z0-9]/g, '')}`,
+            category: 'Chocolates',
+            description: flavorName,
+            qty: updatedQty,
+            ourUnitCost: 55,
+            clientUnitCost: 99,
+            gstRate: 5
+          };
+          updatedLineItems.push(newLine);
+        }
+      }
+
+      updateProjectState({
+        ...activeProject,
+        lineItems: updatedLineItems
+      });
+    }
+  };
+
+  const handleApplyPreset = (preset: Record<string, number>) => {
+    setSelectedBars(preset);
+
+    if (activeProject) {
+      const non25gItems = activeProject.lineItems.filter(item => {
+        const is25g = FLAVOR_CONFIG.some(
+          f => f.name.toLowerCase() === item.description.toLowerCase()
+        );
+        const isLegacy = item.description.toLowerCase().includes('25g') || item.description.toLowerCase().includes('25 grm');
+        return !is25g && !isLegacy;
+      });
+
+      const new25gLines: TajHamperLineItem[] = [];
+      Object.entries(preset).forEach(([flvName, qty]) => {
+        if (qty > 0) {
+          const existing = activeProject.lineItems.find(
+            l => l.description.toLowerCase() === flvName.toLowerCase()
+          );
+          new25gLines.push({
+            id: existing ? existing.id : `LINE-${Date.now()}-${flvName.replace(/[^a-zA-Z0-9]/g, '')}`,
+            category: 'Chocolates',
+            description: flvName,
+            qty: qty,
+            ourUnitCost: 55,
+            clientUnitCost: existing?.clientUnitCost || 99,
+            gstRate: 5
+          });
+        }
+      });
+
+      updateProjectState({
+        ...activeProject,
+        lineItems: [...non25gItems, ...new25gLines]
+      });
+    }
+  };
+
   const handleUpdateItemProperty = (description: string, field: 'qty' | 'clientUnitCost' | 'gstRate', val: number) => {
     if (!activeProject) return;
     const updatedItems = activeProject.lineItems.map(l => {
@@ -352,11 +526,26 @@ export const HamperStudio: React.FC = () => {
       return l;
     });
     updateProjectState({ ...activeProject, lineItems: updatedItems });
+
+    if (field === 'qty') {
+      const matched = FLAVOR_CONFIG.find(f => f.name.toLowerCase() === description.toLowerCase());
+      if (matched) {
+        setSelectedBars(prev => ({ ...prev, [matched.name]: val }));
+      }
+    }
   };
 
   const handleRemoveLineItem = (lineId: string) => {
     if (!activeProject) return;
+    const itemToRemove = activeProject.lineItems.find(l => l.id === lineId);
     updateProjectState({ ...activeProject, lineItems: activeProject.lineItems.filter(l => l.id !== lineId) });
+
+    if (itemToRemove) {
+      const matched = FLAVOR_CONFIG.find(f => f.name.toLowerCase() === itemToRemove.description.toLowerCase());
+      if (matched) {
+        setSelectedBars(prev => ({ ...prev, [matched.name]: 0 }));
+      }
+    }
   };
 
   const handleAddExpense = (preset?: { desc: string; amount: number; category: any; billable: boolean }) => {
@@ -646,7 +835,7 @@ export const HamperStudio: React.FC = () => {
                 </p>
                 <div className="flex items-center gap-1.5">
                   <button
-                    onClick={() => setSelectedBars({
+                    onClick={() => handleApplyPreset({
                       'Indian Sea Salt (25g)': 1,
                       'Malabar Jackfruit (25g)': 1,
                       'Almond Noir (25g)': 0,
@@ -660,7 +849,7 @@ export const HamperStudio: React.FC = () => {
                     Reset Defaults
                   </button>
                   <button
-                    onClick={() => setSelectedBars({
+                    onClick={() => handleApplyPreset({
                       'Indian Sea Salt (25g)': 1,
                       'Malabar Jackfruit (25g)': 1,
                       'Almond Noir (25g)': 1,
@@ -711,10 +900,7 @@ export const HamperStudio: React.FC = () => {
 
                       <div className="flex items-center justify-between bg-[#101010] border border-[#333333] rounded-lg p-0.5">
                         <button
-                          onClick={() => setSelectedBars(prev => ({
-                            ...prev,
-                            [flv.name]: Math.max((prev[flv.name] || 0) - 1, 0)
-                          }))}
+                          onClick={() => handleUpdateFlavorQty(flv.name, currentQty - 1)}
                           className="w-6 h-6 flex items-center justify-center text-xs text-[#aaaaaa] hover:text-white hover:bg-[#252525] rounded transition-colors"
                         >
                           -
@@ -723,10 +909,7 @@ export const HamperStudio: React.FC = () => {
                           {currentQty}
                         </span>
                         <button
-                          onClick={() => setSelectedBars(prev => ({
-                            ...prev,
-                            [flv.name]: (prev[flv.name] || 0) + 1
-                          }))}
+                          onClick={() => handleUpdateFlavorQty(flv.name, currentQty + 1)}
                           className="w-6 h-6 flex items-center justify-center text-xs text-white hover:bg-[#252525] rounded transition-colors"
                         >
                           +
