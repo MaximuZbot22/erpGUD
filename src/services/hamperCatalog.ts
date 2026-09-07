@@ -169,7 +169,14 @@ const SOURCING_STORAGE_KEY = 'gud_hamper_sourcing_pipeline_v1';
 
 export const SEED_HAMPER_CATALOG: HamperCatalogItem[] = [
   { id: 'CAT-01', category: 'Tins', description: 'Banana chips, Sweet banana chips, Sharkaravarti (along with the design file)', defaultQty: 1, ourUnitCost: 41, gstRate: 18 },
-  { id: 'CAT-02', category: 'Chocolates', description: 'Indian Seasalt, Malabar Jackfruit , Almond Noir, Orange Sunset , Mocha (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02', category: 'Chocolates', description: '25 grm bar', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02-SEASALT', category: 'Chocolates', description: 'Indian Sea Salt (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02-JACKFRUIT', category: 'Chocolates', description: 'Malabar Jackfruit (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02-ALMOND', category: 'Chocolates', description: 'Almond Noir (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02-ORANGE', category: 'Chocolates', description: 'Orange Sunset (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02-MOCHA', category: 'Chocolates', description: 'Mocha (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02-LEMON', category: 'Chocolates', description: 'Sun-Kissed Lemon (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
+  { id: 'CAT-02-PEANUT', category: 'Chocolates', description: 'Peanut Royale (25g)', defaultQty: 1, ourUnitCost: 55, gstRate: 5 },
   { id: 'CAT-03', category: 'Souvenir', description: 'Kathakali Face Figurine', defaultQty: 1, ourUnitCost: 33, gstRate: 18 },
   { id: 'CAT-04', category: 'Souvenir', description: 'Visiri - Traditional Fan', defaultQty: 1, ourUnitCost: 35, gstRate: 18 },
   { id: 'CAT-05', category: 'Packaging', description: 'Onam Note Card', defaultQty: 1, ourUnitCost: 23, gstRate: 18 },
@@ -192,7 +199,30 @@ export class HamperCatalogService {
    * Get all master catalog items
    */
   static getCatalog(): HamperCatalogItem[] {
-    return StorageEngine.getLocal<HamperCatalogItem[]>(STORAGE_KEY, SEED_HAMPER_CATALOG);
+    let items = StorageEngine.getLocal<HamperCatalogItem[]>(STORAGE_KEY, SEED_HAMPER_CATALOG);
+    let dirty = false;
+
+    // Migrate old CAT-02 description to Google Sheet standard '25 grm bar'
+    items = items.map(it => {
+      if (it.id === 'CAT-02' && (it.description.includes('Indian Seasalt') || it.description.includes('Malabar Jackfruit'))) {
+        dirty = true;
+        return { ...it, description: '25 grm bar' };
+      }
+      return it;
+    });
+
+    // Ensure all individual 25g flavor SKUs are present
+    for (const seedItem of SEED_HAMPER_CATALOG) {
+      if (seedItem.id.startsWith('CAT-02-') && !items.some(i => i.id === seedItem.id)) {
+        items.push(seedItem);
+        dirty = true;
+      }
+    }
+
+    if (dirty) {
+      StorageEngine.setLocal(STORAGE_KEY, items);
+    }
+    return items;
   }
 
   /**

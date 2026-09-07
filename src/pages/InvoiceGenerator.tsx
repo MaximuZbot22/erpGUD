@@ -3,7 +3,7 @@ import { GudLogo } from '../components/Sidebar';
 import { 
   FileText, Plus, Minus, Trash2, Printer, CheckCircle, 
   Sparkles, DollarSign, Calculator, Download, Save, RefreshCw,
-  FolderPlus, Edit3, ArrowRight, Truck
+  FolderPlus, Edit3, ArrowRight, Truck, Pin, PinOff
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -12,6 +12,7 @@ import { GoogleSheetsService, GoogleDriveService } from '../services/google';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { exportElementToPdf, printIsolatedElement } from '../utils/documentExport';
+import { getAssetUrl } from '../utils/assetPath';
 
 interface InvoiceItem {
   id: string;
@@ -282,6 +283,26 @@ export const InvoiceGenerator: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [exportingDocs, setExportingDocs] = useState(false);
   const [draftSavedAlert, setDraftSavedAlert] = useState(false);
+
+  // Locked Invoice Preview mode: keep invoice pinned while editor controls scroll with blur fade
+  const [lockPreview, setLockPreview] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('gud_invoice_preview_locked');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleLockPreview = () => {
+    setLockPreview(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('gud_invoice_preview_locked', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // 7 Flavor Interactive Counters for 25g Bars — Default to ZERO for a clean slate
   const [flavors, setFlavors] = useState<FlavorCounts>({
@@ -845,6 +866,19 @@ CIN: U72200KL2015PTC039279
             <FolderPlus className="w-3.5 h-3.5" />
             <span>{exportingDocs ? 'Saving...' : 'Save to Drive'}</span>
           </Button>
+          <button
+            type="button"
+            onClick={toggleLockPreview}
+            className={`text-xs px-3 py-1.5 rounded-lg border font-semibold flex items-center gap-1.5 transition-all tactile-press ${
+              lockPreview
+                ? 'bg-[#2a2618] border-amber-500/40 text-amber-300 shadow-sm'
+                : 'bg-[#272727] border-[#383838] text-neutral-400 hover:text-white'
+            }`}
+            title={lockPreview ? "Invoice preview is locked in position while editing. Click to enable free scroll." : "Click to lock invoice preview in view while editing."}
+          >
+            {lockPreview ? <Pin className="w-3.5 h-3.5 text-amber-400 rotate-45" /> : <PinOff className="w-3.5 h-3.5 text-neutral-400" />}
+            <span>{lockPreview ? 'Locked View' : 'Free Scroll'}</span>
+          </button>
           <Button 
             variant="primary" 
             size="sm" 
@@ -872,9 +906,25 @@ CIN: U72200KL2015PTC039279
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Editor Controls (Hidden on Print) */}
-        <div className="lg:col-span-5 space-y-5 print:hidden">
+        <div className="lg:col-span-5 print:hidden relative">
+          <div className="relative">
+            {lockPreview && (
+              <div className="pointer-events-none sticky top-0 z-20 h-5 w-full bg-gradient-to-b from-[#0f0f0f] via-[#0f0f0f]/80 to-transparent backdrop-blur-[2px] transition-all rounded-t-xl" />
+            )}
+
+            <div 
+              className={`space-y-5 transition-all ${
+                lockPreview 
+                  ? 'lg:max-h-[calc(100vh-135px)] lg:overflow-y-auto lg:pr-2.5 pt-1 pb-10 scroll-smooth' 
+                  : ''
+              }`}
+              style={lockPreview ? {
+                maskImage: 'linear-gradient(to bottom, transparent 0px, black 28px, black calc(100% - 32px), transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 28px, black calc(100% - 32px), transparent 100%)'
+              } : undefined}
+            >
 
           {/* ── Mode Toggle & Quick Reset Action Bar ── */}
           <Card className="border border-[#262626]">
@@ -1170,13 +1220,13 @@ CIN: U72200KL2015PTC039279
               {/* 7 Flavors Grid — crisp, high-contrast steppers with product visual */}
               <div className="space-y-2">
                 {[
-                  { key: 'almond', label: 'Almond Noir', img: '/images/brand/prod_almond_art.png' },
-                  { key: 'peanut', label: 'Peanut Royale', img: '/images/brand/prod_peanut_art.png' },
-                  { key: 'orange', label: 'Orange Sunset', img: '/images/brand/prod_orange_art.png' },
-                  { key: 'lemon', label: 'Sun-Kissed Lemon', img: '/images/brand/prod_lemon_art.png' },
-                  { key: 'seaSalt', label: 'Indian Sea Salt', img: '/images/brand/prod_seasalt_art.png' },
-                  { key: 'mocha', label: 'Midnight Mocha', img: '/images/brand/prod_mocha_art.png' },
-                  { key: 'jackfruit', label: 'Malabar Jackfruit', img: '/images/brand/prod_jackfruit_art.png' },
+                  { key: 'almond', label: 'Almond Noir', img: getAssetUrl('/images/brand/prod_almond_art.png') },
+                  { key: 'peanut', label: 'Peanut Royale', img: getAssetUrl('/images/brand/prod_peanut_art.png') },
+                  { key: 'orange', label: 'Orange Sunset', img: getAssetUrl('/images/brand/prod_orange_art.png') },
+                  { key: 'lemon', label: 'Sun-Kissed Lemon', img: getAssetUrl('/images/brand/prod_lemon_art.png') },
+                  { key: 'seaSalt', label: 'Indian Sea Salt', img: getAssetUrl('/images/brand/prod_seasalt_art.png') },
+                  { key: 'mocha', label: 'Midnight Mocha', img: getAssetUrl('/images/brand/prod_mocha_art.png') },
+                  { key: 'jackfruit', label: 'Malabar Jackfruit', img: getAssetUrl('/images/brand/prod_jackfruit_art.png') },
                 ].map(({ key, label, img }) => {
                   const fk = key as keyof FlavorCounts;
                   return (
@@ -1235,7 +1285,7 @@ CIN: U72200KL2015PTC039279
               <div className="p-3 rounded-xl bg-[#0c0c0c] border border-[#262626] hover:border-[#404040] transition-all space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <img src="/images/brand/kerala_heritage_hamper.jpg" alt="Gift Hamper" className="w-8 h-8 object-cover rounded-md bg-[#181818] border border-[#303030] shrink-0" />
+                    <img src={getAssetUrl('/images/brand/kerala_heritage_hamper.jpg')} alt="Gift Hamper" className="w-8 h-8 object-cover rounded-md bg-[#181818] border border-[#303030] shrink-0" />
                     <div className="font-semibold text-white">Gift Hamper</div>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -1267,7 +1317,7 @@ CIN: U72200KL2015PTC039279
               <div className="p-3 rounded-xl bg-[#0c0c0c] border border-[#262626] hover:border-[#404040] transition-all space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <img src="/images/brand/prod_gift_6.jpg" alt="6-Piece Box" className="w-8 h-8 object-cover rounded-md bg-[#181818] border border-[#303030] shrink-0" />
+                    <img src={getAssetUrl('/images/brand/prod_gift_6.jpg')} alt="6-Piece Box" className="w-8 h-8 object-cover rounded-md bg-[#181818] border border-[#303030] shrink-0" />
                     <div className="font-semibold text-white">6-Piece Box</div>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -1299,7 +1349,7 @@ CIN: U72200KL2015PTC039279
               <div className="p-3 rounded-xl bg-[#0c0c0c] border border-[#262626] hover:border-[#404040] transition-all space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <img src="/images/brand/prod_gift_8.jpg" alt="8-Piece Box" className="w-8 h-8 object-cover rounded-md bg-[#181818] border border-[#303030] shrink-0" />
+                    <img src={getAssetUrl('/images/brand/prod_gift_8.jpg')} alt="8-Piece Box" className="w-8 h-8 object-cover rounded-md bg-[#181818] border border-[#303030] shrink-0" />
                     <div className="font-semibold text-white">8-Piece Box</div>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -1440,14 +1490,43 @@ CIN: U72200KL2015PTC039279
               </div>
             </CardContent>
           </Card>
+            </div>
+
+            {lockPreview && (
+              <div className="pointer-events-none sticky bottom-0 z-20 h-8 w-full bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/80 to-transparent backdrop-blur-[2px] transition-all -mt-8 rounded-b-xl" />
+            )}
+          </div>
         </div>
 
         {/* Printable Invoice Container (Isolated via #printable-invoice-container) */}
-        <div className="lg:col-span-7">
-          <div 
-            id="printable-invoice-container"
-            className="bg-white text-slate-900 p-8 rounded-xl shadow-lg border border-slate-200 font-sans text-xs max-w-[794px] mx-auto box-border"
-          >
+        <div className={`lg:col-span-7 transition-all ${lockPreview ? 'lg:sticky lg:top-4' : ''}`}>
+          {/* Header Bar for Live Preview Status & Pin Toggle (Print Hidden) */}
+          <div className="flex items-center justify-between pb-2.5 px-1 text-xs text-neutral-400 print:hidden">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-semibold text-neutral-200">Live Invoice Document</span>
+              <span className="text-[10px] text-neutral-500 font-mono">Standard A4</span>
+            </div>
+            <button
+              type="button"
+              onClick={toggleLockPreview}
+              className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium flex items-center gap-1.5 transition-all tactile-press ${
+                lockPreview
+                  ? 'bg-[#2a2618] border-amber-500/40 text-amber-300 shadow-sm'
+                  : 'bg-[#1a1a1a] border-[#2c2c2c] text-neutral-400 hover:text-white'
+              }`}
+              title={lockPreview ? "Invoice stays pinned in view while editing. Click to enable free scroll." : "Click to lock invoice in place."}
+            >
+              {lockPreview ? <Pin className="w-3 h-3 text-amber-400 rotate-45" /> : <PinOff className="w-3 h-3 text-neutral-500" />}
+              <span>{lockPreview ? 'Locked in View' : 'Free Scroll'}</span>
+            </button>
+          </div>
+
+          <div className={lockPreview ? 'lg:max-h-[calc(100vh-100px)] lg:overflow-y-auto pr-1' : ''}>
+            <div 
+              id="printable-invoice-container"
+              className="bg-white text-slate-900 p-8 rounded-xl shadow-lg border border-slate-200 font-sans text-xs max-w-[794px] mx-auto box-border"
+            >
             {/* Header */}
             <div className="flex justify-between items-start border-b border-slate-200 pb-4 mb-4">
               <div>
@@ -1590,7 +1669,7 @@ CIN: U72200KL2015PTC039279
               </div>
               <div className="text-right flex flex-col items-end justify-end space-y-1">
                 <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">For Gudoria Food Innovations Pvt Ltd</div>
-                <img src="/images/brand/founder_signature.jpg" alt="Founder Signature" className="h-12 max-w-[140px] object-contain my-1" />
+                <img src={getAssetUrl('/images/brand/founder_signature.jpg')} alt="Founder Signature" className="h-12 max-w-[140px] object-contain my-1" />
                 <div className="text-[10px] font-semibold text-slate-700">Authorized Signatory</div>
                 <div className="text-[9px] text-slate-400">Founder & Operations</div>
               </div>
@@ -1599,5 +1678,6 @@ CIN: U72200KL2015PTC039279
         </div>
       </div>
     </div>
+  </div>
   );
 };

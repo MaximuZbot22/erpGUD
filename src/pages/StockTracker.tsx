@@ -10,6 +10,7 @@ import { Modal } from '../components/ui/Modal';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { GoogleSheetsService } from '../services/google';
+import { getAssetUrl } from '../utils/assetPath';
 
 export interface FlavorData {
   almond: number;
@@ -46,13 +47,13 @@ const FLAVOR_CONFIG: {
   dotColor: string; 
   image: string; 
 }[] = [
-  { key: 'almond', name: 'Almond Noir 25g', shortName: 'Almond', color: 'text-amber-400', dotColor: 'bg-amber-500', image: '/images/brand/prod_almond_art.png' },
-  { key: 'orange', name: 'Orange Sunset 25g', shortName: 'Orange', color: 'text-orange-400', dotColor: 'bg-orange-500', image: '/images/brand/prod_orange_art.png' },
-  { key: 'jackfruit', name: 'Malabar Jackfruit 25g', shortName: 'Jackfruit', color: 'text-yellow-400', dotColor: 'bg-yellow-400', image: '/images/brand/prod_jackfruit_art.png' },
-  { key: 'lemon', name: 'Sun-Kissed Lemon 25g', shortName: 'Lemon', color: 'text-lime-400', dotColor: 'bg-lime-400', image: '/images/brand/prod_lemon_art.png' },
-  { key: 'mocha', name: 'Midnight Mocha 25g', shortName: 'Mocha', color: 'text-amber-600', dotColor: 'bg-amber-700', image: '/images/brand/prod_mocha_art.png' },
-  { key: 'seaSalt', name: 'Indian Sea Salt 25g', shortName: 'Sea Salt', color: 'text-cyan-400', dotColor: 'bg-cyan-400', image: '/images/brand/prod_seasalt_art.png' },
-  { key: 'peanuts', name: 'Peanut Royale 25g', shortName: 'Peanuts', color: 'text-stone-300', dotColor: 'bg-stone-300', image: '/images/brand/prod_peanut_art.png' }
+  { key: 'almond', name: 'Almond Noir 25g', shortName: 'Almond', color: 'text-amber-400', dotColor: 'bg-amber-500', image: getAssetUrl('/images/brand/prod_almond_art.png') },
+  { key: 'orange', name: 'Orange Sunset 25g', shortName: 'Orange', color: 'text-orange-400', dotColor: 'bg-orange-500', image: getAssetUrl('/images/brand/prod_orange_art.png') },
+  { key: 'jackfruit', name: 'Malabar Jackfruit 25g', shortName: 'Jackfruit', color: 'text-yellow-400', dotColor: 'bg-yellow-400', image: getAssetUrl('/images/brand/prod_jackfruit_art.png') },
+  { key: 'lemon', name: 'Sun-Kissed Lemon 25g', shortName: 'Lemon', color: 'text-lime-400', dotColor: 'bg-lime-400', image: getAssetUrl('/images/brand/prod_lemon_art.png') },
+  { key: 'mocha', name: 'Midnight Mocha 25g', shortName: 'Mocha', color: 'text-amber-600', dotColor: 'bg-amber-700', image: getAssetUrl('/images/brand/prod_mocha_art.png') },
+  { key: 'seaSalt', name: 'Indian Sea Salt 25g', shortName: 'Sea Salt', color: 'text-cyan-400', dotColor: 'bg-cyan-400', image: getAssetUrl('/images/brand/prod_seasalt_art.png') },
+  { key: 'peanuts', name: 'Peanut Royale 25g', shortName: 'Peanuts', color: 'text-stone-300', dotColor: 'bg-stone-300', image: getAssetUrl('/images/brand/prod_peanut_art.png') }
 ];
 
 const parseSafeInt = (val: any): number => {

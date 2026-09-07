@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { TajHamperProject } from '../../pages/HamperStudio';
 import { GudLogo } from '../Sidebar';
 import { exportElementToPdf, printIsolatedElement } from '../../utils/documentExport';
+import { getAssetUrl } from '../../utils/assetPath';
 
 interface DeliveryNoteProps {
   project: TajHamperProject;
@@ -135,7 +136,7 @@ export const HamperDeliveryNoteDocument: React.FC<DeliveryNoteProps> = ({ projec
             <div className="border border-slate-300 p-4 rounded-lg bg-slate-50/50 space-y-2">
               <div className="font-bold text-slate-800">DISPATCHED BY (GUDORIA LOGISTICS):</div>
               <div className="py-2">
-                <img src="/images/brand/founder_signature.jpg" alt="Founder Signature" className="h-12 max-w-[150px] object-contain" />
+                <img src={getAssetUrl('/images/brand/founder_signature.jpg')} alt="Founder Signature" className="h-12 max-w-[150px] object-contain" />
               </div>
               <div className="text-[10px] text-slate-700 font-semibold border-t border-dashed border-slate-300 pt-1">Logistics Executive / Authorized Signatory</div>
             </div>

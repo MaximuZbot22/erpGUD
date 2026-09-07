@@ -33,20 +33,52 @@ const getFaviconSvg = (color: string) => `
 </svg>
 `;
 
+const getBaseRoute = () => {
+  if (typeof window === 'undefined') return '';
+  const pathname = window.location.pathname;
+  const match = pathname.match(/^(\/[a-zA-Z0-9_-]+)/);
+  const knownRoutes = [
+    '/dashboard', '/login', '/settings', '/tasks', '/calendar',
+    '/documents', '/invoice-generator', '/stock-checker', '/quotations',
+    '/sales-orders', '/delivery', '/procurement-manager', '/returns',
+    '/notes', '/hampers', '/user-management'
+  ];
+  if (match && !knownRoutes.includes(match[1])) {
+    return match[1];
+  }
+  return '';
+};
+
+const normalizePath = (rawPath: string) => {
+  const base = getBaseRoute();
+  if (base && rawPath.startsWith(base)) {
+    const stripped = rawPath.slice(base.length);
+    return stripped.startsWith('/') ? stripped : `/${stripped}`;
+  }
+  return rawPath || '/';
+};
+
 const AppContent: React.FC = () => {
   const { user, profile, loading } = useAuth();
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [currentPath, setCurrentPath] = useState(() => {
+    const norm = normalizePath(window.location.pathname);
+    return norm === '/' ? '/dashboard' : norm;
+  });
   const [searchQuery, setSearchQuery] = useState('');
 
   const navigate = (path: string) => {
-    window.history.pushState(null, '', path);
-    setCurrentPath(path);
+    const base = getBaseRoute();
+    const clean = path.startsWith('/') ? path : `/${path}`;
+    const fullPath = base ? `${base}${clean}` : clean;
+    window.history.pushState(null, '', fullPath);
+    setCurrentPath(clean);
   };
 
   // Sync with browser Back/Forward buttons
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+      const norm = normalizePath(window.location.pathname);
+      setCurrentPath(norm === '/' ? '/dashboard' : norm);
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -54,13 +86,16 @@ const AppContent: React.FC = () => {
 
   // Security Gate: Redirect anonymous visitors back to /login
   useEffect(() => {
+    const norm = normalizePath(window.location.pathname);
     if (!loading && (!user || !profile)) {
-      if (window.location.pathname !== '/login') {
-        window.history.replaceState(null, '', '/login');
+      if (norm !== '/login') {
+        const base = getBaseRoute();
+        window.history.replaceState(null, '', base ? `${base}/login` : '/login');
         setCurrentPath('/login');
       }
-    } else if (!loading && user && profile && window.location.pathname === '/login') {
-      window.history.replaceState(null, '', '/dashboard');
+    } else if (!loading && user && profile && (norm === '/login' || norm === '/')) {
+      const base = getBaseRoute();
+      window.history.replaceState(null, '', base ? `${base}/dashboard` : '/dashboard');
       setCurrentPath('/dashboard');
     }
   }, [user, profile, loading]);

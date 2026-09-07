@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Search, Plus, Truck, FileText, Trash2 } from 'lucide-react';
+import { ShoppingBag, Search, Plus, Truck, FileText, Trash2, Eye, Calendar, MapPin, DollarSign, Tag } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
+import { DetailSlideOver } from '../components/ui/DetailSlideOver';
 import { SalesOrder, SalesOrderStatus, CommercialLineItem } from '../types/commercial';
 import { ProductMasterService } from '../services/productMaster';
 import { StorageEngine } from '../services/storageEngine';
@@ -18,6 +19,7 @@ export const SalesOrderManager: React.FC<{ onNavigate?: (path: string) => void }
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [inspectingOrder, setInspectingOrder] = useState<SalesOrder | null>(null);
 
   // Form State for creating new Sales Order
   const [form, setForm] = useState({
@@ -167,6 +169,32 @@ export const SalesOrderManager: React.FC<{ onNavigate?: (path: string) => void }
         </div>
       </div>
 
+      {/* ERPNext-style Segmented Status Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 select-none">
+        {['All', 'Confirmed', 'InProduction', 'Dispatched', 'Fulfilled'].map(statusKey => {
+          const count = statusKey === 'All' ? orders.length : orders.filter(o => o.status === statusKey).length;
+          const isActive = statusFilter === statusKey;
+          return (
+            <button
+              key={statusKey}
+              onClick={() => setStatusFilter(statusKey)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] ${
+                isActive
+                  ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-700/60 shadow-sm'
+                  : 'bg-slate-900 text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-slate-800'
+              }`}
+            >
+              <span>{statusKey === 'InProduction' ? 'In Production' : statusKey}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
+                isActive ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Orders List / Empty State */}
       {filteredOrders.length === 0 ? (
         <Card className="bg-slate-900 border-slate-800 p-8 text-center text-slate-400">
@@ -180,11 +208,16 @@ export const SalesOrderManager: React.FC<{ onNavigate?: (path: string) => void }
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredOrders.map(so => (
-            <Card key={so.id} className="bg-slate-900 border-slate-800">
+            <Card 
+              key={so.id} 
+              hoverEffect 
+              className="bg-slate-900 hover:bg-slate-850 border-slate-800 hover:border-slate-700 transition-all cursor-pointer group"
+              onClick={() => setInspectingOrder(so)}
+            >
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-xs font-mono text-emerald-400 font-bold">{so.orderNumber}</span>
+                    <span className="text-xs font-mono text-emerald-400 font-bold group-hover:underline">{so.orderNumber}</span>
                     {so.customerPoNumber && (
                       <span className="block text-[10px] font-mono text-amber-400">Cust PO: {so.customerPoNumber}</span>
                     )}
@@ -200,22 +233,121 @@ export const SalesOrderManager: React.FC<{ onNavigate?: (path: string) => void }
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-xs text-slate-300">
-                <div className="text-slate-400">Address: {so.deliveryAddress}</div>
+                <div className="text-slate-400 truncate">Address: {so.deliveryAddress}</div>
                 <div className="border-t border-slate-800 pt-2 flex justify-between items-center">
                   <span className="text-slate-400">Order Value:</span>
                   <span className="text-sm font-bold font-mono text-emerald-400">₹{so.grandTotal.toLocaleString('en-IN')}</span>
                 </div>
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800" onClick={e => e.stopPropagation()}>
                   {so.status !== 'Fulfilled' && (
                     <Button size="sm" onClick={() => handleCreateDeliveryDispatch(so)} className="text-xs bg-emerald-600 hover:bg-emerald-500 text-white w-full">
                       <Truck className="w-3 h-3 mr-1" /> Create Delivery & Dispatch Stock
                     </Button>
                   )}
+                  <Button 
+                    variant="ghost" 
+                    size="xs" 
+                    onClick={() => setInspectingOrder(so)} 
+                    className="text-xs text-slate-400 hover:text-white w-full"
+                    leftIcon={<Eye className="w-3.5 h-3.5" />}
+                  >
+                    Inspect DocType Details
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+      )}
+
+      {/* ERPNext-style DocType Slide-over Inspector */}
+      {inspectingOrder && (
+        <DetailSlideOver
+          isOpen={Boolean(inspectingOrder)}
+          onClose={() => setInspectingOrder(null)}
+          title={inspectingOrder.customerName}
+          subtitle={`Sales Order Document • ${inspectingOrder.items.length} line items`}
+          docId={inspectingOrder.orderNumber}
+          status={inspectingOrder.status}
+          fields={[
+            {
+              label: 'Customer PO',
+              value: inspectingOrder.customerPoNumber || 'N/A',
+              copyable: Boolean(inspectingOrder.customerPoNumber)
+            },
+            {
+              label: 'Order Date',
+              value: inspectingOrder.date || new Date().toISOString().split('T')[0]
+            },
+            {
+              label: 'Grand Total',
+              value: <span className="font-mono text-emerald-400">₹{inspectingOrder.grandTotal.toLocaleString('en-IN')}</span>
+            },
+            {
+              label: 'Delivery Address',
+              value: inspectingOrder.deliveryAddress
+            }
+          ]}
+          actions={[
+            {
+              label: 'Create Delivery Note',
+              icon: <Truck className="w-3.5 h-3.5" />,
+              variant: 'primary',
+              onClick: () => {
+                handleCreateDeliveryDispatch(inspectingOrder);
+                setInspectingOrder(null);
+              }
+            },
+            {
+              label: 'Invoice Generator',
+              icon: <FileText className="w-3.5 h-3.5" />,
+              variant: 'secondary',
+              onClick: () => {
+                if (onNavigate) onNavigate('/invoice-generator');
+                setInspectingOrder(null);
+              }
+            }
+          ]}
+        >
+          {/* Line Items Table in Inspector */}
+          <div className="space-y-3">
+            <h4 className="text-xs uppercase font-bold text-zinc-400 tracking-wider">
+              Ordered Items Breakdown
+            </h4>
+            <div className="border border-[#2e2e2e] rounded-xl overflow-hidden bg-[#121212]">
+              <table className="w-full text-xs text-left text-zinc-300">
+                <thead className="bg-[#181818] border-b border-[#282828] text-[10px] uppercase font-mono text-zinc-400">
+                  <tr>
+                    <th className="px-3 py-2">Item</th>
+                    <th className="px-3 py-2 text-right">Qty</th>
+                    <th className="px-3 py-2 text-right">Rate</th>
+                    <th className="px-3 py-2 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#222222]">
+                  {inspectingOrder.items.map((it, idx) => (
+                    <tr key={idx} className="hover:bg-[#1a1a1a]">
+                      <td className="px-3 py-2">
+                        <p className="font-semibold text-white">{it.name}</p>
+                        <span className="text-[10px] font-mono text-zinc-500">{it.sku}</span>
+                      </td>
+                      <td className="px-3 py-2 text-right font-mono font-bold text-zinc-200">{it.qty}</td>
+                      <td className="px-3 py-2 text-right font-mono text-zinc-400">₹{it.unitPrice}</td>
+                      <td className="px-3 py-2 text-right font-mono font-bold text-emerald-400">₹{it.totalAmount.toLocaleString('en-IN')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {inspectingOrder.notes && (
+              <div className="p-3 bg-[#161616] rounded-xl border border-[#282828] text-xs text-zinc-400">
+                <span className="font-bold text-zinc-300 block mb-1">Internal Notes:</span>
+                {inspectingOrder.notes}
+              </div>
+            )}
+          </div>
+        </DetailSlideOver>
       )}
 
       {/* Modal */}

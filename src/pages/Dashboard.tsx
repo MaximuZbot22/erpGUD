@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { StatisticsCard } from '../components/ui/StatisticsCard';
+import { QuickActionBar } from '../components/ui/QuickActionBar';
 import { Table } from '../components/ui/Table';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { Button } from '../components/ui/Button';
@@ -16,6 +17,7 @@ import { collection, query, limit, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AuditLogEntry } from '../types/audit';
 import { GoogleSheetsService } from '../services/google';
+import { getAssetUrl } from '../utils/assetPath';
 
 export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ onNavigate }) => {
   const { profile, googleToken, signInWithGoogle } = useAuth();
@@ -180,14 +182,14 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
 
   // Brand products array for showcase widget
   const brandProducts = [
-    { name: 'Almond Noir (25g)', image: '/images/brand/prod_almond_art.png', tag: 'Wholesale Standard' },
-    { name: 'Orange Sunset (25g)', image: '/images/brand/prod_orange_art.png', tag: 'High Margin' },
-    { name: 'Peanut Royale (25g)', image: '/images/brand/prod_peanut_art.png', tag: 'Bestseller' },
-    { name: 'Sea Salt Noir (25g)', image: '/images/brand/prod_seasalt_art.png', tag: 'Artisan' },
-    { name: 'Mocha Espresso (25g)', image: '/images/brand/prod_mocha_art.png', tag: 'Gourmet' },
-    { name: 'Jackfruit Crunch (25g)', image: '/images/brand/prod_jackfruit_art.png', tag: 'Kerala Special' },
-    { name: 'Sun-Kissed Lemon (25g)', image: '/images/brand/prod_lemon_art.png', tag: 'Specialty' },
-    { name: '8-Piece Gift Box', image: '/images/brand/prod_gift_8.jpg', tag: 'Gift Suite' },
+    { name: 'Almond Noir (25g)', image: getAssetUrl('/images/brand/prod_almond_art.png'), tag: 'Wholesale Standard' },
+    { name: 'Orange Sunset (25g)', image: getAssetUrl('/images/brand/prod_orange_art.png'), tag: 'High Margin' },
+    { name: 'Peanut Royale (25g)', image: getAssetUrl('/images/brand/prod_peanut_art.png'), tag: 'Bestseller' },
+    { name: 'Sea Salt Noir (25g)', image: getAssetUrl('/images/brand/prod_seasalt_art.png'), tag: 'Artisan' },
+    { name: 'Mocha Espresso (25g)', image: getAssetUrl('/images/brand/prod_mocha_art.png'), tag: 'Gourmet' },
+    { name: 'Jackfruit Crunch (25g)', image: getAssetUrl('/images/brand/prod_jackfruit_art.png'), tag: 'Kerala Special' },
+    { name: 'Sun-Kissed Lemon (25g)', image: getAssetUrl('/images/brand/prod_lemon_art.png'), tag: 'Specialty' },
+    { name: '8-Piece Gift Box', image: getAssetUrl('/images/brand/prod_gift_8.jpg'), tag: 'Gift Suite' },
   ];
 
   return (
@@ -269,39 +271,54 @@ export const Dashboard: React.FC<{ onNavigate: (path: string) => void }> = ({ on
         </div>
       </div>
 
+      {/* ERPNext-style Quick Action Shortcuts */}
+      <QuickActionBar onNavigate={onNavigate} />
+
       {/* KPI Cards Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatisticsCard
           title="Active Clients"
           value={`${activeCustomersCount || 73}`}
           description="Customer Master directory"
+          badge="CRM"
           trend={{ value: 12.5, type: 'up' }}
+          subMetric={{ label: 'Status', value: 'Verified' }}
           sparklineData={[30, 32, 35, 34, 38, activeCustomersCount || 73]}
           icon={<Users className="w-5 h-5 text-neutral-300" />}
+          onClick={() => onNavigate('/modules/sales-customers/customers')}
         />
         <StatisticsCard
           title="Production Runs"
           value={`${activeProductionRuns || 8} Batches`}
-          description="Active outsourced batches"
+          description="Outsourced batches & stock"
+          badge="Stock"
           trend={{ value: 8.4, type: 'up' }}
+          subMetric={{ label: 'Active', value: 'TB 1202 & 1201' }}
           sparklineData={[5, 8, 6, 9, 7, activeProductionRuns || 8]}
           icon={<Factory className="w-5 h-5 text-neutral-300" />}
+          onClick={() => onNavigate('/stock-tracker')}
         />
         <StatisticsCard
           title="Accounts Payable"
           value={pendingPaymentsTotal > 0 ? `₹${pendingPaymentsTotal.toLocaleString()}` : '₹1,24,500'}
           description="Outstanding supplier balance"
+          badge="Finance"
           trend={{ value: 5.2, type: 'down' }}
+          subMetric={{ label: 'Due', value: '< 15 days' }}
           sparklineData={[200000, 180000, 150000, 160000, 130000, pendingPaymentsTotal || 124500]}
           icon={<DollarSign className="w-5 h-5 text-amber-400" />}
+          onClick={() => onNavigate('/procurement')}
         />
         <StatisticsCard
           title="Compliance Alerts"
           value={`${legalAlertsCount} Expiries`}
-          description="Licenses < 30 days"
+          description="Licenses & agreements"
+          badge="Admin"
           trend={{ value: 0, type: 'neutral' }}
+          subMetric={{ label: 'Action', value: 'Review Needed' }}
           sparklineData={[1, 2, 1, 0, 2, legalAlertsCount]}
           icon={<ShieldCheck className="w-5 h-5 text-emerald-400" />}
+          onClick={() => onNavigate('/modules/compliance-admin/legal')}
         />
       </div>
 

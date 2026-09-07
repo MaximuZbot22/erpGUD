@@ -26,6 +26,9 @@ jobs:
 
       - name: Build Production Bundle
         run: npm run build
+        env:
+          GITHUB_PAGES: 'true'
+          VITE_BASE_PATH: '/erpGUD/'
 
       - name: Deploy to GitHub Pages Branch
         uses: JamesIves/github-pages-deploy-action@v4

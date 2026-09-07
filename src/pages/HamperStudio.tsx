@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Gift, Plus, Trash2, CheckCircle2, RefreshCw, CheckSquare, Square, 
   FileText, Truck, Sparkles, Box, Compass, ArrowRight, Sliders, 
-  Info, ShieldCheck, ChevronRight, AlertTriangle, Layers, ArrowUpRight, Search
+  Info, ShieldCheck, ChevronRight, AlertTriangle, Layers, ArrowUpRight, Search, ChevronDown
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -22,6 +22,7 @@ import {
 } from '../services/hamperPricingEngine';
 import { HamperProposalDocument } from '../components/documents/HamperProposalDocument';
 import { HamperDeliveryNoteDocument } from '../components/documents/HamperDeliveryNoteDocument';
+import { getAssetUrl } from '../utils/assetPath';
 
 export interface TajHamperLineItem {
   id: string;
@@ -129,11 +130,30 @@ export const HamperStudio: React.FC = () => {
     inStockQty: 25
   });
 
-  // Generate 3 Curated Tiers live
+  // 25g Chocolate Bar Selection State for Hamper Generator
+  const [selectedBars, setSelectedBars] = useState<Record<string, number>>({
+    'Indian Sea Salt (25g)': 1,
+    'Malabar Jackfruit (25g)': 1,
+    'Almond Noir (25g)': 0,
+    'Orange Sunset (25g)': 0,
+    'Mocha (25g)': 0,
+    'Sun-Kissed Lemon (25g)': 0,
+    'Peanut Royale (25g)': 0
+  });
+  const [barCustomizerOpen, setBarCustomizerOpen] = useState(false);
+
+  // Compute active custom bar list from state
+  const activeCustomBars = Object.entries(selectedBars)
+    .filter(([_, qty]) => qty > 0)
+    .map(([description, qty]) => ({ description, qty }));
+
+  // Generate 4 Curated Tiers live with user custom flavor selection
   const generatedTiers = HamperPricingEngine.generateTiersForBudget(
     targetBudgetInput || 1000,
     targetQtyInput || 50,
-    masterCatalog
+    masterCatalog,
+    0,
+    activeCustomBars.length > 0 ? activeCustomBars : undefined
   );
 
   // Sync Live Sheet Catalog
@@ -462,19 +482,19 @@ export const HamperStudio: React.FC = () => {
 
   const getItemThumbnail = (desc: string, category: string) => {
     const d = desc.toLowerCase();
-    if (d.includes('almond')) return '/images/brand/prod_almond_art.png';
-    if (d.includes('peanut')) return '/images/brand/prod_peanut_art.png';
-    if (d.includes('orange')) return '/images/brand/prod_orange_art.png';
-    if (d.includes('lemon')) return '/images/brand/prod_lemon_art.png';
-    if (d.includes('sea salt') || d.includes('seasalt')) return '/images/brand/prod_seasalt_art.png';
-    if (d.includes('mocha')) return '/images/brand/prod_mocha_art.png';
-    if (d.includes('jackfruit')) return '/images/brand/prod_jackfruit_art.png';
-    if (d.includes('8 piece') || d.includes('8-piece') || d.includes('8 pc') || d.includes('box')) return '/images/brand/prod_gift_8.jpg';
-    if (d.includes('6 piece') || d.includes('6-piece') || d.includes('6 pc')) return '/images/brand/prod_gift_6.jpg';
-    if (d.includes('house boat') || d.includes('souvenir') || category === 'Souvenir') return '/images/brand/kerala_heritage_hamper.jpg';
-    if (d.includes('tin') || d.includes('chips') || category === 'Tins') return '/images/brand/prod_real_ppan0941.jpg';
-    if (category === 'Chocolate Box' || category === 'Packaging') return '/images/brand/prod_gift_8.jpg';
-    return '/images/brand/prod_real_ppan1026.jpg';
+    if (d.includes('almond')) return getAssetUrl('/images/brand/prod_almond_art.png');
+    if (d.includes('peanut')) return getAssetUrl('/images/brand/prod_peanut_art.png');
+    if (d.includes('orange')) return getAssetUrl('/images/brand/prod_orange_art.png');
+    if (d.includes('lemon')) return getAssetUrl('/images/brand/prod_lemon_art.png');
+    if (d.includes('sea salt') || d.includes('seasalt')) return getAssetUrl('/images/brand/prod_seasalt_art.png');
+    if (d.includes('mocha')) return getAssetUrl('/images/brand/prod_mocha_art.png');
+    if (d.includes('jackfruit')) return getAssetUrl('/images/brand/prod_jackfruit_art.png');
+    if (d.includes('8 piece') || d.includes('8-piece') || d.includes('8 pc') || d.includes('box')) return getAssetUrl('/images/brand/prod_gift_8.jpg');
+    if (d.includes('6 piece') || d.includes('6-piece') || d.includes('6 pc')) return getAssetUrl('/images/brand/prod_gift_6.jpg');
+    if (d.includes('house boat') || d.includes('souvenir') || category === 'Souvenir') return getAssetUrl('/images/brand/kerala_heritage_hamper.jpg');
+    if (d.includes('tin') || d.includes('chips') || category === 'Tins') return getAssetUrl('/images/brand/prod_real_ppan0941.jpg');
+    if (category === 'Chocolate Box' || category === 'Packaging') return getAssetUrl('/images/brand/prod_gift_8.jpg');
+    return getAssetUrl('/images/brand/prod_real_ppan1026.jpg');
   };
 
   return (
@@ -596,6 +616,129 @@ export const HamperStudio: React.FC = () => {
             </Button>
           </div>
         </div>
+
+        {/* 25g Chocolate Bar Flavour & Quantity Selector Panel */}
+        <div className="mt-4 pt-3.5 border-t border-[#2e2e2e]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-300 flex items-center gap-1.5">
+                <Gift className="w-3.5 h-3.5 text-amber-400" /> 25g Artisan Bar Selection:
+              </span>
+              <span className="text-[11px] text-[#aaaaaa]">
+                ({activeCustomBars.reduce((sum, b) => sum + b.qty, 0)} bars configured across {activeCustomBars.length} flavors • ₹55/bar)
+              </span>
+            </div>
+            <button
+              onClick={() => setBarCustomizerOpen(!barCustomizerOpen)}
+              className="text-[11px] text-neutral-300 hover:text-white font-medium flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#272727] hover:bg-[#333333] border border-[#383838] transition-colors self-start sm:self-auto tactile-press"
+            >
+              {barCustomizerOpen ? 'Hide Flavor Controls' : 'Customize Flavors & Counts'}
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${barCustomizerOpen ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+
+          {/* Collapsible Flavor Selection Grid */}
+          {barCustomizerOpen && (
+            <div className="mt-3.5 pt-3 border-t border-[#282828] animate-fade-in-up space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[11px] text-[#aaaaaa]">
+                  Select exact flavors and quantities. Each 25g bar costs ₹55. Tiers will include your chosen flavors instead of default assortments.
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setSelectedBars({
+                      'Indian Sea Salt (25g)': 1,
+                      'Malabar Jackfruit (25g)': 1,
+                      'Almond Noir (25g)': 0,
+                      'Orange Sunset (25g)': 0,
+                      'Mocha (25g)': 0,
+                      'Sun-Kissed Lemon (25g)': 0,
+                      'Peanut Royale (25g)': 0
+                    })}
+                    className="text-[10px] text-[#888888] hover:text-white px-2 py-0.5 rounded bg-[#181818] border border-[#303030]"
+                  >
+                    Reset Defaults
+                  </button>
+                  <button
+                    onClick={() => setSelectedBars({
+                      'Indian Sea Salt (25g)': 1,
+                      'Malabar Jackfruit (25g)': 1,
+                      'Almond Noir (25g)': 1,
+                      'Orange Sunset (25g)': 1,
+                      'Mocha (25g)': 1,
+                      'Sun-Kissed Lemon (25g)': 0,
+                      'Peanut Royale (25g)': 0
+                    })}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 px-2 py-0.5 rounded bg-[#181818] border border-[#303030]"
+                  >
+                    All 5 Core Flavors (1 ea)
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+                {[
+                  { name: 'Indian Sea Salt (25g)', short: 'Sea Salt', color: 'text-cyan-400', img: getAssetUrl('/images/brand/prod_seasalt_art.png') },
+                  { name: 'Malabar Jackfruit (25g)', short: 'Jackfruit', color: 'text-yellow-400', img: getAssetUrl('/images/brand/prod_jackfruit_art.png') },
+                  { name: 'Almond Noir (25g)', short: 'Almond', color: 'text-amber-400', img: getAssetUrl('/images/brand/prod_almond_art.png') },
+                  { name: 'Orange Sunset (25g)', short: 'Orange', color: 'text-orange-400', img: getAssetUrl('/images/brand/prod_orange_art.png') },
+                  { name: 'Mocha (25g)', short: 'Mocha', color: 'text-amber-600', img: getAssetUrl('/images/brand/prod_mocha_art.png') },
+                  { name: 'Sun-Kissed Lemon (25g)', short: 'Lemon', color: 'text-lime-400', img: getAssetUrl('/images/brand/prod_lemon_art.png') },
+                  { name: 'Peanut Royale (25g)', short: 'Peanut', color: 'text-stone-300', img: getAssetUrl('/images/brand/prod_peanut_art.png') }
+                ].map(flv => {
+                  const currentQty = selectedBars[flv.name] || 0;
+                  const isSelected = currentQty > 0;
+                  return (
+                    <div 
+                      key={flv.name}
+                      className={`p-2 rounded-xl border flex flex-col justify-between transition-all ${
+                        isSelected 
+                          ? 'bg-[#252525] border-white/40 shadow-sm' 
+                          : 'bg-[#161616] border-[#2b2b2b] opacity-60 hover:opacity-100 hover:border-[#3a3a3a]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <img 
+                          src={flv.img} 
+                          alt={flv.name}
+                          className="w-8 h-8 rounded-lg object-contain bg-black border border-[#2e2e2e] shrink-0" 
+                        />
+                        <div className="min-w-0">
+                          <p className={`text-xs font-semibold truncate ${flv.color}`}>{flv.short}</p>
+                          <p className="text-[9px] text-[#888888] font-mono">₹55/bar</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-[#101010] border border-[#333333] rounded-lg p-0.5">
+                        <button
+                          onClick={() => setSelectedBars(prev => ({
+                            ...prev,
+                            [flv.name]: Math.max((prev[flv.name] || 0) - 1, 0)
+                          }))}
+                          className="w-6 h-6 flex items-center justify-center text-xs text-[#aaaaaa] hover:text-white hover:bg-[#252525] rounded transition-colors"
+                        >
+                          -
+                        </button>
+                        <span className="text-xs font-mono font-bold text-white px-1">
+                          {currentQty}
+                        </span>
+                        <button
+                          onClick={() => setSelectedBars(prev => ({
+                            ...prev,
+                            [flv.name]: (prev[flv.name] || 0) + 1
+                          }))}
+                          className="w-6 h-6 flex items-center justify-center text-xs text-white hover:bg-[#252525] rounded transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* STUDIO NAVIGATION TABS */}
@@ -673,30 +816,30 @@ export const HamperStudio: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[generatedTiers.tiers.basic, generatedTiers.tiers.better, generatedTiers.tiers.premium].map(recipe => (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {[generatedTiers.tiers.pouch, generatedTiers.tiers.basic, generatedTiers.tiers.better, generatedTiers.tiers.premium].filter(Boolean).map(recipe => (
               <div 
                 key={recipe.tier}
-                className="relative rounded-2xl bg-[#1f1f1f] border border-[#2e2e2e] hover:border-[#444444] p-5 flex flex-col justify-between shadow-sm transition-all hover:scale-[1.005]"
+                className="relative rounded-2xl bg-[#1f1f1f] border border-[#2e2e2e] hover:border-[#444444] p-4 flex flex-col justify-between shadow-sm transition-all hover:scale-[1.005]"
               >
-                <div>
+                <div className="flex-1 flex flex-col">
                   {/* Hero Showcase Image */}
                   {recipe.image && (
-                    <div className="w-full h-40 rounded-xl overflow-hidden mb-4 border border-[#333333] relative group">
+                    <div className="w-full h-32 rounded-xl overflow-hidden mb-3 border border-[#333333] relative group flex-shrink-0">
                       <img 
                         src={recipe.image} 
                         alt={recipe.tierName} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                      <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white uppercase tracking-wider bg-black/80 px-2 py-0.5 rounded border border-white/20">
+                      <span className="absolute bottom-1.5 left-2 text-[9px] font-bold text-white uppercase tracking-wider bg-black/80 px-2 py-0.5 rounded border border-white/20 truncate max-w-[85%]">
                         {recipe.recommendedBox.name}
                       </span>
                     </div>
                   )}
 
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#272727] border border-[#383838] text-[#f1f1f1]">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#272727] border border-[#383838] text-[#f1f1f1]">
                       {recipe.badge}
                     </span>
                     <span className="text-xs font-mono font-bold text-emerald-400">
@@ -704,33 +847,37 @@ export const HamperStudio: React.FC = () => {
                     </span>
                   </div>
 
-                  <h4 className="text-lg font-bold text-white">{recipe.tierName}</h4>
-                  <p className="text-xs text-[#aaaaaa] mt-1 min-h-[36px]">{recipe.tagline}</p>
+                  <h4 className="text-sm font-bold text-white leading-tight truncate" title={recipe.tierName}>
+                    {recipe.tierName}
+                  </h4>
+                  <p className="text-[11px] text-[#aaaaaa] mt-0.5 h-8 line-clamp-2 leading-tight">
+                    {recipe.tagline}
+                  </p>
 
                   {/* Pricing Overview */}
-                  <div className="bg-[#141414] p-3.5 rounded-xl border border-[#282828] my-4 space-y-2">
+                  <div className="bg-[#141414] p-3 rounded-xl border border-[#282828] my-2.5 space-y-1.5 text-xs">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-[#aaaaaa]">Client Quote:</span>
-                      <span className="text-base font-bold font-mono text-white">₹{recipe.clientQuoteInclGst.toLocaleString('en-IN')} <span className="text-[10px] text-[#888888] font-normal">incl GST</span></span>
+                      <span className="text-[#aaaaaa] text-[11px]">Client Quote:</span>
+                      <span className="text-sm font-bold font-mono text-white">₹{recipe.clientQuoteInclGst.toLocaleString('en-IN')} <span className="text-[9px] text-[#888888] font-normal">incl GST</span></span>
                     </div>
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-[#aaaaaa]">Our BOM Cost (with GST):</span>
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="text-[#aaaaaa]">BOM Cost (incl GST):</span>
                       <span className="text-zinc-300 font-mono">₹{recipe.ourBOMTotalWithGst.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="border-t border-[#242424] pt-2 flex justify-between items-center text-xs font-bold">
-                      <span className="text-zinc-300">Net Profit / Hamper:</span>
+                    <div className="border-t border-[#242424] pt-1.5 flex justify-between items-center text-xs font-bold">
+                      <span className="text-zinc-300 text-[11px]">Net Profit / Hamper:</span>
                       <span className="text-emerald-400 font-mono font-bold">₹{recipe.netProfit.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="text-[11px] text-right text-[#aaaaaa] font-mono">
-                      Project Profit ({targetQtyInput} units): <span className="text-white font-bold">₹{(recipe.netProfit * targetQtyInput).toLocaleString('en-IN')}</span>
+                    <div className="text-[10px] text-right text-[#aaaaaa] font-mono">
+                      Project Profit ({targetQtyInput}u): <span className="text-white font-bold">₹{(recipe.netProfit * targetQtyInput).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
 
                   {/* Packaging & Capacity */}
-                  <div className="mb-4 text-xs space-y-1.5">
+                  <div className="mb-2 text-[11px] space-y-1">
                     <div className="flex justify-between text-[#aaaaaa]">
-                      <span>Packaging: <strong className="text-white">{recipe.recommendedBox.name}</strong></span>
-                      <span className="font-mono text-zinc-300">{recipe.capacityUtilizationPercent}% full</span>
+                      <span className="truncate max-w-[160px]" title={recipe.recommendedBox.name}>Pack: <strong className="text-white">{recipe.recommendedBox.name}</strong></span>
+                      <span className="font-mono text-zinc-300 flex-shrink-0">{recipe.capacityUtilizationPercent}% full</span>
                     </div>
                     <div className="w-full bg-[#121212] h-1.5 rounded-full overflow-hidden border border-[#282828]">
                       <div 
@@ -740,27 +887,30 @@ export const HamperStudio: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Components List */}
-                  <div className="space-y-1.5 mb-6">
-                    <div className="text-[10px] font-semibold text-[#888888] uppercase tracking-wider">Curated Components:</div>
+                  {/* Components List with Balanced Container */}
+                  <div className="flex-1 flex flex-col min-h-[130px] max-h-[150px] overflow-y-auto pr-1 border-t border-[#262626] pt-1.5 space-y-1">
+                    <div className="text-[9px] font-semibold text-[#888888] uppercase tracking-wider">Curated Components ({recipe.lineItems.length}):</div>
                     {recipe.lineItems.map((li, idx) => (
-                      <div key={idx} className="flex justify-between items-center text-xs py-1 border-b border-[#242424] text-zinc-300">
-                        <div className="truncate max-w-[200px]" title={li.catalogItem.description}>
+                      <div key={idx} className="flex justify-between items-center text-[11px] py-0.5 border-b border-[#222222] text-zinc-300">
+                        <div className="truncate max-w-[180px]" title={li.catalogItem.description}>
                           {li.qty}x {li.catalogItem.description}
                         </div>
-                        <span className="text-[#888888] font-mono text-[11px]">₹{li.catalogItem.ourUnitCost}</span>
+                        <span className="text-[#888888] font-mono text-[10px] flex-shrink-0 ml-1">₹{li.catalogItem.ourUnitCost}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <Button
-                  onClick={() => handleApplyCuratedTier(recipe)}
-                  variant={recipe.tier === 'Better' ? 'primary' : 'secondary'}
-                  className="w-full text-xs py-2.5 rounded-xl font-semibold shadow-sm flex items-center justify-center gap-1.5"
-                >
-                  Apply {recipe.tier} Tier to Workstation <ArrowRight className="w-3.5 h-3.5" />
-                </Button>
+                {/* Snug Bottom CTA */}
+                <div className="pt-2.5 border-t border-[#282828] mt-2 flex-shrink-0">
+                  <Button
+                    onClick={() => handleApplyCuratedTier(recipe)}
+                    variant={recipe.tier === 'Better' ? 'primary' : 'secondary'}
+                    className="w-full text-xs py-2 rounded-xl font-semibold shadow-sm flex items-center justify-center gap-1.5 tactile-press"
+                  >
+                    Apply {recipe.tier} to Workstation <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

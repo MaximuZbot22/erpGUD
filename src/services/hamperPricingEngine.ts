@@ -1,4 +1,5 @@
 import { HamperCatalogItem } from './hamperCatalog';
+import { getAssetUrl } from '../utils/assetPath';
 
 export interface BoxCapacitySpec {
   id: string;
@@ -13,11 +14,14 @@ export const STANDARD_BOX_SPECS: BoxCapacitySpec[] = [
   { id: 'BOX-1012', name: '10*12 Hamper Box (Rigid Premium)', dimensions: '12"x10"x4"', maxVolumeUnits: 10, ourCost: 169.49, gstRate: 18 },
   { id: 'BOX-88', name: '8*8 Box (Square Classic)', dimensions: '8"x8"x3.5"', maxVolumeUnits: 6, ourCost: 250, gstRate: 18 },
   { id: 'BAG-NETHI', name: 'Nethipatta Bag (Jute / Fabric)', dimensions: '10"x8"', maxVolumeUnits: 4, ourCost: 92, gstRate: 18 },
-  { id: 'POUCH-GOLD', name: 'Golden Pouch Set', dimensions: 'Compact', maxVolumeUnits: 3, ourCost: 10, gstRate: 18 }
+  { id: 'POUCH-KRAFT', name: 'Artisan Stand-Up Kraft Pouch (Zipper/Window)', dimensions: '8"x5"x2.5"', maxVolumeUnits: 3, ourCost: 12, gstRate: 18 },
+  { id: 'POUCH-GOLD', name: 'Golden Artisanal Pouch Set with Ribbon', dimensions: 'Compact', maxVolumeUnits: 3, ourCost: 10, gstRate: 18 },
+  { id: 'POUCH-SATIN', name: 'Festive Satin Drawstring Pouch', dimensions: '9"x6"', maxVolumeUnits: 4, ourCost: 24, gstRate: 18 },
+  { id: 'POUCH-STICKER', name: 'GUD Branded Pouch with Seal Sticker', dimensions: '7"x5"', maxVolumeUnits: 3, ourCost: 6, gstRate: 18 }
 ];
 
 export interface CuratedTierRecipe {
-  tier: 'Basic' | 'Better' | 'Premium';
+  tier: 'Pouch' | 'Basic' | 'Better' | 'Premium';
   tierName: string;
   tagline: string;
   recommendedBox: BoxCapacitySpec;
@@ -48,6 +52,7 @@ export interface BudgetRecommendationResult {
   targetBudgetInclGst: number;
   quantity: number;
   tiers: {
+    pouch: CuratedTierRecipe;
     basic: CuratedTierRecipe;
     better: CuratedTierRecipe;
     premium: CuratedTierRecipe;
@@ -93,7 +98,8 @@ export class HamperPricingEngine {
     targetBudgetInclGst: number,
     quantity: number,
     catalog: HamperCatalogItem[],
-    absorbedExpensesPerHamper: number = 0 // e.g. Travel/Courier split per hamper
+    absorbedExpensesPerHamper: number = 0, // e.g. Travel/Courier split per hamper
+    customBarSelection?: { description: string; qty: number }[]
   ): BudgetRecommendationResult {
     // 1. Calculate Target Pre-GST Base assuming blended GST (~12-14% average)
     const effectiveGstMultiplier = 1.12; 
@@ -103,17 +109,66 @@ export class HamperPricingEngine {
     const findItem = (pattern: string) => 
       catalog.find(i => i.description.toLowerCase().includes(pattern.toLowerCase()));
 
+    // Resolve chocolate bar items: either user custom selection or default 25g bars
+    const resolveChocolateBars = (defaultQty: number) => {
+      if (customBarSelection && customBarSelection.length > 0) {
+        return customBarSelection.map(bar => {
+          const catItem = catalog.find(i => i.description.toLowerCase() === bar.description.toLowerCase()) ||
+            catalog.find(i => i.description.toLowerCase().includes(bar.description.toLowerCase())) ||
+            findItem('25 grm bar') ||
+            findItem('Indian Sea Salt') ||
+            catalog.find(i => i.category === 'Chocolates') ||
+            catalog[1];
+          return { catalogItem: catItem, qty: bar.qty, volumeUnits: 1 };
+        });
+      }
+      const defaultBar = findItem('Indian Sea Salt') || findItem('25 grm bar') || catalog.find(i => i.category === 'Chocolates') || catalog[1];
+      return [{ catalogItem: defaultBar, qty: defaultQty, volumeUnits: 1 }];
+    };
+
+    // 1. Build TIER 0: POUCH PACK (Eco, High Volume, ~58-65% Margin)
+    const pouchBox = STANDARD_BOX_SPECS.find(b => b.id === 'POUCH-KRAFT') || STANDARD_BOX_SPECS.find(b => b.id === 'POUCH-GOLD') || STANDARD_BOX_SPECS[3];
+    const pouchCatalog = findItem('Pouch with Stickers') || findItem('Pouch') || catalog[0];
+    const pouchBars = resolveChocolateBars(2);
+    const pouchSnack = findItem('Banana chips') || catalog.find(i => i.category === 'Tins') || catalog[0];
+    const pouchCard = findItem('Onam Note Card') || findItem('Taj logo card') || catalog[4];
+
+    const pouchItems = [
+      { catalogItem: pouchCatalog, qty: 1, volumeUnits: 0 },
+      ...pouchBars,
+      { catalogItem: pouchSnack, qty: 1, volumeUnits: 1 },
+      { catalogItem: pouchCard, qty: 1, volumeUnits: 0 }
+    ];
+
+    const pouchTier = this.calculateTierMetrics(
+      'Pouch',
+      'Artisan Stand-Up Pouch Pack',
+      'Eco-conscious high-volume gifting: Artisanal stand-up pouch with confections & chips',
+      pouchBox,
+      pouchItems,
+      Math.max(Math.round(targetBudgetInclGst * 0.50), 380),
+      absorbedExpensesPerHamper,
+      'Pouch Pack (~60% Margin)',
+      getAssetUrl('/images/brand/prod_real_ppan0887.jpg'),
+      {
+        bg: 'bg-[#181818]',
+        border: 'border-[#2e2e2e]',
+        text: 'text-zinc-300',
+        accent: 'bg-[#222222]'
+      }
+    );
+
     // 2. Build TIER 1: BASIC / ESSENTIAL (Budget-Friendly, High Margin ~45-50%)
     // Aim: 75% - 85% of target budget, smart compact gifting
     const basicBox = STANDARD_BOX_SPECS.find(b => b.id === 'BAG-NETHI') || STANDARD_BOX_SPECS[2];
     const basicCatalogBox = findItem('Nethipatta') || findItem('Pouch with Stickers') || catalog[0];
-    const basicChocolate = findItem('Indian Seasalt') || catalog.find(i => i.category === 'Chocolates') || catalog[1];
+    const basicBars = resolveChocolateBars(2);
     const basicSnack = findItem('Banana chips') || catalog.find(i => i.category === 'Tins') || catalog[0];
     const basicCard = findItem('Onam Note Card') || findItem('Company logo') || catalog[4];
 
     const basicItems = [
       { catalogItem: basicCatalogBox, qty: 1, volumeUnits: 0 },
-      { catalogItem: basicChocolate, qty: 2, volumeUnits: 2 },
+      ...basicBars,
       { catalogItem: basicSnack, qty: 1, volumeUnits: 2 },
       { catalogItem: basicCard, qty: 1, volumeUnits: 0 }
     ];
@@ -127,7 +182,7 @@ export class HamperPricingEngine {
       targetBudgetInclGst * 0.75, // Target 75% of budget
       absorbedExpensesPerHamper,
       'Value Pick (~45% Margin)',
-      '/images/brand/prod_real_ppan1026.jpg',
+      getAssetUrl('/images/brand/prod_real_ppan1026.jpg'),
       {
         bg: 'bg-[#1f1f1f]',
         border: 'border-[#2e2e2e]',
@@ -164,7 +219,7 @@ export class HamperPricingEngine {
       targetBudgetInclGst, // Exact client target
       absorbedExpensesPerHamper,
       'Most Popular (Balanced)',
-      '/images/brand/prod_gift_8.jpg',
+      getAssetUrl('/images/brand/prod_gift_8.jpg'),
       {
         bg: 'bg-[#212121]',
         border: 'border-[#3f3f3f]',
@@ -178,7 +233,7 @@ export class HamperPricingEngine {
     const premiumBox = STANDARD_BOX_SPECS.find(b => b.id === 'BOX-1012') || STANDARD_BOX_SPECS[0];
     const premiumCatalogBox = findItem('10*12') || findItem('8*8 Box') || catalog[6];
     const premiumChocBox = findItem('8 Piece Box') || findItem('Artisanal Jaggery') || catalog[6];
-    const premiumBars = findItem('Indian Seasalt') || catalog[1];
+    const premiumBars = resolveChocolateBars(2);
     const premiumSnack = findItem('Banana chips') || catalog[0];
     const premiumSouvenir = findItem('House Boat Wooden') || findItem('Coconut Candle') || catalog[7];
     const premiumFiller = findItem('Shredded Paper') || catalog[5];
@@ -187,7 +242,7 @@ export class HamperPricingEngine {
     const premiumItems = [
       { catalogItem: premiumCatalogBox, qty: 1, volumeUnits: 0 },
       { catalogItem: premiumChocBox, qty: 1, volumeUnits: 4 },
-      { catalogItem: premiumBars, qty: 2, volumeUnits: 2 },
+      ...premiumBars,
       { catalogItem: premiumSnack, qty: 1, volumeUnits: 2.5 },
       { catalogItem: premiumSouvenir, qty: 1, volumeUnits: 3 },
       { catalogItem: premiumFiller, qty: 1, volumeUnits: 1 },
@@ -203,7 +258,7 @@ export class HamperPricingEngine {
       Math.max(targetBudgetInclGst * 1.35, 1250), // 35% upsell tier
       absorbedExpensesPerHamper,
       'VIP Luxury Upgrade',
-      '/images/brand/kerala_heritage_hamper.jpg',
+      getAssetUrl('/images/brand/kerala_heritage_hamper.jpg'),
       {
         bg: 'bg-[#1f1f1f]',
         border: 'border-[#2e2e2e]',
@@ -216,6 +271,7 @@ export class HamperPricingEngine {
       targetBudgetInclGst,
       quantity,
       tiers: {
+        pouch: pouchTier,
         basic: basicTier,
         better: betterTier,
         premium: premiumTier
@@ -224,7 +280,7 @@ export class HamperPricingEngine {
   }
 
   private static calculateTierMetrics(
-    tier: 'Basic' | 'Better' | 'Premium',
+    tier: 'Pouch' | 'Basic' | 'Better' | 'Premium',
     tierName: string,
     tagline: string,
     box: BoxCapacitySpec,

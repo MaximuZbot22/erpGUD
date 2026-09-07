@@ -11,6 +11,7 @@ import { Modal } from '../components/ui/Modal';
 import { StorageEngine } from '../services/storageEngine';
 import { auditLogService } from '../services/audit';
 import { GudLogo } from '../components/Sidebar';
+import { getAssetUrl } from '../utils/assetPath';
 
 // Types
 export interface POItem {
@@ -1678,7 +1679,7 @@ _Please confirm acceptance and target dispatch date._`;
                     {/* Actual Founder Hima Signature Image */}
                     <div className="my-0.5 flex justify-end">
                       <img 
-                        src="/images/brand/founder_signature.jpg" 
+                        src={getAssetUrl('/images/brand/founder_signature.jpg')} 
                         alt="Founder Hima Signature" 
                         className="h-11 max-w-[150px] object-contain"
                       />

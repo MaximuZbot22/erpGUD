@@ -10,12 +10,22 @@ export interface FilterField {
   placeholder?: string;
 }
 
+export interface StatusTab {
+  key: string;
+  label: string;
+  count?: number;
+}
+
 interface FiltersProps {
   fields: FilterField[];
   values: Record<string, string>;
   onChange: (values: Record<string, string>) => void;
   onClear?: () => void;
   searchPlaceholder?: string;
+  statusTabs?: StatusTab[];
+  activeStatusTab?: string;
+  onStatusTabChange?: (key: string) => void;
+  className?: string;
 }
 
 export const Filters: React.FC<FiltersProps> = ({
@@ -23,7 +33,11 @@ export const Filters: React.FC<FiltersProps> = ({
   values,
   onChange,
   onClear,
-  searchPlaceholder = 'Search...'
+  searchPlaceholder = 'Search...',
+  statusTabs,
+  activeStatusTab,
+  onStatusTabChange,
+  className = ''
 }) => {
   const handleFieldChange = (key: string, value: string) => {
     onChange({
@@ -47,7 +61,38 @@ export const Filters: React.FC<FiltersProps> = ({
   const hasActiveFilters = Object.values(values).some((val) => val !== '');
 
   return (
-    <div className="flex flex-wrap items-center gap-3 bg-[#181818] p-3 rounded-xl border border-[#2e2e2e]">
+    <div className={`space-y-3 ${className}`}>
+      {/* ERPNext-style Segmented Status Filter Tabs */}
+      {statusTabs && statusTabs.length > 0 && onStatusTabChange && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 select-none">
+          {statusTabs.map((tab) => {
+            const isActive = (activeStatusTab || '') === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => onStatusTabChange(tab.key)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] ${
+                  isActive
+                    ? 'bg-[#2b2b2b] text-white border border-[#444444] shadow-sm'
+                    : 'bg-[#181818] text-zinc-400 hover:text-zinc-200 hover:bg-[#202020] border border-[#262626]'
+                }`}
+              >
+                <span>{tab.label}</span>
+                {tab.count !== undefined && (
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-bold ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-[#242424] text-zinc-400'
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Main Filter Inputs Row */}
+      <div className="flex flex-wrap items-center gap-3 bg-[#181818] p-3 rounded-xl border border-[#2e2e2e]">
       
       {/* Global Text Search if there's a general field, or render fields */}
       {fields.map((field) => {
@@ -123,6 +168,7 @@ export const Filters: React.FC<FiltersProps> = ({
           Reset
         </Button>
       )}
+      </div>
     </div>
   );
 };
