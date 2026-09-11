@@ -46,7 +46,7 @@ export const ReturnsManager: React.FC<{ onNavigate?: (path: string) => void }> =
     // Generate Credit Note automatically if disposition requires financial adjustment
     const existingCNs = StorageEngine.getLocal<CreditNote[]>('gud_credit_notes_v1', []);
     const taxableAmount = Number(form.qty) * Number(form.unitPrice);
-    const gstAdjustment = (taxableAmount * 18) / 100;
+    const gstAdjustment = (taxableAmount * 5) / 100; // Standard 5% GST for chocolate returns
     const totalCredit = taxableAmount + gstAdjustment;
 
     const newCN: CreditNote = {
@@ -56,12 +56,39 @@ export const ReturnsManager: React.FC<{ onNavigate?: (path: string) => void }> =
       customerId: form.customerId,
       customerName: form.customerId,
       originalInvoiceId: form.invoiceId,
-      reason: `Customer Return - ${form.disposition}`,
-      items: [{ sku: form.sku, qty: Number(form.qty), unitPrice: Number(form.unitPrice), total: taxableAmount }],
+      originalInvoiceNumber: form.invoiceId,
+      returnId: newReturn.id,
+      reason: 'Customer return',
+      customReason: `Return disposition: ${form.disposition}`,
+      items: [
+        {
+          id: `ITEM-${Date.now()}`,
+          sku: form.sku,
+          description: form.name,
+          hsnSac: '1806',
+          originalQty: Number(form.qty),
+          creditQty: Number(form.qty),
+          rate: Number(form.unitPrice),
+          taxableAmount,
+          gstRate: 5,
+          cgst: gstAdjustment / 2,
+          sgst: gstAdjustment / 2,
+          igst: 0,
+          lineTotal: totalCredit
+        }
+      ],
       taxableAmount,
+      cgstTotal: gstAdjustment / 2,
+      sgstTotal: gstAdjustment / 2,
+      igstTotal: 0,
       gstAdjustment,
       totalCredit,
+      grandTotal: totalCredit,
+      status: 'Issued',
       approvalStatus: 'Approved',
+      createdBy: 'MaximuZ (Returns & QC)',
+      createdAt: new Date().toISOString(),
+      issuedAt: new Date().toISOString(),
       notes: form.notes
     };
 
@@ -90,9 +117,16 @@ export const ReturnsManager: React.FC<{ onNavigate?: (path: string) => void }> =
             Log customer return requests, perform QC disposition (Restock, Damaged, Sample, Disposal), and generate Credit Notes.
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs">
-          <Plus className="w-4 h-4 mr-1" /> + Log Customer Return
-        </Button>
+        <div className="flex items-center gap-2">
+          {onNavigate && (
+            <Button onClick={() => onNavigate('/notes')} variant="outline" className="text-xs border-slate-700 text-slate-300">
+              View Credit Notes Registry →
+            </Button>
+          )}
+          <Button onClick={() => setIsModalOpen(true)} className="bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs">
+            <Plus className="w-4 h-4 mr-1" /> + Log Customer Return
+          </Button>
+        </div>
       </div>
 
       {/* Returns List / Empty State */}

@@ -96,34 +96,185 @@ export interface CustomerReturnRecord {
   notes?: string;
 }
 
+export type NoteStatus = 'Draft' | 'Issued' | 'Applied' | 'Cancelled';
+
+export type CreditNoteReason = 
+  | 'Customer return'
+  | 'Damaged/incorrect goods accepted for credit'
+  | 'Overbilling'
+  | 'Incorrect quantity billed'
+  | 'Pricing correction'
+  | 'Tax correction'
+  | 'Commercial adjustment'
+  | 'Order cancellation adjustment'
+  | 'Other';
+
+export type DebitNoteReason =
+  | 'Short quantity received'
+  | 'Damaged goods'
+  | 'Wrong product received'
+  | 'Quality issue'
+  | 'Pricing discrepancy'
+  | 'Tax discrepancy'
+  | 'Supplier invoice discrepancy'
+  | 'Return to supplier'
+  | 'Other adjustment';
+
+export interface CreditNoteLineItem {
+  id: string;
+  sku?: string;
+  description: string;
+  hsnSac?: string;
+  originalQty?: number;
+  creditQty: number;
+  rate: number;
+  discount?: number;
+  taxableAmount: number;
+  gstRate: number; // e.g. 0, 5, 12, 18, 28
+  cgst: number;
+  sgst: number;
+  igst: number;
+  lineTotal: number;
+}
+
+export interface DebitNoteLineItem {
+  id: string;
+  sku?: string;
+  description: string;
+  hsnSac?: string;
+  quantity: number;
+  rate: number;
+  discount?: number;
+  taxableAmount: number;
+  gstRate: number; // e.g. 0, 5, 12, 18, 28
+  cgst: number;
+  sgst: number;
+  igst: number;
+  lineTotal: number;
+}
+
 export interface CreditNote {
-  id: string; // e.g. 'CN-001'
+  id: string; // e.g. 'CN-001' or 'CN-2026-001'
   creditNoteNumber: string;
   date: string;
   customerId: string;
   customerName: string;
+  customerGstin?: string;
+  billingAddress?: string;
+  deliveryAddress?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   originalInvoiceId: string;
-  reason: string;
-  items: { sku: string; qty: number; unitPrice: number; total: number }[];
+  originalInvoiceNumber?: string;
+  originalInvoiceDate?: string;
+  salesOrderId?: string;
+  salesOrderNumber?: string;
+  returnId?: string;
+  deliveryNoteNumber?: string;
+  reason: CreditNoteReason | string;
+  customReason?: string;
+  items: Array<{
+    id?: string;
+    sku?: string;
+    description?: string;
+    hsnSac?: string;
+    originalQty?: number;
+    creditQty?: number;
+    qty?: number;
+    unitPrice?: number;
+    rate?: number;
+    discount?: number;
+    taxableAmount?: number;
+    gstRate?: number;
+    cgst?: number;
+    sgst?: number;
+    igst?: number;
+    lineTotal?: number;
+    total?: number;
+  }>;
   taxableAmount: number;
-  gstAdjustment: number;
+  discountTotal?: number;
+  cgstTotal?: number;
+  sgstTotal?: number;
+  igstTotal?: number;
+  gstAdjustment?: number;
+  otherAdjustment?: number;
   totalCredit: number;
-  approvalStatus: 'Pending' | 'Approved';
+  grandTotal?: number;
+  amountInWords?: string;
+  status: NoteStatus;
+  approvalStatus?: 'Pending' | 'Approved' | 'Rejected';
+  cancellationReason?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  issuedAt?: string;
+  driveFileId?: string;
+  driveUrl?: string;
   notes?: string;
 }
 
 export interface DebitNote {
-  id: string; // e.g. 'DN-001'
+  id: string; // e.g. 'DN-001' or 'DN-2026-001'
   debitNoteNumber: string;
   date: string;
-  partyType: 'Customer' | 'Supplier';
-  partyId: string;
-  partyName: string;
-  originalDocumentId: string;
-  reason: string;
-  amount: number;
-  taxAdjustment: number;
-  totalAmount: number;
-  approvalStatus: 'Pending' | 'Approved';
+  partyType?: 'Customer' | 'Supplier';
+  supplierId: string;
+  supplierName: string;
+  supplierGstin?: string;
+  supplierAddress?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  purchaseOrderId?: string;
+  purchaseOrderNumber?: string;
+  grnId?: string;
+  grnNumber?: string;
+  supplierInvoiceNumber?: string;
+  supplierInvoiceDate?: string;
+  supplierIssueId?: string;
+  originalDocumentId?: string;
+  partyId?: string;
+  partyName?: string;
+  reason: DebitNoteReason | string;
+  customReason?: string;
+  items: Array<{
+    id?: string;
+    sku?: string;
+    description?: string;
+    hsnSac?: string;
+    quantity?: number;
+    qty?: number;
+    unitPrice?: number;
+    rate?: number;
+    discount?: number;
+    taxableAmount?: number;
+    gstRate?: number;
+    cgst?: number;
+    sgst?: number;
+    igst?: number;
+    lineTotal?: number;
+    total?: number;
+  }>;
+  taxableAmount?: number;
+  discountTotal?: number;
+  cgstTotal?: number;
+  sgstTotal?: number;
+  igstTotal?: number;
+  amount?: number;
+  taxAdjustment?: number;
+  otherAdjustment?: number;
+  totalAmount?: number;
+  totalDebit?: number;
+  grandTotal?: number;
+  amountInWords?: string;
+  status: NoteStatus;
+  approvalStatus?: 'Pending' | 'Approved' | 'Rejected';
+  cancellationReason?: string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  issuedAt?: string;
+  driveFileId?: string;
+  driveUrl?: string;
   notes?: string;
 }
