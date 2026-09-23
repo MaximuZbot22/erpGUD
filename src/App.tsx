@@ -20,6 +20,7 @@ import { ProcurementManager } from './pages/ProcurementManager';
 import { ReturnsManager } from './pages/ReturnsManager';
 import { NotesManager } from './pages/NotesManager';
 import { HamperStudio } from './pages/HamperStudio';
+import { CAReports } from './pages/CAReports';
 import { GudLogo } from './components/Sidebar';
 import { Loader2 } from 'lucide-react';
 
@@ -41,7 +42,7 @@ const getBaseRoute = () => {
     '/dashboard', '/login', '/settings', '/tasks', '/calendar',
     '/documents', '/invoice-generator', '/stock-checker', '/quotations',
     '/sales-orders', '/delivery', '/procurement-manager', '/returns',
-    '/notes', '/hampers', '/user-management'
+    '/notes', '/hampers', '/user-management', '/ca-reports'
   ];
   if (match && !knownRoutes.includes(match[1])) {
     return match[1];
@@ -179,6 +180,9 @@ const AppContent: React.FC = () => {
 
       case '/hampers':
         return <HamperStudio />;
+
+      case '/ca-reports':
+        return <CAReports />;
 
       default:
         const moduleId = currentPath.substring(1);

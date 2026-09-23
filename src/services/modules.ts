@@ -190,6 +190,16 @@ export const MODULE_REGISTRY: BusinessModule[] = [
     status: 'google-sync-required',
     category: 'business-intel'
   },
+  {
+    id: 'ca-reports',
+    name: 'CA & GST Reconciler',
+    path: '/ca-reports',
+    iconName: 'FileSpreadsheet',
+    requiredPermission: 'customers:read',
+    description: 'Monthly Sales & GST reconciliation register for CA (GSTR-1 format) with 1-click Excel export.',
+    status: 'active',
+    category: 'business-intel'
+  },
 
   // ═══════════════════════════════════════
   // 📋 LEGAL & COMPLIANCE (Sheet 5)
