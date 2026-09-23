@@ -28,13 +28,14 @@ export const db = getFirestore(app);
 // Google Sign-In Provider for Google Workspace Access
 export const googleProvider = new GoogleAuthProvider();
 
-// Request scopes for Google APIs (Workspace integration)
+// Request scopes for Google Sheets and Google Drive (Workspace integration)
 googleProvider.addScope('https://www.googleapis.com/auth/spreadsheets');
 googleProvider.addScope('https://www.googleapis.com/auth/drive');
-googleProvider.addScope('https://www.googleapis.com/auth/documents');
-googleProvider.addScope('https://www.googleapis.com/auth/calendar');
-googleProvider.addScope('https://www.googleapis.com/auth/gmail.send');
-googleProvider.addScope('https://www.googleapis.com/auth/gmail.readonly');
+
+// Force account selector prompt so user can choose account explicitly
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 export { GoogleAuthProvider, EmailAuthProvider, signInWithPopup, signOut };
 export default app;

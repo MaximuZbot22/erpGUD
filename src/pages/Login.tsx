@@ -53,8 +53,23 @@ export const Login: React.FC = () => {
     try {
       await signInWithGoogle();
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Google workspace authentication failed');
+      console.error('Google Sign-In Error:', err);
+      let errMsg = err.message || 'Google authentication failed';
+      if (err.code === 'auth/popup-blocked') {
+        errMsg = 'Pop-up blocked by your browser. Please allow pop-ups for this site in your address bar icon, then try again.';
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        errMsg = 'Google sign-in window was closed before completing login.';
+      } else if (err.code === 'auth/cancelled-popup-request') {
+        errMsg = 'Another sign-in pop-up was already in progress.';
+      } else if (err.code === 'auth/unauthorized-domain') {
+        const host = window.location.hostname;
+        errMsg = `The domain "${host}" is not authorized in Firebase. Please open http://localhost:5173 (instead of 127.0.0.1) or add "${host}" to Firebase Console > Authentication > Settings > Authorized Domains.`;
+      } else if (err.code === 'auth/network-request-failed') {
+        errMsg = 'Network connection failed. Please check your internet connection and try again.';
+      } else if (err.code === 'auth/access-denied' || err.message?.includes('access_denied')) {
+        errMsg = 'Google account access was denied. Please ensure your Google account is authorized or try the Sandbox mode below.';
+      }
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
@@ -66,8 +81,8 @@ export const Login: React.FC = () => {
     try {
       await signInAnonymouslyUser(selectedRole);
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Anonymous login failed');
+      console.error('Anonymous Sign-In Error:', err);
+      setError(err.message || 'Instant sandbox login failed');
     } finally {
       setLoading(false);
     }
