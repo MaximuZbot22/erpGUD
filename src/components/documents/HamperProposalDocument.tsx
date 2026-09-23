@@ -239,6 +239,7 @@ export const HamperProposalDocument: React.FC<ProposalDocProps> = ({ project, on
                 <img src={getAssetUrl('/images/brand/founder_signature.jpg')} alt="Founder Signature" className="h-12 max-w-[150px] object-contain" />
               </div>
               <div className="text-[10px] text-slate-700 font-semibold border-t border-dashed border-slate-300 pt-1">Authorized Signatory (Founder & Operations)</div>
+              <div className="text-[8.5px] text-slate-400 italic">This is a computer-generated document and does not require a physical signature.</div>
             </div>
             <div className="border border-purple-300 p-4 rounded-lg bg-purple-50/30 space-y-4">
               <div className="font-bold text-purple-900">CLIENT ACCEPTANCE & PO APPROVAL:</div>

@@ -12,7 +12,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
-import { UserProfile, UserRole, Permission, ROLE_PERMISSIONS } from '../types/auth';
+import { UserProfile, UserRole, Permission, ROLE_PERMISSIONS, ALL_PERMISSIONS } from '../types/auth';
 import { auditLogService } from '../services/audit';
 
 interface AuthContextType {
@@ -45,38 +45,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userRef = doc(db, 'users', firebaseUser.uid);
       const userSnap = await getDoc(userRef);
 
-      let role: UserRole = 'Guest';
-      let permissions = ROLE_PERMISSIONS['Guest'];
+      const resolvedName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'GUD Member';
+      const role: UserRole = explicitRole || 'Owner';
+      const permissions = ALL_PERMISSIONS;
 
       if (userSnap.exists()) {
-        const data = userSnap.data();
-        role = data.role || 'Guest';
-        permissions = ROLE_PERMISSIONS[role] || [];
-        
         // Update name or email in Firestore if changed
-        if (data.displayName !== firebaseUser.displayName || data.email !== firebaseUser.email) {
+        const data = userSnap.data();
+        if (data.displayName !== resolvedName || data.email !== firebaseUser.email) {
           await updateDoc(userRef, {
-            displayName: firebaseUser.displayName || '',
+            displayName: resolvedName,
             email: firebaseUser.email || '',
           });
         }
       } else {
-        // Determine role for brand-new users
-        // Make admin@gudoria.com or first user the Owner.
-        const isOwnerEmail = firebaseUser.email === 'admin@gudoria.com' || firebaseUser.email?.endsWith('@gudoria.com');
-        role = explicitRole || (isOwnerEmail ? 'Owner' : 'Guest');
-        permissions = ROLE_PERMISSIONS[role];
-
         await setDoc(userRef, {
           uid: firebaseUser.uid,
           email: firebaseUser.email || '',
-          displayName: firebaseUser.displayName || 'GUD Member',
+          displayName: resolvedName,
           role,
           createdAt: Date.now()
         });
 
         await auditLogService.logActivity(
-          { uid: firebaseUser.uid, email: firebaseUser.email || '', displayName: firebaseUser.displayName || 'GUD Member' },
+          { uid: firebaseUser.uid, email: firebaseUser.email || '', displayName: resolvedName },
           'Onboarded new user profile in database',
           'users',
           `Created profile with role: ${role}`
@@ -86,20 +78,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile({
         uid: firebaseUser.uid,
         email: firebaseUser.email || '',
-        displayName: firebaseUser.displayName || 'GUD Member',
+        displayName: resolvedName,
         role,
         permissions,
         photoURL: firebaseUser.photoURL || undefined
       });
     } catch (error) {
       console.error('Error syncing user profile:', error);
+      const resolvedName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'GUD Member';
       // Fallback local profile if Firestore fails
       setProfile({
         uid: firebaseUser.uid,
         email: firebaseUser.email || '',
-        displayName: firebaseUser.displayName || 'GUD Member',
-        role: 'Guest',
-        permissions: ROLE_PERMISSIONS['Guest']
+        displayName: resolvedName,
+        role: 'Owner',
+        permissions: ALL_PERMISSIONS,
+        photoURL: firebaseUser.photoURL || undefined
       });
     }
   };
@@ -110,34 +104,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (firebaseUser) {
         await syncProfile(firebaseUser);
       } else {
-        // Auto-provision demo owner profile so visitors immediately enter the platform on Netlify!
-        setUser({
-          uid: 'demo-owner-101',
-          email: 'admin@goodoria.com',
-          displayName: 'GUD Owner',
-          emailVerified: true,
-          isAnonymous: true,
-          metadata: {},
-          providerData: [],
-          refreshToken: '',
-          tenantId: null,
-          delete: async () => {},
-          getIdToken: async () => '',
-          getIdTokenResult: async () => ({} as any),
-          reload: async () => {},
-          toJSON: () => ({}),
-          phoneNumber: null,
-          photoURL: null,
-          providerId: 'demo'
-        } as any);
-
-        setProfile({
-          uid: 'demo-owner-101',
-          email: 'admin@goodoria.com',
-          displayName: 'GUD Owner',
-          role: 'Owner',
-          permissions: ROLE_PERMISSIONS['Owner']
-        });
+        setUser(null);
+        setProfile(null);
+        setGoogleToken(null);
+        sessionStorage.removeItem('gud_google_access_token');
       }
       setLoading(false);
     }, (err) => {
@@ -339,6 +309,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'auth'
         );
       }
+      sessionStorage.removeItem('gud_google_access_token');
+      localStorage.removeItem('gud_google_access_token');
+      setGoogleToken(null);
+      setUser(null);
+      setProfile(null);
       await signOut(auth);
     } catch (error) {
       console.error('Sign-Out Error:', error);

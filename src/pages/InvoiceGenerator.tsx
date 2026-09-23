@@ -58,6 +58,8 @@ const PRESET_CUSTOMERS = [
     Customer_ID: 'CUST-DRDENTAL',
     Business_Name: 'Dr. Dental Clinic',
     Contact_Person: 'Dr. Dental',
+    Phone: '+91 75598 63962',
+    Email: 'drdental@gmail.com',
     Address: 'Kochi, Kerala',
     City: 'Kochi',
     State: 'Kerala',
@@ -67,6 +69,8 @@ const PRESET_CUSTOMERS = [
     Customer_ID: 'CUST-0074',
     Business_Name: 'Moby',
     Contact_Person: 'Moby',
+    Phone: '+91 98470 12345',
+    Email: 'moby@example.com',
     Address: 'Kaniyapilly Rd, near Holiday Inn Hotel',
     City: 'Ernakulam',
     State: 'Kerala 682028 India',
@@ -76,6 +80,8 @@ const PRESET_CUSTOMERS = [
     Customer_ID: 'CUST-0075',
     Business_Name: 'Nihala Jasmine',
     Contact_Person: 'Nihala Jasmine',
+    Phone: '+91 97450 67890',
+    Email: 'nihala@example.com',
     Address: 'Naduvath House No:4, Kanhiyoor, Mookuthala Post',
     City: 'Malapuram Dist',
     State: 'Kerala - 679574',
@@ -85,6 +91,8 @@ const PRESET_CUSTOMERS = [
     Customer_ID: 'CUST-0041',
     Business_Name: 'Naveen',
     Contact_Person: 'Naveen',
+    Phone: '+91 94471 23456',
+    Email: 'naveen@example.com',
     Address: 'Delivery: Self',
     City: 'Ernakulam',
     State: 'Kerala',
@@ -269,6 +277,8 @@ export const InvoiceGenerator: React.FC = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
   const [clientName, setClientName] = useState('');
   const [clientAddress, setClientAddress] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
   const [clientCin, setClientCin] = useState('');
   const [clientGstin, setClientGstin] = useState('');
   
@@ -335,6 +345,8 @@ export const InvoiceGenerator: React.FC = () => {
         const parsed = JSON.parse(savedDraft);
         if (parsed.clientName !== undefined) setClientName(parsed.clientName);
         if (parsed.clientAddress !== undefined) setClientAddress(parsed.clientAddress);
+        if (parsed.clientPhone !== undefined) setClientPhone(parsed.clientPhone);
+        if (parsed.clientEmail !== undefined) setClientEmail(parsed.clientEmail);
         if (parsed.clientCin !== undefined) setClientCin(parsed.clientCin);
         if (parsed.clientGstin !== undefined) setClientGstin(parsed.clientGstin);
         if (parsed.invoiceSeq !== undefined) setInvoiceSeq(parsed.invoiceSeq);
@@ -361,6 +373,8 @@ export const InvoiceGenerator: React.FC = () => {
       selectedCustomerId,
       clientName,
       clientAddress,
+      clientPhone,
+      clientEmail,
       clientCin,
       clientGstin,
       invoiceSeq,
@@ -384,7 +398,7 @@ export const InvoiceGenerator: React.FC = () => {
       console.warn('Failed to save invoice draft:', e);
     }
   }, [
-    selectedCustomerId, clientName, clientAddress, clientCin, clientGstin,
+    selectedCustomerId, clientName, clientAddress, clientPhone, clientEmail, clientCin, clientGstin,
     invoiceSeq, invoiceTag, invoiceDate, flavors, box6Qty, box8Qty,
     hamperQty, barUnitPrice, courierCharge, discount, gstMode
   ]);
@@ -395,6 +409,8 @@ export const InvoiceGenerator: React.FC = () => {
     setSelectedCustomerId('');
     setClientName('');
     setClientAddress('');
+    setClientPhone('');
+    setClientEmail('');
     setClientCin('');
     setClientGstin('');
     setInvoiceSeq('1156');
@@ -432,6 +448,8 @@ export const InvoiceGenerator: React.FC = () => {
       setClientName(cust.Business_Name || cust.Contact_Person || '');
       const addrParts = [cust.Address, cust.City, cust.State].filter(Boolean);
       setClientAddress(addrParts.join(', ') || 'Kerala');
+      setClientPhone(cust.Phone || cust.WhatsApp || '');
+      setClientEmail(cust.Email || '');
       const cleanTag = (cust.Business_Name || cust.Contact_Person || 'Client').replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
       setInvoiceTag(cleanTag || 'Client');
       if (cust.Notes) {
@@ -608,6 +626,8 @@ export const InvoiceGenerator: React.FC = () => {
         setClientName(found.Business_Name || found.Contact_Person || '');
         const addrParts = [found.Address, found.City, found.State].filter(Boolean);
         setClientAddress(addrParts.join(', ') || 'Kerala');
+        setClientPhone(found.Phone || found.WhatsApp || '');
+        setClientEmail(found.Email || '');
         const cleanTag = (found.Business_Name || found.Contact_Person || 'Client').replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
         setInvoiceTag(cleanTag || 'Client');
         if (found.Notes) {
@@ -645,7 +665,8 @@ export const InvoiceGenerator: React.FC = () => {
   const cgst = itemsSubtotal * 0.025 + courierBase * 0.09;
   const grossTotal = subtotal + sgst + cgst;
   const totalReceivable = Math.max(0, grossTotal - discount);
-  const invoiceNoFormatted = `Invoice-${invoiceSeq}-GUD-${new Date(invoiceDate).getFullYear()}-${invoiceTag}`;
+  const invoiceNumOnly = `${invoiceSeq}-GUD-${new Date(invoiceDate).getFullYear()}-${invoiceTag}`;
+  const invoiceNoFormatted = `Invoice-${invoiceNumOnly}`;
 
   // PDF Export State Guard
   const [pdfStatus, setPdfStatus] = useState<'idle' | 'generating' | 'success' | 'error'>('idle');
@@ -1083,6 +1104,33 @@ CIN: U72200KL2015PTC039279
                   onChange={e => setClientAddress(e.target.value)}
                   className="w-full rounded-lg border border-[#303030] bg-[#0c0c0c] p-2 text-xs text-white focus:outline-none focus:border-red-500"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-medium text-neutral-300 mb-1">
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    value={clientPhone}
+                    onChange={e => setClientPhone(e.target.value)}
+                    placeholder="+91..."
+                    className="w-full rounded-lg border border-[#303030] bg-[#0c0c0c] p-2 text-xs text-white focus:outline-none focus:border-red-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium text-neutral-300 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={clientEmail}
+                    onChange={e => setClientEmail(e.target.value)}
+                    placeholder="client@example.com"
+                    className="w-full rounded-lg border border-[#303030] bg-[#0c0c0c] p-2 text-xs text-white focus:outline-none focus:border-red-500"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -1528,37 +1576,67 @@ CIN: U72200KL2015PTC039279
               className="bg-white text-slate-900 p-8 rounded-xl shadow-lg border border-slate-200 font-sans text-xs max-w-[794px] mx-auto box-border"
             >
             {/* Header */}
-            <div className="flex justify-between items-start border-b border-slate-200 pb-4 mb-4">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Invoice</h1>
-                <p className="text-slate-800 font-bold text-sm">Gudoria Food Innovations Private Limited</p>
-                <p className="text-slate-500 text-[11px]">Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038</p>
-                <p className="text-slate-500 text-[11px]">Ph: +91 95448 09992 | Email: gudchocolates@gmail.com</p>
+            <div className="flex justify-between items-start border-b border-slate-200 pb-4 mb-5">
+              <div className="flex items-start">
+                <img 
+                  src={getAssetUrl('/images/brand/gud_logo.png')} 
+                  alt="GUD Logo" 
+                  className="h-14 w-auto object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (!target.dataset.triedSvg) {
+                      target.dataset.triedSvg = 'true';
+                      target.src = getAssetUrl('/images/brand/gud_logo.svg');
+                    }
+                  }}
+                />
               </div>
-              <div className="text-right flex items-center justify-end">
-                <div className="p-1.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-800">
-                  <GudLogo size={36} />
-                </div>
+              <div className="text-right">
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900 uppercase">Invoice</h1>
+                <p className="text-slate-500 text-[11px] mt-1 leading-snug">
+                  Pranavam Tower 1st Floor, Petta, Poonithura, Maradu, Ernakulam, Kerala 682038
+                </p>
+                <p className="text-slate-500 text-[11px] leading-snug mt-0.5">
+                  <span>Ph: +91 95448 09992</span>
+                  <span className="mx-1.5 text-slate-300">•</span>
+                  <span>Email: gudchocolates@gmail.com</span>
+                </p>
+                <p className="text-slate-400 text-[10px] font-mono mt-0.5">
+                  <span>GSTIN: 32AANCA8181G1ZK</span>
+                  <span className="mx-1.5 text-slate-300">•</span>
+                  <span>CIN: U72200KL2015PTC039279</span>
+                </p>
               </div>
             </div>
 
             {/* Client & Metadata */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <div className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider mb-1">Invoice To:</div>
-                <div className="font-bold text-slate-900 text-sm">{clientName}</div>
-                <div className="text-slate-600 whitespace-pre-line mt-0.5">{clientAddress}</div>
-                {clientCin && <div className="text-slate-600 font-mono text-[11px] mt-1">{clientCin}</div>}
-                {clientGstin && <div className="text-slate-600 font-mono text-[11px]">{clientGstin}</div>}
+                <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider mb-1">Invoice To</div>
+                <div className="font-semibold text-slate-900 text-xs">{clientName || 'Customer Name'}</div>
+                {clientAddress && (
+                  <div className="text-slate-600 text-xs whitespace-pre-line leading-relaxed mt-0.5">{clientAddress}</div>
+                )}
+                {(clientPhone || clientEmail) && (
+                  <div className="text-slate-600 text-xs leading-relaxed mt-0.5">
+                    {[clientPhone, clientEmail].filter(Boolean).join(' • ')}
+                  </div>
+                )}
+                {(clientGstin || clientCin) && (
+                  <div className="text-slate-500 font-mono text-[11px] mt-1 space-y-0.5">
+                    {clientGstin && <div>{clientGstin}</div>}
+                    {clientCin && <div>{clientCin}</div>}
+                  </div>
+                )}
               </div>
-              <div className="text-right space-y-1">
+              <div className="text-right space-y-3">
                 <div>
-                  <span className="text-slate-400 font-medium">Invoice No: </span>
-                  <span className="font-bold text-slate-900 font-mono">{invoiceNoFormatted}</span>
+                  <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider mb-1">Invoice No</div>
+                  <div className="font-semibold text-slate-900 text-xs font-mono">{invoiceNumOnly}</div>
                 </div>
                 <div>
-                  <span className="text-slate-400 font-medium">Date: </span>
-                  <span className="font-semibold text-slate-800">{new Date(invoiceDate).toLocaleDateString('en-GB')}</span>
+                  <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider mb-1">Date</div>
+                  <div className="font-semibold text-slate-900 text-xs">{new Date(invoiceDate).toLocaleDateString('en-GB')}</div>
                 </div>
               </div>
             </div>
@@ -1657,21 +1735,24 @@ CIN: U72200KL2015PTC039279
             )}
 
             {/* Bank Details Footer */}
-            <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4 text-[10px] text-slate-500">
+            <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4 text-xs">
               <div>
-                <div className="font-bold text-slate-800 text-[11px] mb-1">Bank Details</div>
-                <div>Account Name: <span className="font-semibold text-slate-700">Gudoria Food Innovations Private Limited</span></div>
-                <div>Branch Name: <span className="font-semibold text-slate-700">ERNAKULAM - NRI</span></div>
-                <div>Account Number: <span className="font-semibold font-mono text-slate-700">0307073000000080</span></div>
-                <div>IFSC Code: <span className="font-semibold font-mono text-slate-700">SIBL0000307</span></div>
-                <div className="mt-1">GST NO: <span className="font-semibold font-mono text-slate-700">32AANCA8181G1ZK</span></div>
-                <div>CIN: <span className="font-semibold font-mono text-slate-700">U72200KL2015PTC039279</span></div>
+                <div className="text-slate-400 font-bold uppercase text-[10px] tracking-wider mb-1.5">Bank Details</div>
+                <div className="space-y-0.5 text-xs text-slate-600">
+                  <div><span className="text-slate-400">Bank Name:</span> <span className="font-semibold text-slate-800">South Indian Bank</span></div>
+                  <div><span className="text-slate-400">Account Name:</span> <span className="font-semibold text-slate-800">Gudoria Food Innovations Private Limited</span></div>
+                  <div><span className="text-slate-400">Account Number:</span> <span className="font-semibold font-mono text-slate-800">0307073000000080</span></div>
+                  <div><span className="text-slate-400">IFSC Code:</span> <span className="font-semibold font-mono text-slate-800">SIBL0000307</span></div>
+                  <div><span className="text-slate-400">Branch:</span> <span className="font-semibold text-slate-800">ERNAKULAM - NRI</span></div>
+                </div>
               </div>
               <div className="text-right flex flex-col items-end justify-end space-y-1">
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">For Gudoria Food Innovations Pvt Ltd</div>
-                <img src={getAssetUrl('/images/brand/founder_signature.jpg')} alt="Founder Signature" className="h-12 max-w-[140px] object-contain my-1" />
+                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">For Gudoria Food Innovations Pvt Ltd</div>
+                <div className="my-2 py-1 px-2.5 rounded bg-slate-50 border border-slate-200 text-[9px] text-slate-500 font-medium tracking-wide">
+                  Digitally Generated Invoice
+                </div>
                 <div className="text-[10px] font-semibold text-slate-700">Authorized Signatory</div>
-                <div className="text-[9px] text-slate-400">Founder & Operations</div>
+                <div className="text-[8.5px] text-slate-400 italic">This is a computer-generated invoice and does not require a physical signature.</div>
               </div>
             </div>
           </div>

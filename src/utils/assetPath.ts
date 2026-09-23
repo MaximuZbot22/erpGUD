@@ -20,8 +20,16 @@ export function getAssetUrl(path: string | undefined | null): string {
   // Remove leading slash to get pure relative path
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
 
-  // 1. Detect if running inside a GitHub Pages or subdirectory route in browser
+  // 1. Detect environment
   if (typeof window !== 'undefined') {
+    // On localhost, 127.0.0.1, or local dev preview, Vite always serves static files directly from root '/'
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]' || hostname === '';
+    if (isLocalhost) {
+      return `/${cleanPath}`;
+    }
+
+    // Detect if running inside a GitHub Pages (e.g. maximuzbot22.github.io/erpGUD/) or subdirectory
     const pathname = window.location.pathname;
     const match = pathname.match(/^(\/[a-zA-Z0-9_-]+)/);
     const knownAppRoutes = [

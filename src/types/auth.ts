@@ -42,7 +42,7 @@ export interface UserProfile {
   permissions: Permission[];
 }
 
-const ALL_PERMISSIONS: Permission[] = [
+export const ALL_PERMISSIONS: Permission[] = [
   'dashboard:read',
   'customers:read', 'customers:write',
   'vendors:read', 'vendors:write',

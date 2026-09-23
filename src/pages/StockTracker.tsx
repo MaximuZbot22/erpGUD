@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   PackageCheck, AlertTriangle, Plus, ArrowUpRight, ArrowDownRight, 
   RefreshCw, Search, CheckCircle2, Factory, Clock, ShieldAlert,
-  Boxes, Truck, Sparkles, Filter, Info, ChevronRight, Share2, Layers, Wrench
+  Boxes, Truck, Sparkles, Filter, Info, ChevronRight, Share2, Layers, Wrench,
+  Gift, Box, Calculator
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -22,12 +23,29 @@ export interface FlavorData {
   peanuts: number;
 }
 
+export interface Flavor8gData {
+  almond: number;
+  peanut: number;
+  orange: number;
+  lemon: number;
+}
+
 export interface StockBatch {
   dateReceived: string;
   batchId: string;
   mfgDate?: string;
   totalIn: FlavorData;
   damagedIn: FlavorData;
+}
+
+export interface Stock8gBatch {
+  dateReceived: string;
+  batchId: string;
+  totalIn: Flavor8gData;
+  damagedIn: Flavor8gData;
+  goodRemaining: Flavor8gData;
+  damagedRemaining: Flavor8gData;
+  notes?: string;
 }
 
 export interface StockMovement {
@@ -38,6 +56,32 @@ export interface StockMovement {
   stockType: 'Good' | 'Damaged';
   flavors: FlavorData;
 }
+
+const FLAVOR_8G_CONFIG: { 
+  key: keyof Flavor8gData; 
+  name: string; 
+  shortName: string; 
+  color: string; 
+  dotColor: string; 
+  image: string; 
+}[] = [
+  { key: 'almond', name: 'Almond Noir 8g', shortName: 'Almond (8g)', color: 'text-amber-400', dotColor: 'bg-amber-500', image: getAssetUrl('/images/brand/prod_almond_art.png') },
+  { key: 'peanut', name: 'Peanut Royale 8g', shortName: 'Peanut (8g)', color: 'text-stone-300', dotColor: 'bg-stone-300', image: getAssetUrl('/images/brand/prod_peanut_art.png') },
+  { key: 'orange', name: 'Orange Sunset 8g', shortName: 'Orange (8g)', color: 'text-orange-400', dotColor: 'bg-orange-500', image: getAssetUrl('/images/brand/prod_orange_art.png') },
+  { key: 'lemon', name: 'Sun-Kissed Lemon 8g', shortName: 'Lemon (8g)', color: 'text-lime-400', dotColor: 'bg-lime-400', image: getAssetUrl('/images/brand/prod_lemon_art.png') }
+];
+
+const SEED_8G_BATCHES: Stock8gBatch[] = [
+  {
+    dateReceived: '2026-08-24',
+    batchId: 'TB 1202',
+    totalIn: { almond: 120, peanut: 119, orange: 120, lemon: 120 },
+    damagedIn: { almond: 0, peanut: 0, orange: 0, lemon: 0 },
+    goodRemaining: { almond: 14, peanut: 13, orange: 14, lemon: 32 },
+    damagedRemaining: { almond: 0, peanut: 0, orange: 0, lemon: 0 },
+    notes: 'all were 120 when we got only peanut was 119'
+  }
+];
 
 const FLAVOR_CONFIG: { 
   key: keyof FlavorData; 
@@ -63,89 +107,72 @@ const parseSafeInt = (val: any): number => {
   return isNaN(parsed) ? 0 : parsed;
 };
 
-// Initial Seed Batches matching the user's exact Google Sheet structure
+// Parse Indian date formats (e.g. 24/08/26 or 24/08/2026) to standard YYYY-MM-DD
+const parseSheetDate = (dStr: any): string => {
+  if (!dStr) return '';
+  const trimmed = String(dStr).trim();
+  const parts = trimmed.split(/[-/]/);
+  if (parts.length === 3) {
+    let [d, m, y] = parts;
+    if (y && y.length === 2) y = '20' + y;
+    if (d && d.length === 4) { // YYYY-MM-DD
+      return `${d}-${m.padStart(2, '0')}-${y.padStart(2, '0')}`;
+    }
+    if (d && m && y) { // DD/MM/YYYY or DD/MM/YY
+      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+  }
+  return trimmed;
+};
+
+// Initial Seed Batches matching the user's exact live Google Sheet structure ('25 Grams bars' tab)
 const SEED_BATCHES: StockBatch[] = [
   {
-    dateReceived: '2023-07-05',
-    batchId: 'B-0705',
-    totalIn: { almond: 50, orange: 50, jackfruit: 50, lemon: 50, mocha: 50, seaSalt: 50, peanuts: 50 },
-    damagedIn: { almond: 2, orange: 2, jackfruit: 2, lemon: 2, mocha: 2, seaSalt: 2, peanuts: 2 }
-  },
-  {
-    dateReceived: '2023-07-12',
-    batchId: 'B-0712',
-    totalIn: { almond: 60, orange: 60, jackfruit: 60, lemon: 60, mocha: 60, seaSalt: 60, peanuts: 60 },
+    dateReceived: '2026-08-24',
+    batchId: 'TB 1202',
+    totalIn: { almond: 139, orange: 140, jackfruit: 160, lemon: 65, mocha: 81, seaSalt: 100, peanuts: 65 },
     damagedIn: { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 0 }
   },
   {
-    dateReceived: '2023-08-02',
-    batchId: 'B-0802',
-    totalIn: { almond: 40, orange: 40, jackfruit: 40, lemon: 40, mocha: 40, seaSalt: 40, peanuts: 40 },
-    damagedIn: { almond: 5, orange: 5, jackfruit: 5, lemon: 5, mocha: 5, seaSalt: 5, peanuts: 5 }
+    dateReceived: '2026-08-21',
+    batchId: 'TB 1201',
+    totalIn: { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 18 },
+    damagedIn: { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 0 }
   },
   {
-    dateReceived: '2023-08-05',
-    batchId: 'B-0805',
-    totalIn: { almond: 70, orange: 70, jackfruit: 70, lemon: 70, mocha: 70, seaSalt: 70, peanuts: 70 },
-    damagedIn: { almond: 1, orange: 1, jackfruit: 1, lemon: 1, mocha: 1, seaSalt: 1, peanuts: 1 }
-  },
-  {
-    dateReceived: '2023-08-10',
-    batchId: 'B-0810',
-    totalIn: { almond: 55, orange: 55, jackfruit: 55, lemon: 55, mocha: 55, seaSalt: 55, peanuts: 55 },
-    damagedIn: { almond: 3, orange: 3, jackfruit: 3, lemon: 3, mocha: 3, seaSalt: 3, peanuts: 3 }
-  },
-  {
-    dateReceived: '2026-08-18',
-    batchId: 'B-0820',
-    totalIn: { almond: 80, orange: 80, jackfruit: 80, lemon: 80, mocha: 80, seaSalt: 80, peanuts: 80 },
-    damagedIn: { almond: 2, orange: 2, jackfruit: 2, lemon: 2, mocha: 2, seaSalt: 2, peanuts: 2 }
+    dateReceived: '2026-09-21',
+    batchId: 'TB 1203',
+    totalIn: { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 50, seaSalt: 47, peanuts: 0 },
+    damagedIn: { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 0 }
   }
 ];
 
+// Initial Seed Movements matching user's exact live Google Sheet ('Stock Movements' tab)
 const SEED_MOVEMENTS: StockMovement[] = [
-  {
-    id: 'MOV-001',
-    date: '2023-07-06',
-    reason: 'Customer Order (Customer A)',
-    batchId: 'B-0705',
-    stockType: 'Good',
-    flavors: { almond: 10, orange: 5, jackfruit: 10, lemon: 5, mocha: 10, seaSalt: 5, peanuts: 10 }
-  },
-  {
-    id: 'MOV-002',
-    date: '2023-07-07',
-    reason: 'Supplier Return (Damaged Sample)',
-    batchId: 'B-0705',
-    stockType: 'Damaged',
-    flavors: { almond: 2, orange: 1, jackfruit: 2, lemon: 0, mocha: 2, seaSalt: 1, peanuts: 1 }
-  },
-  {
-    id: 'MOV-003',
-    date: '2023-07-15',
-    reason: 'Customer Order (Customer B)',
-    batchId: 'B-0712',
-    stockType: 'Good',
-    flavors: { almond: 20, orange: 15, jackfruit: 20, lemon: 15, mocha: 20, seaSalt: 15, peanuts: 20 }
-  },
-  {
-    id: 'MOV-004',
-    date: '2023-08-03',
-    reason: 'Supplier Return (Damaged)',
-    batchId: 'B-0802',
-    stockType: 'Damaged',
-    flavors: { almond: 5, orange: 5, jackfruit: 5, lemon: 5, mocha: 5, seaSalt: 5, peanuts: 5 }
-  }
+  { id: 'MOV-1', date: '2026-08-24', reason: 'nihara', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 20, orange: 20, jackfruit: 20, lemon: 20, mocha: 20, seaSalt: 20, peanuts: 20 } },
+  { id: 'MOV-2', date: '2026-08-24', reason: 'arun', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 21, orange: 49, jackfruit: 42, lemon: 0, mocha: 18, seaSalt: 71, peanuts: 1 } },
+  { id: 'MOV-3', date: '2026-08-24', reason: 'naveen', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 23, orange: 0, jackfruit: 23, lemon: 0, mocha: 23, seaSalt: 0, peanuts: 0 } },
+  { id: 'MOV-4', date: '2026-08-25', reason: 'HMPER divyanshi', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 2, orange: 2, jackfruit: 2, lemon: 0, mocha: 2, seaSalt: 2, peanuts: 0 } },
+  { id: 'MOV-5', date: '2026-08-30', reason: 'BNI/ROTARY event', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 20, orange: 20, jackfruit: 20, lemon: 13, mocha: 16, seaSalt: 5, peanuts: 2 } },
+  { id: 'MOV-6', date: '2026-08-30', reason: 'BNI/ROTARY event', batchId: 'TB 1201', stockType: 'Good', flavors: { almond: 0, orange: 0, jackfruit: 0, lemon: 7, mocha: 0, seaSalt: 0, peanuts: 18 } },
+  { id: 'MOV-7', date: '2026-08-31', reason: 'sabin', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 1, orange: 1, jackfruit: 1, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 1 } },
+  { id: 'MOV-8', date: '2026-08-31', reason: 'office (manasi)', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 1, seaSalt: 0, peanuts: 0 } },
+  { id: 'MOV-9', date: '2026-09-01', reason: 'nihara', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 15, orange: 15, jackfruit: 15, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 0 } },
+  { id: 'MOV-10', date: '2026-09-10', reason: 'samples (Hima)', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 0, orange: 0, jackfruit: 1, lemon: 0, mocha: 1, seaSalt: 0, peanuts: 0 } },
+  { id: 'MOV-11', date: '2026-09-19', reason: 'Hima (Reshma)', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 0, orange: 0, jackfruit: 2, lemon: 0, mocha: 2, seaSalt: 0, peanuts: 0 } },
+  { id: 'MOV-12', date: '2026-09-21', reason: 'Horg', batchId: 'TB 1203', stockType: 'Good', flavors: { almond: 3, orange: 3, jackfruit: 3, lemon: 3, mocha: 3, seaSalt: 3, peanuts: 3 } },
+  { id: 'MOV-13', date: '2026-09-21', reason: 'Nihara', batchId: 'TB 1203', stockType: 'Good', flavors: { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 0, seaSalt: 20, peanuts: 0 } },
+  { id: 'MOV-14', date: '2026-09-21', reason: 'Nihara', batchId: 'TB 1202', stockType: 'Good', flavors: { almond: 10, orange: 10, jackfruit: 10, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 0 } }
 ];
 
 export const StockTracker: React.FC = () => {
   const { googleToken, signInWithGoogle } = useAuth();
   const { sendNotification } = useNotifications();
 
-  // Primary State
+  // Primary State - versioned storage key to immediately clear stale corrupted demo cache
   const [batches, setBatches] = useState<StockBatch[]>(() => {
     try {
-      const saved = localStorage.getItem('gud_stock_batches_v1');
+      const saved = localStorage.getItem('gud_stock_batches_v2');
       return saved ? JSON.parse(saved) : SEED_BATCHES;
     } catch {
       return SEED_BATCHES;
@@ -154,7 +181,7 @@ export const StockTracker: React.FC = () => {
 
   const [movements, setMovements] = useState<StockMovement[]>(() => {
     try {
-      const saved = localStorage.getItem('gud_stock_movements_v1');
+      const saved = localStorage.getItem('gud_stock_movements_v2');
       return saved ? JSON.parse(saved) : SEED_MOVEMENTS;
     } catch {
       return SEED_MOVEMENTS;
@@ -162,23 +189,40 @@ export const StockTracker: React.FC = () => {
   });
 
   const [searchVal, setSearchVal] = useState('');
+  const [activeCategory, setActiveCategory] = useState<'25g' | '8g'>('25g');
+  const [activeLedgerTab, setActiveLedgerTab] = useState<'25g' | '8g'>('25g');
+  const [boxSimBars, setBoxSimBars] = useState<number>(64);
   const [isReceivingModalOpen, setIsReceivingModalOpen] = useState(false);
   const [isMovementModalOpen, setIsMovementModalOpen] = useState(false);
   const [loadingSync, setLoadingSync] = useState(false);
+
+  // 8g Mini Chocolate Bars State (tracked in 'Box Tracker' tab)
+  const [batches8g, setBatches8g] = useState<Stock8gBatch[]>(() => {
+    try {
+      const saved = localStorage.getItem('gud_stock_batches_8g_v2');
+      return saved ? JSON.parse(saved) : SEED_8G_BATCHES;
+    } catch {
+      return SEED_8G_BATCHES;
+    }
+  });
 
   // 10-Row Table Pagination Controls
   const [batchPage, setBatchPage] = useState(1);
   const [movementPage, setMovementPage] = useState(1);
   const ROWS_PER_PAGE = 10;
 
-  // Sync to LocalStorage
+  // Sync to LocalStorage (v2)
   useEffect(() => {
-    localStorage.setItem('gud_stock_batches_v1', JSON.stringify(batches));
+    localStorage.setItem('gud_stock_batches_v2', JSON.stringify(batches));
   }, [batches]);
 
   useEffect(() => {
-    localStorage.setItem('gud_stock_movements_v1', JSON.stringify(movements));
+    localStorage.setItem('gud_stock_movements_v2', JSON.stringify(movements));
   }, [movements]);
+
+  useEffect(() => {
+    localStorage.setItem('gud_stock_batches_8g_v2', JSON.stringify(batches8g));
+  }, [batches8g]);
 
   // Fetch live Google Sheet Data if Token Available
   const fetchSheetStockData = async () => {
@@ -186,12 +230,16 @@ export const StockTracker: React.FC = () => {
     setLoadingSync(true);
     const sheetId = '12F0V0uId2dB9QJsnIqZACVdCjcrmHVO_ra-8q46KKXk';
     try {
-      // Try 'Inventory Tracker' tab first, then fallback to 'Stock Summary'
-      let res;
+      // Try '25 Grams bars' tab first (gid=1001), then fallback to 'Inventory Tracker' and 'Stock Summary'
+      let res: any;
       try {
-        res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Inventory Tracker'!A6:AD");
+        res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'25 Grams bars'!A6:AD");
       } catch {
-        res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Stock Summary'!A5:AE");
+        try {
+          res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Inventory Tracker'!A6:AD");
+        } catch {
+          res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Stock Summary'!A5:AE");
+        }
       }
 
       if (res?.values && res.values.length > 0) {
@@ -200,7 +248,7 @@ export const StockTracker: React.FC = () => {
           if (!row[0] || !row[1]) return;
           const bId = row[1].trim();
           parsedBatches.push({
-            dateReceived: row[0],
+            dateReceived: parseSheetDate(row[0]),
             batchId: bId,
             totalIn: {
               almond: parseSafeInt(row[2]),
@@ -228,18 +276,19 @@ export const StockTracker: React.FC = () => {
         setBatches([]);
       }
 
-      // Also fetch live Stock Movements tab if present
+      // Also fetch live Stock Movements tab
       try {
         const movRes = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Stock Movements'!A2:K");
         if (movRes?.values && movRes.values.length > 0) {
           const parsedMovs: StockMovement[] = [];
           movRes.values.forEach((row: string[], idx: number) => {
-            if (!row[0] || !row[2]) return;
+            if (!row[1] && !row[2]) return;
+            const bId = row[2]?.trim() || 'TB 1202';
             parsedMovs.push({
               id: `MOV-LIVE-${idx + 1}`,
-              date: row[0],
+              date: row[0] ? parseSheetDate(row[0]) : 'Undated',
               reason: row[1] || 'Movement',
-              batchId: row[2].trim(),
+              batchId: bId,
               stockType: (row[3] === 'Damaged' ? 'Damaged' : 'Good') as 'Good' | 'Damaged',
               flavors: {
                 almond: parseSafeInt(row[4]),
@@ -258,6 +307,49 @@ export const StockTracker: React.FC = () => {
         }
       } catch (e) {
         console.warn('Google Sheet movements fetch error:', e);
+      }
+
+      // Also fetch live 8g bars from 'Box Tracker' tab (gid=1003)
+      try {
+        const boxRes = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Box Tracker'!A6:S");
+        if (boxRes?.values && boxRes.values.length > 0) {
+          const parsed8g: Stock8gBatch[] = [];
+          boxRes.values.forEach((row: string[]) => {
+            if (!row[0] || !row[1]) return;
+            parsed8g.push({
+              dateReceived: parseSheetDate(row[0]),
+              batchId: row[1].trim(),
+              totalIn: {
+                almond: parseSafeInt(row[2]),
+                peanut: parseSafeInt(row[6]),
+                orange: parseSafeInt(row[10]),
+                lemon: parseSafeInt(row[14])
+              },
+              damagedIn: {
+                almond: parseSafeInt(row[3]),
+                peanut: parseSafeInt(row[7]),
+                orange: parseSafeInt(row[11]),
+                lemon: parseSafeInt(row[15])
+              },
+              goodRemaining: {
+                almond: parseSafeInt(row[4]),
+                peanut: parseSafeInt(row[8]),
+                orange: parseSafeInt(row[12]),
+                lemon: parseSafeInt(row[16])
+              },
+              damagedRemaining: {
+                almond: parseSafeInt(row[5]),
+                peanut: parseSafeInt(row[9]),
+                orange: parseSafeInt(row[13]),
+                lemon: parseSafeInt(row[17])
+              },
+              notes: row[18] || ''
+            });
+          });
+          setBatches8g(parsed8g);
+        }
+      } catch (e) {
+        console.warn('Google Sheet Box Tracker fetch error:', e);
       }
     } catch (e) {
       console.warn('Google Sheet stock fetch error, using local state:', e);
@@ -336,7 +428,7 @@ export const StockTracker: React.FC = () => {
     });
   }, [batches, movements]);
 
-  // Grand Totals across all active batches
+  // Grand Totals across all active 25g batches
   const grandTotals = useMemo(() => {
     const totalGood: FlavorData = { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 0 };
     const totalDamaged: FlavorData = { almond: 0, orange: 0, jackfruit: 0, lemon: 0, mocha: 0, seaSalt: 0, peanuts: 0 };
@@ -353,6 +445,55 @@ export const StockTracker: React.FC = () => {
 
     return { totalGood, totalDamaged, sumGood, sumDamaged };
   }, [batchBalances]);
+
+  // Grand Totals for 8g Mini Bars & 8-Piece Gift Box calculations
+  const totals8g = useMemo(() => {
+    const totalGood: Flavor8gData = { almond: 0, peanut: 0, orange: 0, lemon: 0 };
+    const totalDamaged: Flavor8gData = { almond: 0, peanut: 0, orange: 0, lemon: 0 };
+
+    batches8g.forEach(b => {
+      totalGood.almond += b.goodRemaining.almond;
+      totalGood.peanut += b.goodRemaining.peanut;
+      totalGood.orange += b.goodRemaining.orange;
+      totalGood.lemon += b.goodRemaining.lemon;
+
+      totalDamaged.almond += b.damagedRemaining.almond;
+      totalDamaged.peanut += b.damagedRemaining.peanut;
+      totalDamaged.orange += b.damagedRemaining.orange;
+      totalDamaged.lemon += b.damagedRemaining.lemon;
+    });
+
+    const sumGoodBars = totalGood.almond + totalGood.peanut + totalGood.orange + totalGood.lemon;
+    const sumDamagedBars = totalDamaged.almond + totalDamaged.peanut + totalDamaged.orange + totalDamaged.lemon;
+
+    // Standard 8-piece gift box calculation: 8 bars per box
+    const boxes8pc = Math.floor(sumGoodBars / 8);
+    const leftover8pc = sumGoodBars % 8;
+
+    // 6-piece gift box calculation: 6 bars per box
+    const boxes6pc = Math.floor(sumGoodBars / 6);
+    const leftover6pc = sumGoodBars % 6;
+
+    // Balanced sets (2 bars of each of the 4 flavors per box = 8 bars)
+    const balancedBoxes8pc = Math.min(
+      Math.floor(totalGood.almond / 2),
+      Math.floor(totalGood.peanut / 2),
+      Math.floor(totalGood.orange / 2),
+      Math.floor(totalGood.lemon / 2)
+    );
+
+    return {
+      totalGood,
+      totalDamaged,
+      sumGoodBars,
+      sumDamagedBars,
+      boxes8pc,
+      leftover8pc,
+      boxes6pc,
+      leftover6pc,
+      balancedBoxes8pc
+    };
+  }, [batches8g]);
 
   // FIFO Engine: Find oldest batch with remaining good stock
   const fifoOldestBatch = useMemo(() => {
@@ -450,10 +591,10 @@ export const StockTracker: React.FC = () => {
       });
 
       try {
-        await GoogleSheetsService.appendSpreadsheetValues(googleToken, sheetId, "'Inventory Tracker'!A6:AD", [rowValues]);
+        await GoogleSheetsService.appendSpreadsheetValues(googleToken, sheetId, "'25 Grams bars'!A6:AD", [rowValues]);
       } catch {
         try {
-          await GoogleSheetsService.appendSpreadsheetValues(googleToken, sheetId, "'Stock Summary'!A5:AE", [rowValues]);
+          await GoogleSheetsService.appendSpreadsheetValues(googleToken, sheetId, "'Inventory Tracker'!A6:AD", [rowValues]);
         } catch (e) {
           console.warn('Google Sheet batch append error:', e);
         }
@@ -621,9 +762,23 @@ export const StockTracker: React.FC = () => {
 
     try {
       // Fetch existing rows from row 6 to 50
-      const res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Inventory Tracker'!A6:AD");
+      let res: any;
+      let targetTab = "'25 Grams bars'";
+      try {
+        res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'25 Grams bars'!A6:AD");
+        targetTab = "'25 Grams bars'";
+      } catch {
+        try {
+          res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Inventory Tracker'!A6:AD");
+          targetTab = "'Inventory Tracker'";
+        } catch {
+          res = await GoogleSheetsService.getSpreadsheetValues(googleToken, sheetId, "'Stock Summary'!A5:AE");
+          targetTab = "'Stock Summary'";
+        }
+      }
+
       if (!res?.values || res.values.length === 0) {
-        alert('No rows found in Inventory Tracker to repair.');
+        alert('No rows found in sheet to repair.');
         return;
       }
 
@@ -662,7 +817,7 @@ export const StockTracker: React.FC = () => {
       await GoogleSheetsService.updateSpreadsheetValues(
         googleToken,
         sheetId,
-        `'Inventory Tracker'!A6:AD${endRow}`,
+        `${targetTab}!A6:AD${endRow}`,
         repairedRows,
         'USER_ENTERED'
       );
@@ -677,13 +832,16 @@ export const StockTracker: React.FC = () => {
     }
   };
 
-  // Clear local demo stock data
+  // Clear local demo stock data and reset cache
   const handleClearLocalDemoData = () => {
-    if (confirm('Are you sure you want to clear local test data and reset to 0 stock?')) {
+    if (confirm('Are you sure you want to clear cached stock data and re-sync fresh from Google Sheets?')) {
       localStorage.removeItem('gud_stock_batches_v1');
       localStorage.removeItem('gud_stock_movements_v1');
-      setBatches([]);
-      setMovements([]);
+      localStorage.removeItem('gud_stock_batches_v2');
+      localStorage.removeItem('gud_stock_movements_v2');
+      setBatches(SEED_BATCHES);
+      setMovements(SEED_MOVEMENTS);
+      fetchSheetStockData();
     }
   };
 
@@ -695,6 +853,16 @@ export const StockTracker: React.FC = () => {
       f.shortName.toLowerCase().includes(searchVal.toLowerCase())
     );
   }, [searchVal]);
+
+  // Filtered 8g Flavor Cards based on Search
+  const filteredFlavors8g = useMemo(() => {
+    if (!searchVal) return FLAVOR_8G_CONFIG;
+    return FLAVOR_8G_CONFIG.filter(f =>
+      f.name.toLowerCase().includes(searchVal.toLowerCase()) ||
+      f.shortName.toLowerCase().includes(searchVal.toLowerCase())
+    );
+  }, [searchVal]);
+
 
   return (
     <div className="space-y-6 pb-20">
@@ -806,30 +974,61 @@ export const StockTracker: React.FC = () => {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* GRAND TOTAL KPI SUMMARY CARDS */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Card 1: 25g Gourmet Bars */}
         <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Total Good Stock Available</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">25g Gourmet Bars</p>
               <h4 className="text-2xl font-bold text-white font-mono mt-1">
                 {grandTotals.sumGood} <span className="text-xs font-normal text-neutral-400">bars</span>
               </h4>
-              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">Ready for customer orders</p>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">7 Origin Flavors · Ready to ship</p>
             </div>
             <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
-              <CheckCircle2 className="w-4 h-4" />
+              <PackageCheck className="w-4 h-4" />
             </div>
           </CardContent>
         </Card>
 
+        {/* Card 2: 8g Mini Bars & 8-Piece Gift Box Capacity */}
+        <Card className="bg-[#1F1F1F] border-amber-500/30 bg-gradient-to-br from-[#1F1F1F] to-amber-950/20">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-amber-300">8g Bars & Gift Boxes</p>
+                <span className="px-1 py-0.2 text-[8px] bg-amber-500/20 text-amber-300 rounded font-mono uppercase">
+                  Box Engine
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1 mt-1 flex-wrap">
+                <span className="text-xl sm:text-2xl font-bold text-amber-400 font-mono">{totals8g.sumGoodBars}</span>
+                <span className="text-[11px] text-neutral-400 font-medium">(8g bars)</span>
+                <span className="text-xs text-neutral-500 font-bold mx-0.5">or</span>
+                <span className="text-xl sm:text-2xl font-bold text-white font-mono">{totals8g.boxes8pc}</span>
+                <span className="text-[11px] text-amber-300 font-semibold">(8-pc boxes)</span>
+              </div>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium truncate">
+                {totals8g.balancedBoxes8pc} balanced 4-flavor boxes · {totals8g.leftover8pc} leftover
+              </p>
+            </div>
+            <div className="p-2.5 bg-amber-500/10 text-amber-400 rounded-lg border border-amber-500/20 flex-shrink-0 ml-2">
+              <Gift className="w-4 h-4" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Card 3: Total Damaged Stock */}
         <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Total Damaged Stock</p>
               <h4 className="text-2xl font-bold text-white font-mono mt-1">
-                {grandTotals.sumDamaged} <span className="text-xs font-normal text-neutral-400">bars</span>
+                {grandTotals.sumDamaged + totals8g.sumDamagedBars} <span className="text-xs font-normal text-neutral-400">bars</span>
               </h4>
-              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">Available for samples / returns</p>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">
+                25g: {grandTotals.sumDamaged} · 8g: {totals8g.sumDamagedBars} (samples/returns)
+              </p>
             </div>
             <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
               <AlertTriangle className="w-4 h-4" />
@@ -837,32 +1036,20 @@ export const StockTracker: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Card 4: Active Batches */}
         <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Active Batches</p>
               <h4 className="text-2xl font-bold text-white font-mono mt-1">
-                {batchBalances.filter(b => b.totalGoodLeft > 0).length} <span className="text-xs font-normal text-neutral-400">batches</span>
+                {batchBalances.filter(b => b.totalGoodLeft > 0).length + batches8g.length} <span className="text-xs font-normal text-neutral-400">batches</span>
               </h4>
-              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">FIFO prioritized</p>
+              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">
+                {batchBalances.filter(b => b.totalGoodLeft > 0).length} (25g) + {batches8g.length} (8g Box Tracker)
+              </p>
             </div>
             <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
               <Boxes className="w-4 h-4" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Movements Logged</p>
-              <h4 className="text-2xl font-bold text-white font-mono mt-1">
-                {movements.length} <span className="text-xs font-normal text-neutral-400">records</span>
-              </h4>
-              <p className="text-[10px] text-neutral-400 mt-0.5 font-medium">Dispatches & returns</p>
-            </div>
-            <div className="p-2.5 bg-[#272727] text-neutral-300 rounded-lg border border-[#383838]">
-              <Truck className="w-4 h-4" />
             </div>
           </CardContent>
         </Card>
@@ -871,239 +1058,657 @@ export const StockTracker: React.FC = () => {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* 🍫 INSTANT FLAVOR STOCK MATRIX (FOR ON-THE-GO LOOKUP ON PHONE) */}
       {/* ───────────────────────────────────────────────────────────── */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 🍫 INSTANT FLAVOR STOCK MATRIX & 8G GIFT BOX ENGINE */}
+      {/* ───────────────────────────────────────────────────────────── */}
       <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
         <CardHeader className="pb-3 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#2E2E2E]">
           <div>
             <CardTitle className="text-base font-bold text-white flex items-center gap-2">
               <Layers className="w-4 h-4 text-neutral-300" />
-              <span>Instant Flavor Stock Lookup (7 Chocolates)</span>
+              <span>Instant Flavor Stock Lookup</span>
             </CardTitle>
             <p className="text-xs text-neutral-400 mt-0.5">
-              Real-time available inventory across all 7 artisanal chocolate flavors.
+              {activeCategory === '25g'
+                ? 'Real-time available inventory across all 7 artisanal 25g chocolate flavors.'
+                : 'Real-time available inventory for 8g mini bars & 8-piece gift box capacity.'}
             </p>
           </div>
 
-          <div className="relative w-full md:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-neutral-400" />
-            <input
-              type="text"
-              placeholder="Search flavor..."
-              value={searchVal}
-              onChange={e => setSearchVal(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#121212] border border-[#2E2E2E] rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400"
-            />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            {/* Category Switcher Tabs */}
+            <div className="flex items-center bg-[#121212] p-1 rounded-lg border border-[#2E2E2E]">
+              <button
+                type="button"
+                onClick={() => setActiveCategory('25g')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                  activeCategory === '25g'
+                    ? 'bg-[#272727] text-white shadow-sm border border-[#3E3E3E]'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                <span>🍫 25g Gourmet Bars</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#181818] border border-[#333] text-neutral-300 font-mono">
+                  {grandTotals.sumGood}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory('8g')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                  activeCategory === '8g'
+                    ? 'bg-amber-950/50 text-amber-300 shadow-sm border border-amber-800/50 font-bold'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                <Gift className="w-3.5 h-3.5 text-amber-400" />
+                <span>🎁 8g Bars & Gift Boxes</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-900/30 border border-amber-700/40 text-amber-300 font-mono">
+                  {totals8g.sumGoodBars} bars / {totals8g.boxes8pc} boxes
+                </span>
+              </button>
+            </div>
+
+            {/* Flavor Search Box */}
+            <div className="relative w-full sm:w-48">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-neutral-400" />
+              <input
+                type="text"
+                placeholder={activeCategory === '25g' ? 'Search 25g flavor...' : 'Search 8g flavor...'}
+                value={searchVal}
+                onChange={e => setSearchVal(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#121212] border border-[#2E2E2E] rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400"
+              />
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {filteredFlavors.map(f => {
-              const goodQty = grandTotals.totalGood[f.key];
-              const damagedQty = grandTotals.totalDamaged[f.key];
-              const isLow = goodQty < 50;
 
-              return (
-                <div 
-                  key={f.key} 
-                  className="p-3.5 rounded-xl border border-[#2E2E2E] bg-[#181818] hover:bg-[#202020] hover:border-[#3E3E3E] transition-all flex flex-col justify-between group"
-                >
-                  {/* Top Row: Artwork Thumbnail + Flavor Name + Minimal Status Badge */}
-                  <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#2E2E2E] flex items-center justify-center p-1 flex-shrink-0 group-hover:border-[#444] transition">
-                          <img 
-                            src={f.image} 
-                            alt={f.name} 
-                            className="w-full h-full object-contain drop-shadow-sm" 
-                            onError={(e) => {
-                              (e.target as HTMLElement).style.display = 'none';
-                            }}
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${f.dotColor}`} />
-                            <h4 className="text-xs font-bold text-white truncate">{f.name}</h4>
+        <CardContent className="p-4 space-y-4">
+          {/* VIEW A: 25G GOURMET BARS (7 FLAVORS) */}
+          {activeCategory === '25g' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {filteredFlavors.map(f => {
+                const goodQty = grandTotals.totalGood[f.key];
+                const damagedQty = grandTotals.totalDamaged[f.key];
+                const isLow = goodQty < 50;
+
+                return (
+                  <div 
+                    key={f.key} 
+                    className="p-3.5 rounded-xl border border-[#2E2E2E] bg-[#181818] hover:bg-[#202020] hover:border-[#3E3E3E] transition-all flex flex-col justify-between group"
+                  >
+                    {/* Top Row: Artwork Thumbnail + Flavor Name + Minimal Status Badge */}
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#2E2E2E] flex items-center justify-center p-1 flex-shrink-0 group-hover:border-[#444] transition relative overflow-hidden">
+                            <img 
+                              src={f.image} 
+                              alt={f.name} 
+                              className="w-full h-full object-contain drop-shadow-sm relative z-10" 
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                if (!target.dataset.triedFallback) {
+                                  target.dataset.triedFallback = 'true';
+                                  target.src = `/images/brand/${f.image.split('/').pop()}`;
+                                } else {
+                                  target.style.display = 'none';
+                                }
+                              }}
+                            />
+                            <span className={`w-3.5 h-3.5 rounded-full ${f.dotColor} opacity-40`} />
                           </div>
-                          <span className="text-[10px] text-neutral-400 font-medium block">25g Origin Bar</span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${f.dotColor}`} />
+                              <h4 className="text-xs font-bold text-white truncate">{f.name}</h4>
+                            </div>
+                            <span className="text-[10px] text-neutral-400 font-medium block">25g Origin Bar</span>
+                          </div>
                         </div>
+
+                        <span className={`px-2 py-0.5 text-[9px] font-semibold rounded-full flex-shrink-0 border ${
+                          isLow 
+                            ? 'bg-amber-950/40 text-amber-300 border-amber-800/40' 
+                            : 'bg-[#272727] text-neutral-300 border-[#383838]'
+                        }`}>
+                          {isLow ? 'Low Stock' : 'In Stock'}
+                        </span>
                       </div>
 
-                      <span className={`px-2 py-0.5 text-[9px] font-semibold rounded-full flex-shrink-0 border ${
-                        isLow 
-                          ? 'bg-amber-950/40 text-amber-300 border-amber-800/40' 
-                          : 'bg-[#272727] text-neutral-300 border-[#383838]'
-                      }`}>
-                        {isLow ? 'Low Stock' : 'In Stock'}
-                      </span>
+                      {/* Stock Numbers */}
+                      <div className="mt-3.5 pt-2.5 border-t border-[#262626] flex items-baseline justify-between">
+                        <div>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-black font-mono text-white tracking-tight">{goodQty}</span>
+                            <span className="text-[11px] font-medium text-neutral-400">Good</span>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-xs font-bold font-mono text-neutral-400">
+                            {damagedQty > 0 ? (
+                              <span className="text-rose-400/90">{damagedQty}</span>
+                            ) : (
+                              <span>0</span>
+                            )}
+                          </span>
+                          <span className="text-[10px] text-neutral-400 block">Damaged/Samples</span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Stock Numbers */}
-                    <div className="mt-3.5 pt-2.5 border-t border-[#262626] flex items-baseline justify-between">
-                      <div>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-black font-mono text-white tracking-tight">{goodQty}</span>
-                          <span className="text-[11px] font-medium text-neutral-400">Good</span>
-                        </div>
-                      </div>
+                    {/* Card Micro Footer */}
+                    <div className="mt-2.5 pt-2 border-t border-[#222222] flex items-center justify-between text-[10px] text-neutral-400">
+                      <span className="flex items-center gap-1">
+                        <span className={`w-1 h-1 rounded-full ${f.dotColor}`} />
+                        <span>{f.shortName}</span>
+                      </span>
+                      <span className="font-mono text-neutral-400 font-medium">Ready</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
-                      <div className="text-right">
-                        <span className="text-xs font-bold font-mono text-neutral-400">
-                          {damagedQty > 0 ? (
-                            <span className="text-rose-400/90">{damagedQty}</span>
-                          ) : (
-                            <span>0</span>
-                          )}
+          {/* VIEW B: 8G MINI BARS & 8-PIECE GIFT BOX ENGINE */}
+          {activeCategory === '8g' && (
+            <div className="space-y-4">
+              {/* 8g Gift Box Yield & Simulator Banner */}
+              <div className="bg-[#181818] border border-amber-500/30 rounded-xl p-4 space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#2E2E2E]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg">
+                      <Gift className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 rounded border border-amber-500/30">
+                          8-Piece Gift Box Engine
                         </span>
-                        <span className="text-[10px] text-neutral-400 block">Damaged/Samples</span>
+                        <span className="text-xs text-neutral-400 font-medium">Synced with 'Box Tracker' Tab</span>
                       </div>
+                      <h3 className="text-sm font-bold text-white mt-0.5">
+                        Approximate 8-Piece Gift Box Capacity
+                      </h3>
                     </div>
                   </div>
 
-                  {/* Card Micro Footer */}
-                  <div className="mt-2.5 pt-2 border-t border-[#222222] flex items-center justify-between text-[10px] text-neutral-400">
-                    <span className="flex items-center gap-1">
-                      <span className={`w-1 h-1 rounded-full ${f.dotColor}`} />
-                      <span>{f.shortName}</span>
+                  {/* Primary Capacity Display (User-Specified Format) */}
+                  <div className="bg-[#121212] border border-[#2E2E2E] px-3.5 py-2 rounded-lg flex items-center gap-2">
+                    <span className="text-xs text-neutral-400 font-medium">Current Stock:</span>
+                    <span className="text-sm font-mono font-bold text-amber-400">
+                      {totals8g.sumGoodBars} (8g bars)
                     </span>
-                    <span className="font-mono text-neutral-400 font-medium">Ready</span>
+                    <span className="text-xs text-neutral-500 font-bold">or</span>
+                    <span className="text-sm font-mono font-bold text-white bg-amber-950/40 text-amber-300 px-2 py-0.5 rounded border border-amber-800/40">
+                      {totals8g.boxes8pc} (8-piece gift boxes)
+                    </span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* 3 Metric Tiles */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3 bg-[#121212] rounded-lg border border-[#2E2E2E]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-medium text-neutral-400">Standard 8-Piece Gift Box</span>
+                      <Box className="w-3.5 h-3.5 text-amber-400" />
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1.5">
+                      <span className="text-2xl font-bold font-mono text-white">{totals8g.boxes8pc}</span>
+                      <span className="text-xs text-amber-300 font-medium">boxes</span>
+                    </div>
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      {totals8g.sumGoodBars} bars ÷ 8 = {totals8g.boxes8pc} full boxes ({totals8g.leftover8pc} leftover bar)
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-[#121212] rounded-lg border border-[#2E2E2E]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-medium text-neutral-400">Balanced 4-Flavor Box</span>
+                      <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1.5">
+                      <span className="text-2xl font-bold font-mono text-white">{totals8g.balancedBoxes8pc}</span>
+                      <span className="text-xs text-orange-300 font-medium">boxes</span>
+                    </div>
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      Exact 2 bars of each flavor (Almond, Peanut, Orange, Lemon)
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-[#121212] rounded-lg border border-[#2E2E2E]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-medium text-neutral-400">Alternative 6-Piece Box</span>
+                      <Boxes className="w-3.5 h-3.5 text-neutral-400" />
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1.5">
+                      <span className="text-2xl font-bold font-mono text-white">{totals8g.boxes6pc}</span>
+                      <span className="text-xs text-neutral-300 font-medium">boxes</span>
+                    </div>
+                    <p className="text-[10px] text-neutral-400 mt-1">
+                      {totals8g.sumGoodBars} bars ÷ 6 = {totals8g.boxes6pc} full boxes ({totals8g.leftover6pc} leftover bar)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Interactive Box Simulator */}
+                <div className="p-3 bg-[#141414] border border-[#2A2A2A] rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <div>
+                      <span className="text-xs font-semibold text-white block">Interactive Gift Box Simulator</span>
+                      <span className="text-[10px] text-neutral-400">
+                        Type any quantity of 8g mini bars to test box yield
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <div className="flex items-center gap-1.5 bg-[#0F0F0F] border border-[#2E2E2E] rounded-md px-2 py-1">
+                      <span className="text-[11px] text-neutral-400">8g Bars:</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={boxSimBars}
+                        onChange={e => setBoxSimBars(Math.max(0, parseInt(e.target.value) || 0))}
+                        className="w-16 bg-transparent text-xs font-bold text-white font-mono text-center focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Quick Preset Buttons */}
+                    <div className="flex items-center gap-1">
+                      {[64, totals8g.sumGoodBars, 120, 240].map(cnt => (
+                        <button
+                          key={cnt}
+                          type="button"
+                          onClick={() => setBoxSimBars(cnt)}
+                          className={`px-2 py-0.5 text-[10px] rounded border font-mono transition ${
+                            boxSimBars === cnt
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
+                              : 'bg-[#1E1E1E] text-neutral-400 border-[#2E2E2E] hover:text-white'
+                          }`}
+                        >
+                          {cnt === totals8g.sumGoodBars ? `${cnt} (Live)` : cnt}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Simulator Result Banner */}
+                    <div className="px-3 py-1.5 rounded-lg bg-[#202020] border border-amber-500/40 flex items-center gap-1.5 text-xs font-mono shadow-sm">
+                      <span className="text-amber-400 font-bold">{boxSimBars} (8g bars)</span>
+                      <span className="text-neutral-400">or</span>
+                      <span className="text-white font-bold bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/40">
+                        {Math.floor(boxSimBars / 8)} (8-piece gift box)
+                      </span>
+                      {boxSimBars % 8 > 0 && (
+                        <span className="text-[10px] text-amber-300/80">({boxSimBars % 8} leftover)</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4 Dedicated 8g Flavor Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {filteredFlavors8g.map(f => {
+                  const goodQty = totals8g.totalGood[f.key];
+                  const damagedQty = totals8g.totalDamaged[f.key];
+                  const isLow = goodQty < 20;
+
+                  return (
+                    <div 
+                      key={f.key} 
+                      className="p-3.5 rounded-xl border border-[#2E2E2E] bg-[#181818] hover:bg-[#202020] hover:border-[#3E3E3E] transition-all flex flex-col justify-between group"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-10 h-10 rounded-lg bg-[#0F0F0F] border border-[#2E2E2E] flex items-center justify-center p-1 flex-shrink-0 group-hover:border-[#444] transition relative overflow-hidden">
+                              <img 
+                                src={f.image} 
+                                alt={f.name} 
+                                className="w-full h-full object-contain drop-shadow-sm relative z-10" 
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  if (!target.dataset.triedFallback) {
+                                    target.dataset.triedFallback = 'true';
+                                    target.src = `/images/brand/${f.image.split('/').pop()}`;
+                                  } else {
+                                    target.style.display = 'none';
+                                  }
+                                }}
+                              />
+                              <span className={`w-3.5 h-3.5 rounded-full ${f.dotColor} opacity-40`} />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${f.dotColor}`} />
+                                <h4 className="text-xs font-bold text-white truncate">{f.name}</h4>
+                              </div>
+                              <span className="text-[10px] text-amber-400 font-medium block">8g Mini Bar</span>
+                            </div>
+                          </div>
+
+                          <span className={`px-2 py-0.5 text-[9px] font-semibold rounded-full flex-shrink-0 border ${
+                            isLow 
+                              ? 'bg-amber-950/40 text-amber-300 border-amber-800/40' 
+                              : 'bg-[#272727] text-neutral-300 border-[#383838]'
+                          }`}>
+                            {isLow ? 'Low Stock' : 'In Stock'}
+                          </span>
+                        </div>
+
+                        {/* Stock Numbers */}
+                        <div className="mt-3.5 pt-2.5 border-t border-[#262626] flex items-baseline justify-between">
+                          <div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-2xl font-black font-mono text-white tracking-tight">{goodQty}</span>
+                              <span className="text-[11px] font-medium text-neutral-400">bars</span>
+                            </div>
+                            <span className="text-[10px] text-neutral-500">Available</span>
+                          </div>
+
+                          <div className="text-right">
+                            <span className="text-xs font-bold font-mono text-neutral-400">
+                              {damagedQty > 0 ? (
+                                <span className="text-rose-400/90">{damagedQty}</span>
+                              ) : (
+                                <span>0</span>
+                              )}
+                            </span>
+                            <span className="text-[10px] text-neutral-400 block">Damaged</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card Micro Footer */}
+                      <div className="mt-2.5 pt-2 border-t border-[#222222] flex items-center justify-between text-[10px] text-neutral-400">
+                        <span className="flex items-center gap-1">
+                          <span className={`w-1 h-1 rounded-full ${f.dotColor}`} />
+                          <span>{f.shortName}</span>
+                        </span>
+                        <span className="font-mono text-amber-400 font-medium">
+                          ~{Math.floor(goodQty / 2)} balanced sets
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {/* ───────────────────────────────────────────────────────────── */}
       {/* 📋 BATCH LEDGER TABLE (FIFO ORDERED) */}
       {/* ───────────────────────────────────────────────────────────── */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 📋 BATCH LEDGER TABLE (25G BATCHES & 8G BOX TRACKER) */}
+      {/* ───────────────────────────────────────────────────────────── */}
       <Card className="bg-[#1F1F1F] border-[#2E2E2E]">
-        <CardHeader className="pb-3 border-b border-[#2E2E2E]">
-          <CardTitle className="text-base font-bold text-white flex items-center gap-2">
-            <Clock className="w-4 h-4 text-neutral-300" />
-            <span>Batch Ledger & Stock Balances (Google Sheet Sync)</span>
-          </CardTitle>
-          <p className="text-xs text-neutral-400">
-            Per-batch tracking. Oldest batches are listed first to enforce FIFO clearance rules.
-          </p>
-        </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-[#181818] border-b border-[#2E2E2E] text-neutral-400 font-semibold tracking-wider uppercase text-[11px]">
-                <th className="py-3 px-4">Date Received</th>
-                <th className="py-3 px-4">Batch ID</th>
-                <th className="py-3 px-4 text-center">Expiry (3 Mo)</th>
-                <th className="py-3 px-4 text-center">Almond</th>
-                <th className="py-3 px-4 text-center">Orange</th>
-                <th className="py-3 px-4 text-center">Jackfruit</th>
-                <th className="py-3 px-4 text-center">Lemon</th>
-                <th className="py-3 px-4 text-center">Mocha</th>
-                <th className="py-3 px-4 text-center">Sea Salt</th>
-                <th className="py-3 px-4 text-center">Peanuts</th>
-                <th className="py-3 px-4 text-right">Good Left</th>
-                <th className="py-3 px-4 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#262626] text-neutral-300">
-              {paginatedBatches.map((b: any) => {
-                const isFifoOldest = fifoOldestBatch?.batchId === b.batchId;
-                return (
-                  <tr key={b.batchId} className={`hover:bg-[#272727]/50 transition ${isFifoOldest ? 'bg-amber-950/10' : ''}`}>
-                    <td className="py-3 px-4 font-mono text-neutral-400 whitespace-nowrap">
-                      {b.dateReceived}
-                    </td>
-                    <td className="py-3 px-4 font-mono font-bold text-white">
-                      <div className="flex items-center gap-1.5">
-                        <span>{b.batchId}</span>
-                        {isFifoOldest && (
-                          <span className="px-1.5 py-0.2 text-[9px] bg-[#272727] text-amber-300 border border-amber-500/30 rounded font-semibold uppercase">
-                            FIFO #1
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-center whitespace-nowrap">
-                      <div className="font-mono text-[11px] text-neutral-300">{b.expiryDate}</div>
-                      <span className={`inline-block px-2 py-0.5 text-[9px] font-semibold rounded-full mt-0.5 border ${
-                        b.shelfLifeStatus === 'EXPIRED' ? 'bg-rose-950/40 text-rose-400 border-rose-800/40' :
-                        b.shelfLifeStatus === 'CRITICAL' ? 'bg-amber-950/40 text-amber-400 border-amber-800/40' :
-                        b.shelfLifeStatus === 'EXPIRING_SOON' ? 'bg-yellow-950/40 text-yellow-400 border-yellow-800/40' :
-                        'bg-[#272727] text-neutral-300 border-[#383838]'
-                      }`}>
-                        {b.shelfLifeStatus === 'EXPIRED' ? 'EXPIRED' :
-                         b.shelfLifeStatus === 'CRITICAL' ? `${b.daysRemaining}d Left` :
-                         b.shelfLifeStatus === 'EXPIRING_SOON' ? `${b.daysRemaining}d Left` :
-                         `${b.daysRemaining}d Left`}
-                      </span>
-                    </td>
-
-                    {FLAVOR_CONFIG.map(f => {
-                      const goodLeft = b.goodRemaining[f.key];
-                      const damLeft = b.damagedRemaining[f.key];
-                      return (
-                        <td key={f.key} className="py-3 px-4 text-center font-mono">
-                          <span className="font-semibold text-white">{goodLeft}</span>
-                          {damLeft > 0 && <span className="text-[10px] text-rose-400/80 ml-1">({damLeft}d)</span>}
-                        </td>
-                      );
-                    })}
-
-                    <td className="py-3 px-4 text-right font-mono font-bold text-white text-sm">
-                      {b.totalGoodLeft}
-                    </td>
-
-                    <td className="py-3 px-4 text-center">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                          setNewMovementForm(prev => ({ ...prev, batchId: b.batchId }));
-                          setIsMovementModalOpen(true);
-                        }}
-                        className="text-[11px] px-2.5 py-1"
-                      >
-                        Dispatch
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </CardContent>
-
-        {/* Batch Ledger 10-Row Pagination Bar */}
-        <div className="p-3 bg-[#181818] border-t border-[#2E2E2E] flex items-center justify-between text-xs text-neutral-400">
-          <span>
-            Showing {paginatedBatches.length > 0 ? (batchPage - 1) * ROWS_PER_PAGE + 1 : 0} to {Math.min(batchPage * ROWS_PER_PAGE, batchBalances.length)} of {batchBalances.length} batches
-          </span>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setBatchPage(p => Math.max(1, p - 1))}
-              disabled={batchPage === 1}
-              className="text-xs px-2.5 py-1"
-            >
-              Previous
-            </Button>
-            <span className="font-mono font-semibold text-white text-xs px-1">
-              Page {batchPage} of {totalBatchPages}
-            </span>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setBatchPage(p => Math.min(totalBatchPages, p + 1))}
-              disabled={batchPage >= totalBatchPages}
-              className="text-xs px-2.5 py-1"
-            >
-              Next
-            </Button>
+        <CardHeader className="pb-3 border-b border-[#2E2E2E] flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-neutral-300" />
+              <span>Batch Ledger & Stock Balances (Google Sheet Sync)</span>
+            </CardTitle>
+            <p className="text-xs text-neutral-400 mt-0.5">
+              {activeLedgerTab === '25g'
+                ? 'Per-batch tracking for 25g Origin bars. Oldest batches are listed first to enforce FIFO clearance rules.'
+                : "Tracking 8g mini chocolate bars from Google Sheet 'Box Tracker' tab (gid=1003)."}
+            </p>
           </div>
-        </div>
+
+          {/* Ledger Category Tabs */}
+          <div className="flex items-center bg-[#121212] p-1 rounded-lg border border-[#2E2E2E] self-start md:self-auto">
+            <button
+              type="button"
+              onClick={() => setActiveLedgerTab('25g')}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                activeLedgerTab === '25g'
+                  ? 'bg-[#272727] text-white shadow-sm border border-[#3E3E3E]'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              <span>🍫 25g Batches</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#181818] border border-[#333] text-neutral-300 font-mono">
+                {batchBalances.length}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveLedgerTab('8g')}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                activeLedgerTab === '8g'
+                  ? 'bg-amber-950/50 text-amber-300 shadow-sm border border-amber-800/50 font-bold'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              <Gift className="w-3.5 h-3.5 text-amber-400" />
+              <span>🎁 8g Box Tracker</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-900/30 border border-amber-700/40 text-amber-300 font-mono">
+                {batches8g.length}
+              </span>
+            </button>
+          </div>
+        </CardHeader>
+
+        {/* LEDGER TAB 1: 25G BATCHES TABLE */}
+        {activeLedgerTab === '25g' && (
+          <>
+            <CardContent className="p-0 overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#181818] border-b border-[#2E2E2E] text-neutral-400 font-semibold tracking-wider uppercase text-[11px]">
+                    <th className="py-3 px-4">Date Received</th>
+                    <th className="py-3 px-4">Batch ID</th>
+                    <th className="py-3 px-4 text-center">Expiry (3 Mo)</th>
+                    <th className="py-3 px-4 text-center">Almond</th>
+                    <th className="py-3 px-4 text-center">Orange</th>
+                    <th className="py-3 px-4 text-center">Jackfruit</th>
+                    <th className="py-3 px-4 text-center">Lemon</th>
+                    <th className="py-3 px-4 text-center">Mocha</th>
+                    <th className="py-3 px-4 text-center">Sea Salt</th>
+                    <th className="py-3 px-4 text-center">Peanuts</th>
+                    <th className="py-3 px-4 text-right">Good Left</th>
+                    <th className="py-3 px-4 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#262626] text-neutral-300">
+                  {paginatedBatches.map((b: any) => {
+                    const isFifoOldest = fifoOldestBatch?.batchId === b.batchId;
+                    return (
+                      <tr key={b.batchId} className={`hover:bg-[#272727]/50 transition ${isFifoOldest ? 'bg-amber-950/10' : ''}`}>
+                        <td className="py-3 px-4 font-mono text-neutral-400 whitespace-nowrap">
+                          {b.dateReceived}
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-white">
+                          <div className="flex items-center gap-1.5">
+                            <span>{b.batchId}</span>
+                            {isFifoOldest && (
+                              <span className="px-1.5 py-0.2 text-[9px] bg-[#272727] text-amber-300 border border-amber-500/30 rounded font-semibold uppercase">
+                                FIFO #1
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-center whitespace-nowrap">
+                          <div className="font-mono text-[11px] text-neutral-300">{b.expiryDate}</div>
+                          <span className={`inline-block px-2 py-0.5 text-[9px] font-semibold rounded-full mt-0.5 border ${
+                            b.shelfLifeStatus === 'EXPIRED' ? 'bg-rose-950/40 text-rose-400 border-rose-800/40' :
+                            b.shelfLifeStatus === 'CRITICAL' ? 'bg-amber-950/40 text-amber-400 border-amber-800/40' :
+                            b.shelfLifeStatus === 'EXPIRING_SOON' ? 'bg-yellow-950/40 text-yellow-400 border-yellow-800/40' :
+                            'bg-[#272727] text-neutral-300 border-[#383838]'
+                          }`}>
+                            {b.shelfLifeStatus === 'EXPIRED' ? 'EXPIRED' :
+                             b.shelfLifeStatus === 'CRITICAL' ? `${b.daysRemaining}d Left` :
+                             b.shelfLifeStatus === 'EXPIRING_SOON' ? `${b.daysRemaining}d Left` :
+                             `${b.daysRemaining}d Left`}
+                          </span>
+                        </td>
+
+                        {FLAVOR_CONFIG.map(f => {
+                          const goodLeft = b.goodRemaining[f.key];
+                          const damLeft = b.damagedRemaining[f.key];
+                          return (
+                            <td key={f.key} className="py-3 px-4 text-center font-mono">
+                              <span className="font-semibold text-white">{goodLeft}</span>
+                              {damLeft > 0 && <span className="text-[10px] text-rose-400/80 ml-1">({damLeft}d)</span>}
+                            </td>
+                          );
+                        })}
+
+                        <td className="py-3 px-4 text-right font-mono font-bold text-white text-sm">
+                          {b.totalGoodLeft}
+                        </td>
+
+                        <td className="py-3 px-4 text-center">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                              setNewMovementForm(prev => ({ ...prev, batchId: b.batchId }));
+                              setIsMovementModalOpen(true);
+                            }}
+                            className="text-[11px] px-2.5 py-1"
+                          >
+                            Dispatch
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </CardContent>
+
+            {/* Batch Ledger 10-Row Pagination Bar */}
+            <div className="p-3 bg-[#181818] border-t border-[#2E2E2E] flex items-center justify-between text-xs text-neutral-400">
+              <span>
+                Showing {paginatedBatches.length > 0 ? (batchPage - 1) * ROWS_PER_PAGE + 1 : 0} to {Math.min(batchPage * ROWS_PER_PAGE, batchBalances.length)} of {batchBalances.length} batches
+              </span>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setBatchPage(p => Math.max(1, p - 1))}
+                  disabled={batchPage === 1}
+                  className="text-xs px-2.5 py-1"
+                >
+                  Previous
+                </Button>
+                <span className="font-mono font-semibold text-white text-xs px-1">
+                  Page {batchPage} of {totalBatchPages}
+                </span>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setBatchPage(p => Math.min(totalBatchPages, p + 1))}
+                  disabled={batchPage >= totalBatchPages}
+                  className="text-xs px-2.5 py-1"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* LEDGER TAB 2: 8G BOX TRACKER TABLE */}
+        {activeLedgerTab === '8g' && (
+          <div>
+            <CardContent className="p-0 overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-[#181818] border-b border-[#2E2E2E] text-neutral-400 font-semibold tracking-wider uppercase text-[11px]">
+                    <th className="py-3 px-4">Date Received</th>
+                    <th className="py-3 px-4">Batch / Reference</th>
+                    <th className="py-3 px-4 text-center">Almond (8g)</th>
+                    <th className="py-3 px-4 text-center">Peanut (8g)</th>
+                    <th className="py-3 px-4 text-center">Orange (8g)</th>
+                    <th className="py-3 px-4 text-center">Lemon (8g)</th>
+                    <th className="py-3 px-4 text-center font-bold text-amber-400">Total 8g Bars</th>
+                    <th className="py-3 px-4 text-center font-bold text-white">8-Piece Gift Box Yield</th>
+                    <th className="py-3 px-4">Remarks / Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#262626] text-neutral-300">
+                  {batches8g.map((b, idx) => {
+                    const totalGood = b.goodRemaining.almond + b.goodRemaining.peanut + b.goodRemaining.orange + b.goodRemaining.lemon;
+                    const totalDamaged = b.damagedRemaining.almond + b.damagedRemaining.peanut + b.damagedRemaining.orange + b.damagedRemaining.lemon;
+                    const boxes = Math.floor(totalGood / 8);
+                    const leftover = totalGood % 8;
+
+                    return (
+                      <tr key={idx} className="hover:bg-[#272727]/50 transition">
+                        <td className="py-3 px-4 font-mono text-neutral-400 whitespace-nowrap">
+                          {b.dateReceived}
+                        </td>
+                        <td className="py-3 px-4 font-mono font-bold text-white whitespace-nowrap">
+                          <span className="px-2 py-0.5 bg-[#272727] text-neutral-200 border border-[#383838] rounded">
+                            {b.batchId}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono">
+                          <span className="font-semibold text-white">{b.goodRemaining.almond}</span>
+                          <span className="text-[10px] text-neutral-500 block">Total In: {b.totalIn.almond}</span>
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono">
+                          <span className="font-semibold text-white">{b.goodRemaining.peanut}</span>
+                          <span className="text-[10px] text-neutral-500 block">Total In: {b.totalIn.peanut}</span>
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono">
+                          <span className="font-semibold text-white">{b.goodRemaining.orange}</span>
+                          <span className="text-[10px] text-neutral-500 block">Total In: {b.totalIn.orange}</span>
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono">
+                          <span className="font-semibold text-white">{b.goodRemaining.lemon}</span>
+                          <span className="text-[10px] text-neutral-500 block">Total In: {b.totalIn.lemon}</span>
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono font-bold text-amber-400 text-sm">
+                          {totalGood} <span className="text-[10px] font-normal text-neutral-400">bars</span>
+                          {totalDamaged > 0 && (
+                            <span className="text-[10px] text-rose-400 block font-normal">({totalDamaged} damaged)</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-center font-mono whitespace-nowrap">
+                          <span className="px-2.5 py-1 bg-amber-950/40 text-amber-300 border border-amber-800/40 rounded-full font-bold">
+                            {boxes} boxes
+                          </span>
+                          {leftover > 0 && (
+                            <span className="text-[10px] text-neutral-400 block mt-0.5">
+                              +{leftover} leftover bar{leftover > 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-neutral-400 max-w-xs text-[11px]">
+                          {b.notes || '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </CardContent>
+
+            {/* 8g Box Tracker Footer Summary */}
+            <div className="p-3 bg-[#181818] border-t border-[#2E2E2E] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-neutral-400">
+              <div className="flex items-center gap-2">
+                <Gift className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                <span>
+                  Total 8g Stock: <strong className="text-white font-mono">{totals8g.sumGoodBars} bars</strong> yields approximately <strong className="text-amber-300 font-mono">{totals8g.boxes8pc} 8-piece gift boxes</strong> (+{totals8g.leftover8pc} leftover)
+                </span>
+              </div>
+              <span className="text-[11px] text-neutral-500 font-mono">
+                Google Sheet Tab: 'Box Tracker' (gid=1003)
+              </span>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* ───────────────────────────────────────────────────────────── */}

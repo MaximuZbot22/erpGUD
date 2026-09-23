@@ -1687,6 +1687,7 @@ _Please confirm acceptance and target dispatch date._`;
 
                     <div className="text-[11px] font-black text-slate-950">{selectedPo.founderSignatureName}</div>
                     <div className="text-[9px] text-slate-600 font-semibold">Founder & Managing Director</div>
+                    <div className="text-[8.5px] text-slate-400 italic mt-0.5">This is a computer-generated document and does not require a physical signature.</div>
                   </div>
                 </div>
               </div>

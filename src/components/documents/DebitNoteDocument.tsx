@@ -459,6 +459,9 @@ export const DebitNoteDocument: React.FC<DebitNoteDocumentProps> = ({
               <div className="text-[10px] text-slate-700 font-semibold border-t border-dashed border-slate-300 pt-1">
                 Authorized Signatory (Procurement & Operations)
               </div>
+              <div className="text-[8.5px] text-slate-400 italic">
+                This is a computer-generated document and does not require a physical signature.
+              </div>
             </div>
           </div>
         </div>
