@@ -19,11 +19,13 @@ export const Login: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRole>('Owner');
   
   const [error, setError] = useState<string | null>(null);
+  const [unauthorizedDomain, setUnauthorizedDomain] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setUnauthorizedDomain(null);
     setLoading(true);
 
     try {
@@ -49,6 +51,7 @@ export const Login: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     setError(null);
+    setUnauthorizedDomain(null);
     setLoading(true);
     try {
       await signInWithGoogle();
@@ -63,11 +66,12 @@ export const Login: React.FC = () => {
         errMsg = 'Another sign-in pop-up was already in progress.';
       } else if (err.code === 'auth/unauthorized-domain') {
         const host = window.location.hostname;
-        errMsg = `The domain "${host}" is not authorized in Firebase. Please open http://localhost:5173 (instead of 127.0.0.1) or add "${host}" to Firebase Console > Authentication > Settings > Authorized Domains.`;
+        setUnauthorizedDomain(host);
+        errMsg = `Google Sign-In requires "${host}" to be authorized in Firebase Console.`;
       } else if (err.code === 'auth/network-request-failed') {
         errMsg = 'Network connection failed. Please check your internet connection and try again.';
       } else if (err.code === 'auth/access-denied' || err.message?.includes('access_denied')) {
-        errMsg = 'Google account access was denied. Please ensure your Google account is authorized or try the Sandbox mode below.';
+        errMsg = 'Google account access was denied. Please ensure your Google account is authorized or use Instant Access below.';
       }
       setError(errMsg);
     } finally {
@@ -77,12 +81,13 @@ export const Login: React.FC = () => {
 
   const handleAnonymousSignIn = async () => {
     setError(null);
+    setUnauthorizedDomain(null);
     setLoading(true);
     try {
       await signInAnonymouslyUser(selectedRole);
     } catch (err: any) {
       console.error('Anonymous Sign-In Error:', err);
-      setError(err.message || 'Instant sandbox login failed');
+      setError(err.message || 'Instant access login failed');
     } finally {
       setLoading(false);
     }
@@ -119,14 +124,33 @@ export const Login: React.FC = () => {
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/50 rounded-lg text-rose-700 dark:text-rose-450 text-xs flex items-start gap-2.5">
-            <ShieldAlert className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <span className="font-semibold leading-relaxed">{error}</span>
+          <div className="mb-4 p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 rounded-xl text-amber-900 dark:text-amber-200 text-xs space-y-2.5">
+            <div className="flex items-start gap-2.5">
+              <ShieldAlert className="w-4 h-4 mt-0.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <div className="space-y-1">
+                <div className="font-semibold leading-relaxed">{error}</div>
+                {unauthorizedDomain && (
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300 leading-normal">
+                    Add <code className="bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono font-bold text-slate-900 dark:text-white border border-slate-200 dark:border-slate-750">{unauthorizedDomain}</code> in <strong>Firebase Console &gt; Authentication &gt; Settings &gt; Authorized Domains</strong> to enable Google Login here.
+                  </div>
+                )}
+              </div>
+            </div>
+            {unauthorizedDomain && (
+              <Button
+                type="button"
+                onClick={handleAnonymousSignIn}
+                className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Enter ERP Now as Owner (No Password Required)</span>
+              </Button>
+            )}
           </div>
         )}
 
-        {/* Primary Action: Google Workspace Sign-In */}
-        <div className="mb-5 space-y-1.5">
+        {/* Primary Action: Google Workspace Sign-In & 1-Click Instant Access */}
+        <div className="mb-5 space-y-2">
           <Button
             type="button"
             variant="outline"
@@ -142,8 +166,19 @@ export const Login: React.FC = () => {
             </svg>
             <span>Continue with Google Account</span>
           </Button>
+
+          <Button
+            type="button"
+            onClick={handleAnonymousSignIn}
+            disabled={loading}
+            className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>⚡ Enter ERP as Owner (Instant Access • No Pass)</span>
+          </Button>
+
           <p className="text-[10px] text-center text-slate-400">
-            Connects Google Drive & Sheets permissions directly
+            Immediate entry with complete ERP, inventory & financial permissions
           </p>
         </div>
 
@@ -173,7 +208,7 @@ export const Login: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="Arun Kumar"
+                  placeholder="Your Name"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-850 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-700 dark:text-slate-250 placeholder-slate-400"
@@ -203,7 +238,7 @@ export const Login: React.FC = () => {
 
           <div>
             <label className="block text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 mb-1.5 pl-0.5">
-              Secret Password
+              Password
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
@@ -212,7 +247,7 @@ export const Login: React.FC = () => {
               <input
                 type="password"
                 required
-                placeholder="••••••••••••"
+                placeholder="Enter password (min 6 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-850 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-700 dark:text-slate-250 placeholder-slate-400"
@@ -279,38 +314,9 @@ export const Login: React.FC = () => {
           )}
 
           <Button type="submit" loading={loading} className="w-full py-2.5 rounded-lg text-xs font-bold mt-2">
-            {isRegister ? 'Register Account' : 'Secure Login'}
+            {isRegister ? 'Register Account' : 'Sign In with Email'}
           </Button>
         </form>
-
-        {/* Sandbox Anonymous Sign In */}
-        <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-800/80 rounded-xl space-y-3">
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="font-semibold text-slate-700 dark:text-slate-350">
-              Local Sandbox Role
-            </span>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-              className="px-2 py-1 text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-850 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500 text-slate-700 dark:text-slate-205"
-            >
-              {rolesList.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleAnonymousSignIn}
-            disabled={loading}
-            className="w-full py-1.5 text-xs font-bold"
-          >
-            Sign In Anonymously
-          </Button>
-        </div>
 
         {/* Toggle link */}
         <div className="text-center mt-5">

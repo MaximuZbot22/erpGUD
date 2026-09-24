@@ -179,33 +179,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const APPROVED_USERS = [
-    'mohith@gudoria.com',
-    'boss@gudoria.com',
-    'owner3@gudoria.com',
-    'owner4@gudoria.com',
-    'owner5@gudoria.com'
-  ];
-
-  const getExpectedPasswordForEmail = (email: string): string => {
-    const e = email.toLowerCase().trim();
-    if (e === 'mohith@gudoria.com') return 'GudoriaMohith2026!';
-    if (e === 'boss@gudoria.com') return 'GudoriaBoss2026!';
-    if (e === 'owner3@gudoria.com') return 'GudoriaOwner3!';
-    if (e === 'owner4@gudoria.com') return 'GudoriaOwner4!';
-    if (e === 'owner5@gudoria.com') return 'GudoriaOwner5!';
-    return '';
-  };
-
   const signInWithEmail = async (email: string, password: string) => {
     const lowerEmail = email.toLowerCase().trim();
-    if (!APPROVED_USERS.includes(lowerEmail)) {
-      throw new Error('Unauthorized domain or account email. Sign-in blocked.');
+    if (!lowerEmail) {
+      throw new Error('Please enter a valid email address.');
     }
-
-    const expectedPassword = getExpectedPasswordForEmail(lowerEmail);
-    if (password !== expectedPassword) {
-      throw new Error('Incorrect password for this whitelisted account.');
+    if (!password || password.length < 6) {
+      throw new Error('Password must be at least 6 characters.');
     }
 
     try {
@@ -220,9 +200,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
     } catch (error: any) {
       // Auto-register fallback if user account is not created yet
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
         try {
-          console.log(`Auto-registering whitelisted user: ${lowerEmail}`);
+          console.log(`Auto-creating new user account: ${lowerEmail}`);
           const regResult = await createUserWithEmailAndPassword(auth, lowerEmail, password);
           const defaultName = lowerEmail.split('@')[0].toUpperCase();
           await updateProfile(regResult.user, { displayName: defaultName });
@@ -230,29 +210,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           await auditLogService.logActivity(
             { uid: regResult.user.uid, email: regResult.user.email || '', displayName: defaultName },
-            'Auto-registered whitelisted user',
+            'Auto-registered user account',
             'auth',
             'Created profile via login'
           );
-        } catch (regErr) {
-          console.error("Auto-registration failed:", regErr);
+          return;
+        } catch (regErr: any) {
+          console.warn("Auto-registration attempt error:", regErr);
           throw error;
         }
-      } else {
-        throw error;
       }
+      throw error;
     }
   };
 
   const signUpWithEmail = async (email: string, password: string, displayName: string, role: UserRole) => {
     const lowerEmail = email.toLowerCase().trim();
-    if (!APPROVED_USERS.includes(lowerEmail)) {
-      throw new Error('Unauthorized domain or account email. Registration blocked.');
+    if (!lowerEmail) {
+      throw new Error('Please enter a valid email address.');
     }
-
-    const expectedPassword = getExpectedPasswordForEmail(lowerEmail);
-    if (password !== expectedPassword) {
-      throw new Error(`Registration password must match the whitelisted password: "${expectedPassword}"`);
+    if (!password || password.length < 6) {
+      throw new Error('Password must be at least 6 characters.');
     }
 
     try {
