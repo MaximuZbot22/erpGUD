@@ -1,12 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
   FileSpreadsheet, Download, Printer, Search, 
-  Calendar, Plus, Trash2, Copy, Check,
-  ExternalLink, Sparkles, AlertCircle
+  Calendar, Plus, Copy, Check, ExternalLink, 
+  RotateCcw, Sparkles, AlertCircle, ArrowUpRight, 
+  Database, CheckCircle2
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 import { Card, CardContent } from '../components/ui/Card';
 import { StatisticsCard } from '../components/ui/StatisticsCard';
 import { Button } from '../components/ui/Button';
+import { GoogleSheetsService } from '../services/google';
+import seedDataV2 from '../data/seedDataV2.json';
 import { 
   InvoiceService, 
   GstInvoiceRecord, 
@@ -14,50 +19,216 @@ import {
 } from '../services/invoiceService';
 
 export const CAReports: React.FC = () => {
-  const [invoices, setInvoices] = useState<GstInvoiceRecord[]>(BASE_AUGUST_INVOICES);
+  const { googleToken, signInWithGoogle } = useAuth();
+  const { sendNotification } = useNotifications();
+
+  // Primary Data State: Loaded from Google Sheets Orders_Log + Customer_Master
+  const [ordersLog, setOrdersLog] = useState<any[]>(() => seedDataV2.Orders_Log || []);
+  const [customerMaster, setCustomerMaster] = useState<any[]>(() => seedDataV2.Customer_Master || []);
+  const [loadingSheet, setLoadingSheet] = useState<boolean>(false);
+  const [isGoogleSynced, setIsGoogleSynced] = useState<boolean>(false);
+  const [lastSyncedTime, setLastSyncedTime] = useState<string>('');
+
+  // UI Filter & Modal States
   const [selectedMonth, setSelectedMonth] = useState<string>('2026-08');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedSummary, setCopiedSummary] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  // New Invoice Form State for Manual Quick Add
-  const [newInv, setNewInv] = useState({
+  // New Order / Invoice Form State
+  const [newOrder, setNewOrder] = useState({
     invoiceNo: '',
     date: '2026-09-01',
-    party: '',
-    partyGstin: '',
-    taxableValue: '',
-    cgst: '',
-    sgst: '',
-    chocolateQuantity: '',
-    notes: ''
+    customerName: '',
+    customerId: 'CUST-0001',
+    items: 'Almond 25g x10, Peanut 25g x5',
+    qty: '15',
+    taxableValue: '1800',
+    cgst: '45.00',
+    sgst: '45.00',
+    channel: 'Direct',
+    notes: 'Payment received upon delivery'
   });
 
-  // Subscribe to real-time Firebase Firestore invoices with local cache fallback
-  useEffect(() => {
-    const unsubscribe = InvoiceService.subscribeToInvoices((loadedInvoices) => {
-      setInvoices(loadedInvoices);
-    });
-    return unsubscribe;
-  }, []);
+  const spreadsheetId = import.meta.env.VITE_GOOGLE_SHEET_ORDERS || '1uUfxL_k6k4ebzHPWL4pwwtdIaxzZ-6mW4mqB_6iJnXo';
 
-  // Compute available months dynamically from all invoices + default recent months
+  // 1. Fetch Orders_Log and Customer_Master directly from Google Sheets
+  const fetchLiveOrdersFromSheet = useCallback(async () => {
+    setLoadingSheet(true);
+    try {
+      let ordersRows: any[] = [];
+      let customerRows: any[] = [];
+
+      // Fetch from Google Sheets API
+      const ordersRes = await GoogleSheetsService.getSpreadsheetValues(
+        googleToken,
+        spreadsheetId,
+        "'Orders_Log'!A1:Z10000"
+      );
+
+      if (ordersRes?.values && ordersRes.values.length > 1) {
+        const [headers, ...rows] = ordersRes.values;
+        ordersRows = rows.map(r => {
+          const obj: Record<string, string> = {};
+          headers.forEach((h: string, idx: number) => {
+            obj[h] = r[idx] !== undefined ? String(r[idx]).trim() : '';
+          });
+          return obj;
+        });
+      }
+
+      const custRes = await GoogleSheetsService.getSpreadsheetValues(
+        googleToken,
+        spreadsheetId,
+        "'Customer_Master'!A1:Z1000"
+      );
+
+      if (custRes?.values && custRes.values.length > 1) {
+        const [headers, ...rows] = custRes.values;
+        customerRows = rows.map(r => {
+          const obj: Record<string, string> = {};
+          headers.forEach((h: string, idx: number) => {
+            obj[h] = r[idx] !== undefined ? String(r[idx]).trim() : '';
+          });
+          return obj;
+        });
+      }
+
+      // Merge with offline seed data if sheet returns fewer records
+      const finalOrders = ordersRows.length > 0 ? ordersRows : (seedDataV2.Orders_Log || []);
+      const finalCustomers = customerRows.length > 0 ? customerRows : (seedDataV2.Customer_Master || []);
+
+      setOrdersLog(finalOrders);
+      setCustomerMaster(finalCustomers);
+      setIsGoogleSynced(ordersRows.length > 0);
+      setLastSyncedTime(new Date().toLocaleTimeString());
+
+      if (ordersRows.length > 0) {
+        sendNotification({
+          title: 'Google Sheets Synced',
+          message: `Loaded ${ordersRows.length} live rows from 'Orders_Log'`,
+          priority: 'low',
+          channels: ['in-app']
+        });
+      }
+    } catch (err: any) {
+      console.warn('[CAReports] Could not load live sheets, using seed data:', err);
+      setOrdersLog(seedDataV2.Orders_Log || []);
+      setCustomerMaster(seedDataV2.Customer_Master || []);
+      setIsGoogleSynced(false);
+    } finally {
+      setLoadingSheet(false);
+    }
+  }, [googleToken, spreadsheetId, sendNotification]);
+
+  // Initial load on mount and when googleToken changes
+  useEffect(() => {
+    fetchLiveOrdersFromSheet();
+  }, [fetchLiveOrdersFromSheet]);
+
+  // Helper map for fast customer lookups
+  const customerMap = useMemo(() => {
+    const map = new Map<string, any>();
+    customerMaster.forEach(c => {
+      if (c.Customer_ID) map.set(c.Customer_ID, c);
+      if (c.Business_Name) map.set(c.Business_Name.toLowerCase(), c);
+    });
+    return map;
+  }, [customerMaster]);
+
+  // 2. Transform Orders_Log into the Exact 7-Column CA & GST Register
+  const gstRows: GstInvoiceRecord[] = useMemo(() => {
+    return ordersLog.map((order, idx) => {
+      // 1. Invoice No.
+      const invoiceNo = (order.Invoice_Link || order.Invoice_Ref || order.Order_ID || `ORD-${idx + 1}`).trim();
+
+      // 2. Date parsing (standardized to DD-MM-YYYY)
+      let dateDisplay = order.Date || '';
+      let rawYm = '';
+      if (dateDisplay) {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateDisplay)) {
+          const [y, m, d] = dateDisplay.split('-');
+          rawYm = `${y}-${m}`;
+          dateDisplay = `${d}-${m}-${y}`;
+        } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateDisplay)) {
+          const [d, m, y] = dateDisplay.split('/');
+          rawYm = `${y}-${m}`;
+          dateDisplay = `${d}-${m}-${y}`;
+        } else if (/^\d{2}-\d{2}-\d{4}$/.test(dateDisplay)) {
+          const [d, m, y] = dateDisplay.split('-');
+          rawYm = `${y}-${m}`;
+        }
+      }
+
+      // 3. Party Name resolution via Customer_Master
+      const custId = order.Customer_ID || '';
+      const cust = customerMap.get(custId) || customerMap.get(custId.toLowerCase());
+      let party = '';
+      if (cust) {
+        party = cust.Business_Name || cust.Contact_Person || custId;
+      } else if (order.Invoice_Link) {
+        // Extract party name suffix from Invoice_Link e.g. "Invoice-1153-GUD-2026-Moby" -> "Moby"
+        const tagMatch = order.Invoice_Link.match(/GUD-\d{4}-([A-Za-z0-9_\s&]+)/i) || 
+                         order.Invoice_Link.match(/Invoice-\d+-([A-Za-z0-9_\s&]+)/i);
+        party = tagMatch ? tagMatch[1].trim() : (custId || 'Direct Customer');
+      } else {
+        party = custId || 'Direct Customer';
+      }
+
+      // 4. Taxable Value & Tax Calculations
+      const totalVal = parseFloat(order.Total_Value || order.Amount || '0') || 0;
+      const priceUnit = parseFloat(order.Price_Per_Unit || '0') || 0;
+      const qtyNum = parseFloat(order.Qty || '1') || 1;
+      const rawBase = totalVal > 0 ? totalVal : (priceUnit * qtyNum);
+
+      // Check if this invoice matches our audited August pack for exact numbers
+      const audited = BASE_AUGUST_INVOICES.find(a => 
+        (a.invoiceNo && invoiceNo && a.invoiceNo.toLowerCase().includes(invoiceNo.toLowerCase())) ||
+        (invoiceNo && a.invoiceNo && invoiceNo.toLowerCase().includes(a.invoiceNo.toLowerCase()))
+      );
+
+      let taxableValue = audited ? audited.taxableValue : rawBase;
+      let cgst = audited ? audited.cgst : Number((taxableValue * 0.025).toFixed(2));
+      let sgst = audited ? audited.sgst : Number((taxableValue * 0.025).toFixed(2));
+      let totalGst = Number((cgst + sgst).toFixed(2));
+      let total = Number((taxableValue + totalGst).toFixed(2));
+      let chocolateQuantity = audited ? audited.chocolateQuantity : (order.Items || `${qtyNum} units`);
+
+      return {
+        id: order.Order_ID || invoiceNo,
+        invoiceNo,
+        date: dateDisplay,
+        party,
+        partyGstin: cust?.Notes?.match(/GSTIN\s*[:|-]?\s*([A-Z0-9]{15})/i)?.[1] || '',
+        taxableValue,
+        cgst,
+        sgst,
+        totalGst,
+        total,
+        chocolateQuantity,
+        entity: 'Goodoria Food Innovations',
+        source: 'imported'
+      };
+    });
+  }, [ordersLog, customerMap]);
+
+  // Compute available months dynamically from all order dates
   const availableMonths = useMemo(() => {
     const monthsSet = new Set<string>();
     
-    // Always include August, September, October 2026
+    // Always include current and recent months
     monthsSet.add('2026-10');
     monthsSet.add('2026-09');
     monthsSet.add('2026-08');
 
-    invoices.forEach(inv => {
-      const ym = InvoiceService.extractYearMonth(inv.date);
+    gstRows.forEach(row => {
+      const ym = InvoiceService.extractYearMonth(row.date);
       if (ym) monthsSet.add(ym);
     });
 
     return Array.from(monthsSet).sort().reverse();
-  }, [invoices]);
+  }, [gstRows]);
 
   // Format month name (e.g. "2026-09" -> "September 2026")
   const formatMonthTitle = (ym: string): string => {
@@ -71,12 +242,12 @@ export const CAReports: React.FC = () => {
     }
   };
 
-  // Filter invoices for selected month & search query
-  const filteredInvoices = useMemo(() => {
-    return invoices.filter(inv => {
+  // Filter rows for selected month & search query
+  const filteredRows = useMemo(() => {
+    return gstRows.filter(row => {
       // Month Filter
       if (selectedMonth) {
-        const ym = InvoiceService.extractYearMonth(inv.date);
+        const ym = InvoiceService.extractYearMonth(row.date);
         if (ym !== selectedMonth) {
           return false;
         }
@@ -85,9 +256,9 @@ export const CAReports: React.FC = () => {
       // Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchInvoice = inv.invoiceNo.toLowerCase().includes(q);
-        const matchParty = inv.party.toLowerCase().includes(q);
-        const matchQty = (inv.chocolateQuantity || '').toLowerCase().includes(q);
+        const matchInvoice = row.invoiceNo.toLowerCase().includes(q);
+        const matchParty = row.party.toLowerCase().includes(q);
+        const matchQty = (row.chocolateQuantity || '').toLowerCase().includes(q);
         if (!matchInvoice && !matchParty && !matchQty) {
           return false;
         }
@@ -95,7 +266,7 @@ export const CAReports: React.FC = () => {
 
       return true;
     });
-  }, [invoices, selectedMonth, searchQuery]);
+  }, [gstRows, selectedMonth, searchQuery]);
 
   // Compute summary totals for the filtered set
   const totals = useMemo(() => {
@@ -105,26 +276,23 @@ export const CAReports: React.FC = () => {
     let totalTax = 0;
     let grossTotal = 0;
 
-    filteredInvoices.forEach(inv => {
-      const taxVal = inv.taxableValue || 0;
-      const c = inv.cgst || 0;
-      const s = inv.sgst || 0;
-      taxable += taxVal;
-      cgst += c;
-      sgst += s;
-      totalTax += (c + s);
-      grossTotal += (inv.total || (taxVal + c + s));
+    filteredRows.forEach(row => {
+      taxable += (row.taxableValue || 0);
+      cgst += (row.cgst || 0);
+      sgst += (row.sgst || 0);
+      totalTax += (row.totalGst || 0);
+      grossTotal += (row.total || 0);
     });
 
     return {
-      count: filteredInvoices.length,
+      count: filteredRows.length,
       taxable: Number(taxable.toFixed(2)),
       cgst: Number(cgst.toFixed(2)),
       sgst: Number(sgst.toFixed(2)),
       totalTax: Number(totalTax.toFixed(2)),
       grossTotal: Number(grossTotal.toFixed(2))
     };
-  }, [filteredInvoices]);
+  }, [filteredRows]);
 
   // INR Currency Formatter
   const formatINR = (val: number): string => {
@@ -136,10 +304,9 @@ export const CAReports: React.FC = () => {
 
   // Auto-calculate next invoice number when opening modal
   const handleOpenAddModal = () => {
-    // Find highest invoice number sequence
     let highestSeq = 1171;
-    invoices.forEach(inv => {
-      const match = inv.invoiceNo.match(/Invoice-(\d+)-/i) || inv.invoiceNo.match(/(\d+)/);
+    gstRows.forEach(r => {
+      const match = r.invoiceNo.match(/Invoice-(\d+)-/i) || r.invoiceNo.match(/(\d+)/);
       if (match) {
         const num = parseInt(match[1]);
         if (!isNaN(num) && num > highestSeq) highestSeq = num;
@@ -149,33 +316,35 @@ export const CAReports: React.FC = () => {
     const nextSeq = highestSeq + 1;
     const defaultDate = selectedMonth ? `${selectedMonth}-05` : new Date().toISOString().split('T')[0];
 
-    setNewInv({
+    setNewOrder({
       invoiceNo: `Invoice-${nextSeq}-GUD-2026-Client`,
       date: defaultDate,
-      party: '',
-      partyGstin: '',
-      taxableValue: '',
-      cgst: '',
-      sgst: '',
-      chocolateQuantity: '6 bars',
-      notes: ''
+      customerName: 'Direct Client',
+      customerId: 'CUST-0001',
+      items: '6 bars (Orange, Sea Salt, Almond)',
+      qty: '6',
+      taxableValue: '742.86',
+      cgst: '18.57',
+      sgst: '18.57',
+      channel: 'Direct',
+      notes: 'Payment received upon delivery'
     });
     setShowAddModal(true);
   };
 
-  // Auto-calculate 2.5% CGST and SGST when taxable value changes
+  // Auto-calculate 2.5% CGST and SGST when taxable value changes in modal
   const handleTaxableChange = (valStr: string) => {
     const val = parseFloat(valStr);
     if (!isNaN(val) && val > 0) {
       const taxHalf = Number((val * 0.025).toFixed(2));
-      setNewInv(prev => ({
+      setNewOrder(prev => ({
         ...prev,
         taxableValue: valStr,
         cgst: taxHalf.toString(),
         sgst: taxHalf.toString()
       }));
     } else {
-      setNewInv(prev => ({
+      setNewOrder(prev => ({
         ...prev,
         taxableValue: valStr,
         cgst: '',
@@ -184,76 +353,107 @@ export const CAReports: React.FC = () => {
     }
   };
 
-  // Submit manual invoice to Firebase Firestore & local registry
-  const handleSaveNewInvoice = async (e: React.FormEvent) => {
+  // Submit new order directly to Google Sheets Orders_Log!A:O
+  const handleSaveOrderToSheet = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newInv.invoiceNo || !newInv.party) return;
+    if (!newOrder.invoiceNo || !newOrder.customerName) return;
 
     setIsSaving(true);
     try {
-      const taxVal = parseFloat(newInv.taxableValue) || 0;
-      const c = parseFloat(newInv.cgst) || Number((taxVal * 0.025).toFixed(2));
-      const s = parseFloat(newInv.sgst) || Number((taxVal * 0.025).toFixed(2));
+      const taxVal = parseFloat(newOrder.taxableValue) || 0;
+      const orderId = `ORD-${Date.now().toString().slice(-4)}`;
 
-      await InvoiceService.saveInvoice({
-        invoiceNo: newInv.invoiceNo.trim(),
-        date: newInv.date,
-        party: newInv.party.trim(),
-        partyGstin: newInv.partyGstin.trim(),
-        taxableValue: taxVal,
-        cgst: c,
-        sgst: s,
-        chocolateQuantity: newInv.chocolateQuantity.trim() || '1 order',
-        notes: newInv.notes,
-        entity: 'Goodoria Food Innovations',
-        source: 'manual_entry'
-      });
+      const orderRowObj = {
+        Order_ID: orderId,
+        Date: newOrder.date,
+        Customer_ID: newOrder.customerId || 'CUST-0001',
+        Channel: newOrder.channel || 'Direct',
+        Items: newOrder.items,
+        Qty: newOrder.qty || '1',
+        Price_Per_Unit: (taxVal / (parseFloat(newOrder.qty) || 1)).toFixed(2),
+        GST_Percent: '5%',
+        Total_Value: taxVal.toFixed(2),
+        Payment_Status: 'Paid',
+        Delivery_Status: 'Delivered',
+        Delivery_Method: 'Self',
+        Tracking_ID: '',
+        Invoice_Link: newOrder.invoiceNo.trim(),
+        Notes: newOrder.notes
+      };
 
-      // Ensure view is on the added month
-      const addedYm = InvoiceService.extractYearMonth(newInv.date);
+      // 1. If Google Token is available, push directly to Google Sheets Orders_Log
+      if (googleToken) {
+        const rowArray = [
+          orderRowObj.Order_ID,
+          orderRowObj.Date,
+          orderRowObj.Customer_ID,
+          orderRowObj.Channel,
+          orderRowObj.Items,
+          orderRowObj.Qty,
+          orderRowObj.Price_Per_Unit,
+          orderRowObj.GST_Percent,
+          orderRowObj.Total_Value,
+          orderRowObj.Payment_Status,
+          orderRowObj.Delivery_Status,
+          orderRowObj.Delivery_Method,
+          orderRowObj.Tracking_ID,
+          orderRowObj.Invoice_Link,
+          orderRowObj.Notes
+        ];
+
+        await GoogleSheetsService.appendSpreadsheetValues(
+          googleToken,
+          spreadsheetId,
+          "'Orders_Log'!A:O",
+          [rowArray]
+        );
+
+        sendNotification({
+          title: 'Added to Google Sheets Orders_Log',
+          message: `${newOrder.invoiceNo} appended to spreadsheet successfully!`,
+          priority: 'medium',
+          channels: ['in-app']
+        });
+      }
+
+      // 2. Add to local Orders_Log state immediately
+      setOrdersLog(prev => [orderRowObj, ...prev]);
+
+      // 3. Ensure view is on the added month
+      const addedYm = InvoiceService.extractYearMonth(newOrder.date);
       if (addedYm) {
         setSelectedMonth(addedYm);
       }
 
       setShowAddModal(false);
     } catch (err: any) {
-      console.error('Save invoice error:', err);
-      alert('Failed to save invoice: ' + (err.message || 'Unknown error'));
+      console.error('Save order error:', err);
+      alert('Failed to save order to sheet: ' + (err.message || 'Unknown error'));
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Delete invoice
-  const handleDeleteInvoice = async (invoiceNo: string) => {
-    if (!window.confirm(`Delete invoice ${invoiceNo} from the GST register?`)) return;
-    try {
-      await InvoiceService.deleteInvoice(invoiceNo);
-    } catch (err: any) {
-      console.error('Delete error:', err);
-    }
-  };
-
-  // Export exact 7-column CSV (matching screenshot)
+  // Export exact 7-column CSV (matching spreadsheet layout)
   const handleExportCsv = () => {
     const periodLabel = selectedMonth ? formatMonthTitle(selectedMonth) : 'All_Time';
-    InvoiceService.exportToExact7ColumnCsv(filteredInvoices, periodLabel);
+    InvoiceService.exportToExact7ColumnCsv(filteredRows, periodLabel);
   };
 
   // Copy WhatsApp/Email summary for CA
   const handleCopySummary = () => {
     const periodLabel = selectedMonth ? formatMonthTitle(selectedMonth) : 'All Time';
-    const summaryText = `*GUDORIA FOOD INNOVATIONS - GST & Sales Register*\n` +
+    const summaryText = `*GUDORIA FOOD INNOVATIONS - CA & GST Sales Register*\n` +
       `📅 Period: ${periodLabel}\n` +
       `━━━━━━━━━━━━━━━━━━━\n` +
-      `📄 Invoices Issued: ${totals.count}\n` +
+      `📄 Invoices / Orders: ${totals.count}\n` +
       `💰 Taxable Value: ${formatINR(totals.taxable)}\n` +
-      `🏛️ CGST: ${formatINR(totals.cgst)}\n` +
-      `🏛️ SGST: ${formatINR(totals.sgst)}\n` +
-      `📈 Total GST (CGST+SGST): ${formatINR(totals.totalTax)}\n` +
+      `🏛️ CGST (2.5%): ${formatINR(totals.cgst)}\n` +
+      `🏛️ SGST (2.5%): ${formatINR(totals.sgst)}\n` +
+      `📈 Total GST: ${formatINR(totals.totalTax)}\n` +
       `💵 Gross Invoiced: ${formatINR(totals.grossTotal)}\n` +
       `━━━━━━━━━━━━━━━━━━━\n` +
-      `Autonomously synced from Goodoria ERP & Firebase Cloud`;
+      `Source: Google Sheets Orders_Log (${ordersLog.length} rows synced)`;
 
     navigator.clipboard.writeText(summaryText);
     setCopiedSummary(true);
@@ -263,69 +463,116 @@ export const CAReports: React.FC = () => {
   return (
     <div className="space-y-6 pb-20 max-w-7xl mx-auto">
       {/* 1. Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#141414] border border-[#242424] p-6 rounded-2xl print:hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#141414] border border-[#242424] p-6 rounded-2xl print:hidden shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-[#1f1f1f] border border-[#2f2f2f] rounded-xl text-[#c5a880]">
               <FileSpreadsheet className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                CA & GST Sales Register
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Live Cloud Synced
-                </span>
-              </h1>
-              <p className="text-xs text-[#888888]">
-                Real-time autonomous outward sales register, CGST/SGST tax split, and party invoice records for CA audit.
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-white tracking-tight">
+                  CA &amp; GST Sales Register
+                </h1>
+                {isGoogleSynced ? (
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/70 text-emerald-400 border border-emerald-800/40 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <span>Sheets Synced ({ordersLog.length} rows)</span>
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-950/70 text-amber-300 border border-amber-800/40 flex items-center gap-1">
+                    <Database className="w-3 h-3 text-amber-300" />
+                    <span>Orders CRM Local ({ordersLog.length} rows)</span>
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#888888] mt-0.5">
+                Autonomously populated from <strong>Orders_Log</strong> in Google Sheets. Live CGST &amp; SGST breakdown for CA tax audits.
               </p>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Direct Link to Orders CRM Portal */}
+          <a
+            href="#/modules/orders"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.hash = '/modules/orders';
+            }}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-[#333333] bg-[#1a1a1a] hover:bg-[#252525] text-neutral-300 hover:text-white transition font-medium"
+            title="Open the Orders CRM Portal to view and edit raw order logs"
+          >
+            <span>Orders CRM Portal</span>
+            <ArrowUpRight className="w-3 h-3 text-neutral-400" />
+          </a>
+
+          {/* Sync / Refresh from Google Sheets */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchLiveOrdersFromSheet}
+            disabled={loadingSheet}
+            className="flex items-center gap-1.5 text-xs border-[#333333] hover:bg-[#222222]"
+            title="Refresh order logs directly from Google Sheets"
+          >
+            <RotateCcw className={`w-3.5 h-3.5 text-[#aaaaaa] ${loadingSheet ? 'animate-spin' : ''}`} />
+            <span>{loadingSheet ? 'Syncing...' : 'Sync Sheet'}</span>
+          </Button>
+
+          {!googleToken && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={signInWithGoogle}
+              className="flex items-center gap-1.5 text-xs border-amber-800/40 bg-amber-950/30 text-amber-200 hover:bg-amber-900/40"
+            >
+              <span>Connect Google</span>
+            </Button>
+          )}
+
           <Button
             variant="outline"
             size="sm"
             onClick={handleCopySummary}
-            className="flex items-center gap-2 text-xs border-[#333333] hover:bg-[#222222]"
+            className="flex items-center gap-1.5 text-xs border-[#333333] hover:bg-[#222222]"
             title="Copy summary for CA WhatsApp/Email"
           >
             {copiedSummary ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-[#aaaaaa]" />}
-            <span>{copiedSummary ? 'Summary Copied!' : 'Copy Summary'}</span>
+            <span>{copiedSummary ? 'Copied' : 'Copy'}</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
             onClick={() => window.print()}
-            className="flex items-center gap-2 text-xs border-[#333333] hover:bg-[#222222]"
+            className="flex items-center gap-1.5 text-xs border-[#333333] hover:bg-[#222222]"
           >
             <Printer className="w-3.5 h-3.5 text-[#aaaaaa]" />
-            <span>Print Register</span>
+            <span>Print</span>
           </Button>
 
           <Button
             variant="outline"
             size="sm"
             onClick={handleExportCsv}
-            disabled={filteredInvoices.length === 0}
-            className="flex items-center gap-2 text-xs border-[#333333] bg-[#1e1e1e] hover:bg-[#2a2a2a] text-white"
+            disabled={filteredRows.length === 0}
+            className="flex items-center gap-1.5 text-xs border-[#333333] bg-[#1e1e1e] hover:bg-[#2a2a2a] text-white"
           >
             <Download className="w-3.5 h-3.5 text-sky-400" />
-            <span>Download Excel (.csv)</span>
+            <span>Export CSV</span>
           </Button>
 
           <Button
             variant="primary"
             size="sm"
             onClick={handleOpenAddModal}
-            className="flex items-center gap-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm"
+            className="flex items-center gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm"
           >
-            <Plus className="w-4 h-4" />
-            <span>+ Add Invoice Entry</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>+ Add Order to Sheet</span>
           </Button>
         </div>
       </div>
@@ -342,7 +589,7 @@ export const CAReports: React.FC = () => {
               </span>
               {availableMonths.map((ym) => {
                 const isSelected = selectedMonth === ym;
-                const count = invoices.filter(i => InvoiceService.extractYearMonth(i.date) === ym).length;
+                const count = gstRows.filter(r => InvoiceService.extractYearMonth(r.date) === ym).length;
                 return (
                   <button
                     key={ym}
@@ -367,7 +614,7 @@ export const CAReports: React.FC = () => {
                     : 'bg-[#1b1b1b] text-[#aaaaaa] hover:text-white hover:bg-[#262626] border border-[#2b2b2b]'
                 }`}
               >
-                All Months ({invoices.length})
+                All Months ({gstRows.length})
               </button>
             </div>
 
@@ -389,7 +636,7 @@ export const CAReports: React.FC = () => {
       {/* 3. KPI Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 print:hidden">
         <StatisticsCard
-          title="Invoices Logged"
+          title="Orders Logged"
           value={totals.count}
           description={`Period: ${selectedMonth ? formatMonthTitle(selectedMonth) : 'All Records'}`}
         />
@@ -425,14 +672,19 @@ export const CAReports: React.FC = () => {
               {selectedMonth ? formatMonthTitle(selectedMonth) : 'All Months'} GST Sales Register
             </h2>
             <span className="text-[11px] px-2 py-0.5 rounded bg-sky-950 text-sky-300 font-semibold border border-sky-800/50">
-              {filteredInvoices.length} Invoices
+              {filteredRows.length} Orders
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-300 print:hidden">
+          <div className="flex items-center gap-3 text-xs text-slate-300 print:hidden">
             <span>Entity: <strong>Gudoria Food Innovations Pvt Ltd</strong></span>
             <span className="text-slate-500">•</span>
             <span>GSTIN: <strong>32AANCA8181G1ZK</strong></span>
+            {lastSyncedTime && (
+              <span className="text-[11px] text-slate-400">
+                (Last sync: {lastSyncedTime})
+              </span>
+            )}
           </div>
         </div>
 
@@ -449,22 +701,21 @@ export const CAReports: React.FC = () => {
                 <th className="py-3 px-4 text-right border-r border-blue-600">CGST</th>
                 <th className="py-3 px-4 text-right border-r border-blue-600">SGST</th>
                 <th className="py-3 px-4">Chocolate Quantity</th>
-                <th className="py-3 px-3 text-center print:hidden w-10"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#222222]">
-              {filteredInvoices.length === 0 ? (
+              {filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-[#777777]">
+                  <td colSpan={7} className="py-16 text-center text-[#777777]">
                     <div className="flex flex-col items-center justify-center space-y-3">
                       <div className="p-3 bg-[#1e1e1e] rounded-full text-[#c5a880]">
                         <AlertCircle className="w-8 h-8" />
                       </div>
                       <p className="text-sm font-medium text-white">
-                        No invoices recorded for {selectedMonth ? formatMonthTitle(selectedMonth) : 'this period'} yet.
+                        No orders found in Orders_Log for {selectedMonth ? formatMonthTitle(selectedMonth) : 'this period'}.
                       </p>
                       <p className="text-xs text-[#888888] max-w-md">
-                        Every invoice you generate or enter automatically persists to Firebase and appears here in real-time.
+                        Every order logged in the Orders CRM Portal or Google Sheets appears here autonomously with auto-calculated CGST &amp; SGST.
                       </p>
                       <div className="pt-2 flex items-center gap-3">
                         <Button
@@ -474,17 +725,17 @@ export const CAReports: React.FC = () => {
                           className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
                         >
                           <Plus className="w-3.5 h-3.5 mr-1" />
-                          <span>+ Add Invoice for {selectedMonth ? formatMonthTitle(selectedMonth) : 'this Month'}</span>
+                          <span>+ Add Order for {selectedMonth ? formatMonthTitle(selectedMonth) : 'this Month'}</span>
                         </Button>
                         <a
-                          href="#/invoice-generator"
+                          href="#/modules/orders"
                           onClick={(e) => {
                             e.preventDefault();
-                            window.location.hash = '/invoice-generator';
+                            window.location.hash = '/modules/orders';
                           }}
                           className="text-xs text-[#c5a880] hover:underline flex items-center gap-1 font-medium"
                         >
-                          <span>Open Invoice Generator</span>
+                          <span>Open Orders CRM Portal</span>
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
@@ -492,61 +743,49 @@ export const CAReports: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredInvoices.map((inv) => (
+                filteredRows.map((row) => (
                   <tr 
-                    key={inv.id || inv.invoiceNo} 
+                    key={row.id || row.invoiceNo} 
                     className="hover:bg-[#1a1a1a] transition-colors group"
                   >
                     {/* 1. Invoice No. */}
                     <td className="py-3 px-4 font-mono font-medium text-white whitespace-nowrap border-r border-[#262626]">
-                      {inv.invoiceNo}
+                      {row.invoiceNo}
                     </td>
 
                     {/* 2. Date */}
                     <td className="py-3 px-4 text-[#cccccc] whitespace-nowrap border-r border-[#262626]">
-                      {inv.date}
+                      {row.date}
                     </td>
 
                     {/* 3. Party */}
                     <td className="py-3 px-4 text-white font-medium border-r border-[#262626]">
-                      <div>{inv.party}</div>
-                      {inv.partyGstin && (
+                      <div>{row.party}</div>
+                      {row.partyGstin && (
                         <div className="text-[10px] text-amber-400 font-mono mt-0.5">
-                          GSTIN: {inv.partyGstin}
+                          GSTIN: {row.partyGstin}
                         </div>
                       )}
                     </td>
 
                     {/* 4. Taxable Value */}
                     <td className="py-3 px-4 text-right font-mono font-medium text-white border-r border-[#262626]">
-                      {formatINR(inv.taxableValue)}
+                      {formatINR(row.taxableValue)}
                     </td>
 
                     {/* 5. CGST */}
                     <td className="py-3 px-4 text-right font-mono text-[#cccccc] border-r border-[#262626]">
-                      {formatINR(inv.cgst)}
+                      {formatINR(row.cgst)}
                     </td>
 
                     {/* 6. SGST */}
                     <td className="py-3 px-4 text-right font-mono text-[#cccccc] border-r border-[#262626]">
-                      {formatINR(inv.sgst)}
+                      {formatINR(row.sgst)}
                     </td>
 
                     {/* 7. Chocolate Quantity */}
                     <td className="py-3 px-4 text-[#dddddd] font-medium">
-                      {inv.chocolateQuantity || '-'}
-                    </td>
-
-                    {/* Row Delete Action */}
-                    <td className="py-3 px-3 text-center print:hidden">
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteInvoice(inv.invoiceNo)}
-                        className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-300 transition-opacity p-1"
-                        title="Delete this record"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {row.chocolateQuantity || '-'}
                     </td>
                   </tr>
                 ))
@@ -554,7 +793,7 @@ export const CAReports: React.FC = () => {
             </tbody>
 
             {/* Total Row matching the bottom of the screenshot */}
-            {filteredInvoices.length > 0 && (
+            {filteredRows.length > 0 && (
               <tfoot>
                 <tr className="bg-[#1c1c1c] text-white font-bold border-t-2 border-[#333333] text-xs">
                   <td className="py-3.5 px-4 border-r border-[#2a2a2a] uppercase tracking-wider">
@@ -562,7 +801,7 @@ export const CAReports: React.FC = () => {
                   </td>
                   <td className="py-3.5 px-4 border-r border-[#2a2a2a]"></td>
                   <td className="py-3.5 px-4 border-r border-[#2a2a2a] text-[#888888] font-normal">
-                    {totals.count} Invoices
+                    {totals.count} Orders
                   </td>
                   <td className="py-3.5 px-4 text-right font-mono text-emerald-400 border-r border-[#2a2a2a] text-sm">
                     {formatINR(totals.taxable)}
@@ -574,9 +813,8 @@ export const CAReports: React.FC = () => {
                     {formatINR(totals.sgst)}
                   </td>
                   <td className="py-3.5 px-4 text-sky-300">
-                    {totals.count} Orders / Batches
+                    {totals.count} Orders Logged
                   </td>
-                  <td className="print:hidden"></td>
                 </tr>
               </tfoot>
             )}
@@ -584,14 +822,14 @@ export const CAReports: React.FC = () => {
         </div>
       </Card>
 
-      {/* 5. Modal: Quick Add Invoice Entry */}
+      {/* 5. Modal: Add Order Record Directly to Sheets Orders_Log */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#181818] border border-[#2e2e2e] rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-[#282828] pb-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-base font-bold text-white">Add Invoice to GST Register</h3>
+                <h3 className="text-base font-bold text-white">Add Order to Orders_Log &amp; GST Register</h3>
               </div>
               <button
                 type="button"
@@ -602,120 +840,126 @@ export const CAReports: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveNewInvoice} className="space-y-3.5 text-xs">
+            <form onSubmit={handleSaveOrderToSheet} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-[#888888] mb-1 font-medium">Invoice Number *</label>
+                  <label className="block text-[#aaaaaa] font-medium mb-1">Invoice / Reference No. *</label>
                   <input
                     type="text"
                     required
-                    value={newInv.invoiceNo}
-                    onChange={(e) => setNewInv({ ...newInv, invoiceNo: e.target.value })}
-                    className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500"
+                    value={newOrder.invoiceNo}
+                    onChange={(e) => setNewOrder(prev => ({ ...prev, invoiceNo: e.target.value }))}
                     placeholder="Invoice-1172-GUD-2026-Client"
+                    className="w-full bg-[#111111] border border-[#333333] rounded-lg p-2.5 text-white font-mono focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-[#888888] mb-1 font-medium">Invoice Date *</label>
+                  <label className="block text-[#aaaaaa] font-medium mb-1">Order Date *</label>
                   <input
                     type="date"
                     required
-                    value={newInv.date}
-                    onChange={(e) => setNewInv({ ...newInv, date: e.target.value })}
-                    className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                    value={newOrder.date}
+                    onChange={(e) => setNewOrder(prev => ({ ...prev, date: e.target.value }))}
+                    className="w-full bg-[#111111] border border-[#333333] rounded-lg p-2.5 text-white focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] text-[#888888] mb-1 font-medium">Party / Customer Name *</label>
+                <label className="block text-[#aaaaaa] font-medium mb-1">Party / Customer Name *</label>
                 <input
                   type="text"
                   required
-                  value={newInv.party}
-                  onChange={(e) => setNewInv({ ...newInv, party: e.target.value })}
-                  className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
-                  placeholder="e.g. Royal Enfield Street or Naveen Kumar"
+                  value={newOrder.customerName}
+                  onChange={(e) => setNewOrder(prev => ({ ...prev, customerName: e.target.value }))}
+                  placeholder="e.g. TAJ Malabar, Cafe Coffee Day, Nishant"
+                  className="w-full bg-[#111111] border border-[#333333] rounded-lg p-2.5 text-white focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-[#888888] mb-1 font-medium">Party GSTIN (Optional)</label>
+                  <label className="block text-[#aaaaaa] font-medium mb-1">Chocolate Items Description *</label>
                   <input
                     type="text"
-                    value={newInv.partyGstin}
-                    onChange={(e) => setNewInv({ ...newInv, partyGstin: e.target.value.toUpperCase() })}
-                    className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white font-mono uppercase focus:outline-none focus:border-emerald-500"
-                    placeholder="32AAAAA0000A1Z5"
+                    required
+                    value={newOrder.items}
+                    onChange={(e) => setNewOrder(prev => ({ ...prev, items: e.target.value }))}
+                    placeholder="e.g. 6 bars (Orange, Almond), 2 Boxes"
+                    className="w-full bg-[#111111] border border-[#333333] rounded-lg p-2.5 text-white focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-[#888888] mb-1 font-medium">Taxable Value (₹) *</label>
+                  <label className="block text-[#aaaaaa] font-medium mb-1">Quantity (Units) *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={newOrder.qty}
+                    onChange={(e) => setNewOrder(prev => ({ ...prev, qty: e.target.value }))}
+                    className="w-full bg-[#111111] border border-[#333333] rounded-lg p-2.5 text-white focus:border-emerald-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 bg-[#111111] p-3 rounded-xl border border-[#262626]">
+                <div>
+                  <label className="block text-[#aaaaaa] font-medium mb-1">Taxable Value (₹) *</label>
                   <input
                     type="number"
                     step="0.01"
                     required
-                    value={newInv.taxableValue}
+                    value={newOrder.taxableValue}
                     onChange={(e) => handleTaxableChange(e.target.value)}
-                    className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500"
-                    placeholder="1000.00"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] text-[#888888] mb-1 font-medium">CGST @ 2.5% (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={newInv.cgst}
-                    onChange={(e) => setNewInv({ ...newInv, cgst: e.target.value })}
-                    className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500"
-                    placeholder="25.00"
+                    placeholder="0.00"
+                    className="w-full bg-[#191919] border border-[#333333] rounded-lg p-2 text-white font-mono focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-[#888888] mb-1 font-medium">SGST @ 2.5% (₹)</label>
+                  <label className="block text-[#aaaaaa] font-medium mb-1">CGST (2.5%)</label>
                   <input
-                    type="number"
-                    step="0.01"
-                    value={newInv.sgst}
-                    onChange={(e) => setNewInv({ ...newInv, sgst: e.target.value })}
-                    className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white font-mono focus:outline-none focus:border-emerald-500"
-                    placeholder="25.00"
+                    type="text"
+                    readOnly
+                    value={newOrder.cgst}
+                    className="w-full bg-[#191919] border border-[#333333] rounded-lg p-2 text-emerald-400 font-mono focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#aaaaaa] font-medium mb-1">SGST (2.5%)</label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={newOrder.sgst}
+                    className="w-full bg-[#191919] border border-[#333333] rounded-lg p-2 text-emerald-400 font-mono focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[11px] text-[#888888] mb-1 font-medium">Chocolate Quantity *</label>
-                <input
-                  type="text"
-                  required
-                  value={newInv.chocolateQuantity}
-                  onChange={(e) => setNewInv({ ...newInv, chocolateQuantity: e.target.value })}
-                  className="w-full bg-[#121212] border border-[#2e2e2e] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
-                  placeholder="e.g. 6 bars, 2 Hampers, or 300 units (250 bars + 50 boxes)"
-                />
+              <div className="flex items-center justify-between text-xs text-[#888888] pt-1">
+                <span>
+                  Total Payable with 5% GST: <strong className="text-white">₹{((parseFloat(newOrder.taxableValue) || 0) * 1.05).toFixed(2)}</strong>
+                </span>
+                <span>Destination: <strong>Google Sheets Orders_Log</strong></span>
               </div>
 
-              <div className="pt-3 border-t border-[#282828] flex items-center justify-end gap-2">
+              <div className="flex justify-end gap-2 pt-3 border-t border-[#282828]">
                 <Button
                   type="button"
                   variant="outline"
+                  size="sm"
                   onClick={() => setShowAddModal(false)}
-                  className="text-xs border-[#333333] hover:bg-[#222222] text-[#cccccc]"
+                  className="border-[#333333] text-[#aaaaaa] hover:text-white"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
+                  variant="primary"
+                  size="sm"
                   disabled={isSaving}
-                  className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
                 >
-                  {isSaving ? 'Saving to Cloud...' : 'Save to Cloud & GST Register'}
+                  {isSaving ? 'Appending to Sheet...' : 'Save & Append to Sheet'}
                 </Button>
               </div>
             </form>
@@ -725,5 +969,3 @@ export const CAReports: React.FC = () => {
     </div>
   );
 };
-
-export default CAReports;
