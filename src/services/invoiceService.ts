@@ -16,6 +16,7 @@ export interface GstInvoiceRecord {
   id: string; // Document ID (usually invoiceNo or unique key)
   invoiceNo: string; // e.g. "Invoice-1153-GUD-2026-IntegratedDesig"
   date: string; // DD/MM/YYYY or YYYY-MM-DD
+  yearMonth?: string; // e.g. "2026-09"
   party: string; // e.g. "Moby (Integrated Design)"
   partyGstin?: string; // e.g. "32A..."
   taxableValue: number; // e.g. 742.86
@@ -315,22 +316,23 @@ const STORAGE_KEY = 'gud_invoices_registry';
 
 export class InvoiceService {
   /**
-   * Helper to normalize a date string into YYYY-MM
+   * Helper to normalize a date string into YYYY-MM (Strictly follows Indian DD/MM/YYYY ordering)
    */
   static extractYearMonth(dateStr: string): string {
     if (!dateStr) return '';
     try {
-      const parts = dateStr.trim().split(/[-/]/);
-      if (parts.length === 3) {
-        if (parts[0].length === 4) {
-          // YYYY-MM-DD
-          return `${parts[0]}-${parts[1].padStart(2, '0')}`;
-        } else if (parts[2].length === 4) {
-          // DD/MM/YYYY
-          return `${parts[2]}-${parts[1].padStart(2, '0')}`;
-        }
+      const trimmed = dateStr.trim();
+      // 1. DD/MM/YYYY or DD-MM-YYYY
+      const dmy = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (dmy) {
+        return `${dmy[3]}-${dmy[2].padStart(2, '0')}`;
       }
-      const d = new Date(dateStr);
+      // 2. YYYY-MM-DD
+      const ymd = trimmed.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+      if (ymd) {
+        return `${ymd[1]}-${ymd[2].padStart(2, '0')}`;
+      }
+      const d = new Date(trimmed);
       if (!isNaN(d.getTime())) {
         const m = String(d.getMonth() + 1).padStart(2, '0');
         return `${d.getFullYear()}-${m}`;
@@ -347,16 +349,18 @@ export class InvoiceService {
   static formatDateDisplay(dateStr: string): string {
     if (!dateStr) return '';
     try {
-      const parts = dateStr.trim().split(/[-/]/);
-      if (parts.length === 3) {
-        if (parts[0].length === 4) {
-          // YYYY-MM-DD -> DD/MM/YYYY
-          return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
-        } else if (parts[2].length === 4) {
-          return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
-        }
+      const trimmed = dateStr.trim();
+      // 1. DD/MM/YYYY or DD-MM-YYYY
+      const dmy = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (dmy) {
+        return `${dmy[1].padStart(2, '0')}/${dmy[2].padStart(2, '0')}/${dmy[3]}`;
       }
-      const d = new Date(dateStr);
+      // 2. YYYY-MM-DD
+      const ymd = trimmed.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+      if (ymd) {
+        return `${ymd[3].padStart(2, '0')}/${ymd[2].padStart(2, '0')}/${ymd[1]}`;
+      }
+      const d = new Date(trimmed);
       if (!isNaN(d.getTime())) {
         const day = String(d.getDate()).padStart(2, '0');
         const month = String(d.getMonth() + 1).padStart(2, '0');

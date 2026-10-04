@@ -302,8 +302,16 @@ export const InvoiceGenerator: React.FC = () => {
   useEffect(() => {
     const unsub = InvoiceService.subscribeToInvoices((loaded) => {
       setCloudInvoices(loaded);
-      // Auto-set next invoice sequence if default
-      let highest = 1171;
+      // Auto-set next invoice sequence dynamically from latest Orders_Log & cloud invoices
+      let highest = 1194;
+      (seedData.Orders_Log || []).forEach((o: any) => {
+        const inv = o.Invoice_Link || o.Invoice_Ref || '';
+        const m = inv.match(/Invoice-(\d+)-/i) || inv.match(/(\d+)/);
+        if (m) {
+          const num = parseInt(m[1]);
+          if (!isNaN(num) && num > highest) highest = num;
+        }
+      });
       loaded.forEach(inv => {
         const m = inv.invoiceNo.match(/Invoice-(\d+)-/i) || inv.invoiceNo.match(/(\d+)/);
         if (m) {
@@ -311,7 +319,7 @@ export const InvoiceGenerator: React.FC = () => {
           if (!isNaN(num) && num > highest) highest = num;
         }
       });
-      if (highest >= 1156 && invoiceSeq === '1156') {
+      if (highest >= 1156 && (invoiceSeq === '1156' || invoiceSeq === '1172')) {
         setInvoiceSeq(String(highest + 1));
       }
     });

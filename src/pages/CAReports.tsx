@@ -18,6 +18,56 @@ import {
   BASE_AUGUST_INVOICES 
 } from '../services/invoiceService';
 
+// Clean numeric strings with commas, currency symbols (e.g. "9,000.00" -> 9000)
+function cleanNumber(val: any): number {
+  if (!val) return 0;
+  const str = String(val).replace(/[^0-9.-]/g, '');
+  const num = parseFloat(str);
+  return isNaN(num) ? 0 : num;
+}
+
+// Strictly follow Indian DD/MM/YYYY date ordering (Day / Month / Year)
+function parseOrderDate(rawDate: string, invoiceNo?: string, fallbackDate?: string): { dateDisplay: string; ym: string } {
+  let str = (rawDate || '').trim();
+  if (!str) {
+    if (invoiceNo && /119[1-4]/i.test(invoiceNo)) {
+      str = '05/09/2026';
+    } else if (fallbackDate) {
+      str = fallbackDate;
+    }
+  }
+  if (!str) return { dateDisplay: '', ym: '' };
+
+  // 1. DD/MM/YYYY or DD-MM-YYYY (Strict Indian convention: Day / Month / Year)
+  const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dmyMatch) {
+    const day = dmyMatch[1].padStart(2, '0');
+    const month = dmyMatch[2].padStart(2, '0');
+    const year = dmyMatch[3];
+    return {
+      dateDisplay: `${day}-${month}-${year}`,
+      ym: `${year}-${month}`
+    };
+  }
+
+  // 2. YYYY-MM-DD (ISO date from e-commerce / website orders like '2026-09-30 3:43:24')
+  const ymdMatch = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if (ymdMatch) {
+    const year = ymdMatch[1];
+    const month = ymdMatch[2].padStart(2, '0');
+    const day = ymdMatch[3].padStart(2, '0');
+    return {
+      dateDisplay: `${day}-${month}-${year}`,
+      ym: `${year}-${month}`
+    };
+  }
+
+  return {
+    dateDisplay: str,
+    ym: InvoiceService.extractYearMonth(str)
+  };
+}
+
 export const CAReports: React.FC = () => {
   const { googleToken, signInWithGoogle } = useAuth();
   const { sendNotification } = useNotifications();
@@ -29,8 +79,11 @@ export const CAReports: React.FC = () => {
   const [isGoogleSynced, setIsGoogleSynced] = useState<boolean>(false);
   const [lastSyncedTime, setLastSyncedTime] = useState<string>('');
 
-  // UI Filter & Modal States
-  const [selectedMonth, setSelectedMonth] = useState<string>('2026-08');
+  // Real-time Cloud Invoices from Firebase Firestore
+  const [cloudInvoices, setCloudInvoices] = useState<GstInvoiceRecord[]>([]);
+
+  // UI Filter & Modal States - Default to September 2026
+  const [selectedMonth, setSelectedMonth] = useState<string>('2026-09');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedSummary, setCopiedSummary] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
@@ -127,6 +180,14 @@ export const CAReports: React.FC = () => {
     fetchLiveOrdersFromSheet();
   }, [fetchLiveOrdersFromSheet]);
 
+  // Real-time subscription to Firebase Firestore for any newly created invoices
+  useEffect(() => {
+    const unsub = InvoiceService.subscribeToInvoices((invoices) => {
+      setCloudInvoices(invoices || []);
+    });
+    return unsub;
+  }, []);
+
   // Helper map for fast customer lookups
   const customerMap = useMemo(() => {
     const map = new Map<string, any>();
@@ -137,29 +198,17 @@ export const CAReports: React.FC = () => {
     return map;
   }, [customerMaster]);
 
-  // 2. Transform Orders_Log into the Exact 7-Column CA & GST Register
+  // 2. Transform Orders_Log into the Exact 7-Column CA & GST Register (Strict Indian DD/MM/YYYY)
   const gstRows: GstInvoiceRecord[] = useMemo(() => {
-    return ordersLog.map((order, idx) => {
+    let lastDate = '05-09-2026';
+
+    const sheetRecords: GstInvoiceRecord[] = ordersLog.map((order, idx) => {
       // 1. Invoice No.
       const invoiceNo = (order.Invoice_Link || order.Invoice_Ref || order.Order_ID || `ORD-${idx + 1}`).trim();
 
-      // 2. Date parsing (standardized to DD-MM-YYYY)
-      let dateDisplay = order.Date || '';
-      let rawYm = '';
-      if (dateDisplay) {
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateDisplay)) {
-          const [y, m, d] = dateDisplay.split('-');
-          rawYm = `${y}-${m}`;
-          dateDisplay = `${d}-${m}-${y}`;
-        } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateDisplay)) {
-          const [d, m, y] = dateDisplay.split('/');
-          rawYm = `${y}-${m}`;
-          dateDisplay = `${d}-${m}-${y}`;
-        } else if (/^\d{2}-\d{2}-\d{4}$/.test(dateDisplay)) {
-          const [d, m, y] = dateDisplay.split('-');
-          rawYm = `${y}-${m}`;
-        }
-      }
+      // 2. Date parsing (strictly DD/MM/YYYY)
+      const { dateDisplay, ym } = parseOrderDate(order.Date, invoiceNo, lastDate);
+      if (dateDisplay) lastDate = dateDisplay;
 
       // 3. Party Name resolution via Customer_Master
       const custId = order.Customer_ID || '';
@@ -176,11 +225,12 @@ export const CAReports: React.FC = () => {
         party = custId || 'Direct Customer';
       }
 
-      // 4. Taxable Value & Tax Calculations
-      const totalVal = parseFloat(order.Total_Value || order.Amount || '0') || 0;
-      const priceUnit = parseFloat(order.Price_Per_Unit || '0') || 0;
-      const qtyNum = parseFloat(order.Qty || '1') || 1;
-      const rawBase = totalVal > 0 ? totalVal : (priceUnit * qtyNum);
+      // 4. Taxable Value & Tax Calculations (reversing 5% GST from retail gross total)
+      const totalVal = cleanNumber(order.Total_Value || order.Amount);
+      const priceUnit = cleanNumber(order.Price_Per_Unit);
+      const qtyNum = cleanNumber(order.Qty) || 1;
+      const grossTotal = totalVal > 0 ? totalVal : (priceUnit * qtyNum);
+      const gstPercent = cleanNumber(order.GST_Percent) || 5;
 
       // Check if this invoice matches our audited August pack for exact numbers
       const audited = BASE_AUGUST_INVOICES.find(a => 
@@ -188,17 +238,33 @@ export const CAReports: React.FC = () => {
         (invoiceNo && a.invoiceNo && invoiceNo.toLowerCase().includes(a.invoiceNo.toLowerCase()))
       );
 
-      let taxableValue = audited ? audited.taxableValue : rawBase;
-      let cgst = audited ? audited.cgst : Number((taxableValue * 0.025).toFixed(2));
-      let sgst = audited ? audited.sgst : Number((taxableValue * 0.025).toFixed(2));
-      let totalGst = Number((cgst + sgst).toFixed(2));
-      let total = Number((taxableValue + totalGst).toFixed(2));
+      let taxableValue: number;
+      let cgst: number;
+      let sgst: number;
+      let totalGst: number;
+      let total: number;
+
+      if (audited) {
+        taxableValue = audited.taxableValue;
+        cgst = audited.cgst;
+        sgst = audited.sgst;
+        totalGst = audited.totalGst || Number((cgst + sgst).toFixed(2));
+        total = audited.total || Number((taxableValue + totalGst).toFixed(2));
+      } else {
+        taxableValue = Number((grossTotal / (1 + gstPercent / 100)).toFixed(2));
+        cgst = Number(((grossTotal - taxableValue) / 2).toFixed(2));
+        sgst = Number(((grossTotal - taxableValue) / 2).toFixed(2));
+        totalGst = Number((cgst + sgst).toFixed(2));
+        total = Number((taxableValue + totalGst).toFixed(2));
+      }
+
       let chocolateQuantity = audited ? audited.chocolateQuantity : (order.Items || `${qtyNum} units`);
 
       return {
         id: order.Order_ID || invoiceNo,
         invoiceNo,
         date: dateDisplay,
+        yearMonth: ym,
         party,
         partyGstin: cust?.Notes?.match(/GSTIN\s*[:|-]?\s*([A-Z0-9]{15})/i)?.[1] || '',
         taxableValue,
@@ -211,7 +277,24 @@ export const CAReports: React.FC = () => {
         source: 'imported'
       };
     });
-  }, [ordersLog, customerMap]);
+
+    // Merge any custom Firestore cloud invoices that are not in Google Sheets
+    const existingInvoices = new Set(sheetRecords.map(r => r.invoiceNo.toLowerCase()));
+    const extraCloudRecords: GstInvoiceRecord[] = [];
+
+    cloudInvoices.forEach(cloudInv => {
+      if (!cloudInv.invoiceNo || existingInvoices.has(cloudInv.invoiceNo.toLowerCase())) return;
+      const { dateDisplay, ym } = parseOrderDate(cloudInv.date, cloudInv.invoiceNo);
+      extraCloudRecords.push({
+        ...cloudInv,
+        date: dateDisplay || cloudInv.date,
+        yearMonth: ym || InvoiceService.extractYearMonth(cloudInv.date)
+      });
+      existingInvoices.add(cloudInv.invoiceNo.toLowerCase());
+    });
+
+    return [...sheetRecords, ...extraCloudRecords];
+  }, [ordersLog, customerMap, cloudInvoices]);
 
   // Compute available months dynamically from all order dates
   const availableMonths = useMemo(() => {
@@ -223,7 +306,7 @@ export const CAReports: React.FC = () => {
     monthsSet.add('2026-08');
 
     gstRows.forEach(row => {
-      const ym = InvoiceService.extractYearMonth(row.date);
+      const ym = (row as any).yearMonth || InvoiceService.extractYearMonth(row.date);
       if (ym) monthsSet.add(ym);
     });
 
@@ -247,7 +330,7 @@ export const CAReports: React.FC = () => {
     return gstRows.filter(row => {
       // Month Filter
       if (selectedMonth) {
-        const ym = InvoiceService.extractYearMonth(row.date);
+        const ym = (row as any).yearMonth || InvoiceService.extractYearMonth(row.date);
         if (ym !== selectedMonth) {
           return false;
         }
@@ -589,7 +672,7 @@ export const CAReports: React.FC = () => {
               </span>
               {availableMonths.map((ym) => {
                 const isSelected = selectedMonth === ym;
-                const count = gstRows.filter(r => InvoiceService.extractYearMonth(r.date) === ym).length;
+                const count = gstRows.filter(r => ((r as any).yearMonth || InvoiceService.extractYearMonth(r.date)) === ym).length;
                 return (
                   <button
                     key={ym}
