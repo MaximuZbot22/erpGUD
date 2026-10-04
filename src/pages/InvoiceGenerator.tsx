@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { exportElementToPdf, printIsolatedElement } from '../utils/documentExport';
 import { getAssetUrl } from '../utils/assetPath';
+import { InvoiceService, GstInvoiceRecord } from '../services/invoiceService';
 
 interface InvoiceItem {
   id: string;
@@ -247,7 +248,8 @@ export const InvoiceGenerator: React.FC = () => {
   // Live Orders list from Orders_Log
   const [liveOrders, setLiveOrders] = useState<any[]>(() => mergeOrders(seedData.Orders_Log || []));
   const [loadingOrders, setLoadingOrders] = useState(false);
-  const [invoiceMode, setInvoiceMode] = useState<'new' | 'from-sheet'>('new');
+  const [invoiceMode, setInvoiceMode] = useState<'new' | 'from-sheet' | 'cloud'>('new');
+  const [cloudSearchTerm, setCloudSearchTerm] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [orderSearchTerm, setOrderSearchTerm] = useState('');
 
@@ -293,6 +295,75 @@ export const InvoiceGenerator: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [exportingDocs, setExportingDocs] = useState(false);
   const [draftSavedAlert, setDraftSavedAlert] = useState(false);
+  const [cloudInvoices, setCloudInvoices] = useState<GstInvoiceRecord[]>([]);
+  const [isSavingCloud, setIsSavingCloud] = useState(false);
+
+  // Subscribe to real-time invoices in Firebase Firestore
+  useEffect(() => {
+    const unsub = InvoiceService.subscribeToInvoices((loaded) => {
+      setCloudInvoices(loaded);
+      // Auto-set next invoice sequence if default
+      let highest = 1171;
+      loaded.forEach(inv => {
+        const m = inv.invoiceNo.match(/Invoice-(\d+)-/i) || inv.invoiceNo.match(/(\d+)/);
+        if (m) {
+          const num = parseInt(m[1]);
+          if (!isNaN(num) && num > highest) highest = num;
+        }
+      });
+      if (highest >= 1156 && invoiceSeq === '1156') {
+        setInvoiceSeq(String(highest + 1));
+      }
+    });
+    return unsub;
+  }, []);
+
+  // Save current invoice directly to Firebase Firestore & local registry
+  const handleSaveToFirebase = async () => {
+    setIsSavingCloud(true);
+    try {
+      const qtyStr = InvoiceService.formatChocolateQuantity({
+        hamperQty,
+        totalBarsQty,
+        box6Qty,
+        box8Qty
+      });
+
+      await InvoiceService.saveInvoice({
+        invoiceNo: invoiceNoFormatted,
+        date: invoiceDate,
+        party: clientName || 'Client',
+        partyGstin: clientGstin ? clientGstin.replace(/^GSTIN\s*[:|-]?\s*/i, '').trim() : '',
+        taxableValue: Number(subtotal.toFixed(2)),
+        cgst: Number(cgst.toFixed(2)),
+        sgst: Number(sgst.toFixed(2)),
+        totalGst: Number((cgst + sgst).toFixed(2)),
+        total: Number(totalReceivable.toFixed(2)),
+        chocolateQuantity: qtyStr,
+        items: items,
+        notes: invoiceNotes,
+        entity: 'Goodoria Food Innovations',
+        source: 'invoice_generator'
+      });
+
+      sendNotification({
+        title: 'Saved to Cloud & GST Register!',
+        message: `${invoiceNoFormatted} saved to Firebase. Available immediately in CA & GST Reports.`,
+        priority: 'medium',
+        channels: ['in-app']
+      });
+    } catch (err: any) {
+      console.error('Firebase save error:', err);
+      sendNotification({
+        title: 'Saved Locally',
+        message: `${invoiceNoFormatted} saved to local cache.`,
+        priority: 'low',
+        channels: ['in-app']
+      });
+    } finally {
+      setIsSavingCloud(false);
+    }
+  };
 
   // Locked Invoice Preview mode: keep invoice pinned while editor controls scroll with blur fade
   const [lockPreview, setLockPreview] = useState<boolean>(() => {
@@ -511,6 +582,73 @@ export const InvoiceGenerator: React.FC = () => {
     sendNotification({ title: 'Order Loaded', message: `Order ${orderId} loaded into invoice. Ready to print!`, priority: 'medium', channels: ['in-app'] });
   };
 
+  // Load a saved cloud invoice from Firebase into the generator
+  const handleLoadFromCloudInvoice = (inv: GstInvoiceRecord) => {
+    setClientName(inv.party || '');
+    setInvoiceDate(inv.date || new Date().toISOString().split('T')[0]);
+    if (inv.partyGstin) {
+      setClientGstin(inv.partyGstin.startsWith('GSTIN') ? inv.partyGstin : `GSTIN - ${inv.partyGstin}`);
+    } else {
+      setClientGstin('');
+    }
+    if (inv.notes) setInvoiceNotes(inv.notes);
+
+    // Sequence & tag matching
+    const seqMatch = inv.invoiceNo.match(/Invoice-([0-9A-Za-z]+)-/i) || inv.invoiceNo.match(/Invoice-([0-9A-Za-z]+)/i) || inv.invoiceNo.match(/([0-9]+)/);
+    if (seqMatch) setInvoiceSeq(seqMatch[1]);
+    const tagMatch = inv.invoiceNo.match(/GUD-\d{4}-([A-Za-z0-9_-]+)/i);
+    if (tagMatch) setInvoiceTag(tagMatch[1]);
+
+    if (inv.items && inv.items.length > 0) {
+      const newFlavors: FlavorCounts = { almond: 0, peanut: 0, orange: 0, lemon: 0, seaSalt: 0, mocha: 0, jackfruit: 0 };
+      let b6 = 0, b8 = 0, h = 0;
+      let courier = 0;
+
+      inv.items.forEach((item: any) => {
+        const lowerName = item.name.toLowerCase();
+        const lowerDesc = (item.description || '').toLowerCase();
+        if (lowerName.includes('orange') || lowerDesc.includes('orange')) newFlavors.orange = item.qty;
+        else if (lowerName.includes('almond') || lowerDesc.includes('almond')) newFlavors.almond = item.qty;
+        else if (lowerName.includes('sea salt') || lowerDesc.includes('sea salt')) newFlavors.seaSalt = item.qty;
+        else if (lowerName.includes('mocha') || lowerDesc.includes('mocha')) newFlavors.mocha = item.qty;
+        else if (lowerName.includes('peanut') || lowerDesc.includes('peanut')) newFlavors.peanut = item.qty;
+        else if (lowerName.includes('jackfruit') || lowerDesc.includes('jackfruit')) newFlavors.jackfruit = item.qty;
+        else if (lowerName.includes('lemon') || lowerDesc.includes('lemon')) newFlavors.lemon = item.qty;
+        else if (lowerName.includes('6 piece') || item.id === 'box6') b6 = item.qty;
+        else if (lowerName.includes('8 piece') || item.id === 'box8') b8 = item.qty;
+        else if (lowerName.includes('hamper') || item.id === 'hamper') h = item.qty;
+        else if (lowerName.includes('courier') || item.id === 'courier') courier = item.rate * item.qty;
+        else if (item.id === 'bars' || lowerName.includes('bar')) {
+          const parsed = parseItemsStringToState(item.description || '');
+          if (parsed && Object.values(parsed.flavors).some(v => v > 0)) {
+            Object.assign(newFlavors, parsed.flavors);
+          } else {
+            newFlavors.orange = item.qty;
+          }
+        }
+      });
+
+      setFlavors(newFlavors);
+      setBox6Qty(b6);
+      setBox8Qty(b8);
+      setHamperQty(h);
+      setCourierCharge(courier);
+    } else if (inv.chocolateQuantity) {
+      const parsed = parseItemsStringToState(inv.chocolateQuantity);
+      setFlavors(parsed.flavors);
+      setBox6Qty(parsed.box6Qty);
+      setBox8Qty(parsed.box8Qty);
+      setHamperQty(parsed.hamperQty);
+    }
+
+    sendNotification({
+      title: 'Invoice Loaded',
+      message: `Loaded ${inv.invoiceNo} into Studio editor.`,
+      priority: 'low',
+      channels: ['in-app']
+    });
+  };
+
   // Reset all items for a repeat-customer new order (keeps client details)
   const handleResetItemsForRepeatOrder = () => {
     setFlavors({ almond: 0, peanut: 0, orange: 0, lemon: 0, seaSalt: 0, mocha: 0, jackfruit: 0 });
@@ -695,9 +833,13 @@ export const InvoiceGenerator: React.FC = () => {
         scale: 1.75
       });
       setPdfStatus('success');
+
+      // Auto-save to Firebase Cloud & GST Register!
+      handleSaveToFirebase();
+
       sendNotification({
-        title: 'PDF Downloaded',
-        message: `${invoiceNoFormatted}.pdf ready and saved!`,
+        title: 'PDF Downloaded & Saved',
+        message: `${invoiceNoFormatted}.pdf ready and synced to GST register!`,
         priority: 'low',
         channels: ['in-app']
       });
@@ -791,6 +933,9 @@ CIN: U72200KL2015PTC039279
   const handleSaveAndPushOrder = async () => {
     setSaving(true);
     try {
+      // Always save to Firebase Firestore so CA Reports & GST Sales Register are updated immediately
+      await handleSaveToFirebase();
+
       if (googleToken) {
         const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ORDERS || '1uUfxL_k6k4ebzHPWL4pwwtdIaxzZ-6mW4mqB_6iJnXo';
         
@@ -910,6 +1055,17 @@ CIN: U72200KL2015PTC039279
             <Download className={`w-3.5 h-3.5 ${pdfStatus === 'generating' ? 'animate-spin' : ''}`} />
             <span>{pdfStatus === 'generating' ? 'Generating PDF...' : 'Download PDF'}</span>
           </Button>
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            onClick={handleSaveToFirebase}
+            disabled={isSavingCloud}
+            className="text-xs bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-semibold"
+            title="Save this invoice directly to Firebase Firestore so CA & GST Sales Register updates in real-time"
+          >
+            <Save className={`w-3.5 h-3.5 ${isSavingCloud ? 'animate-spin' : ''}`} />
+            <span>{isSavingCloud ? 'Saving...' : '💾 Save to Cloud & GST'}</span>
+          </Button>
           <Button variant="outline" size="sm" onClick={handlePrint} className="text-xs border-[#383838] bg-[#272727] hover:bg-[#383838] text-neutral-200">
             <Printer className="w-3.5 h-3.5" />
             <span>Print</span>
@@ -966,34 +1122,100 @@ CIN: U72200KL2015PTC039279
                   ↺ Reset Quantities (0)
                 </button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => { setInvoiceMode('new'); setSelectedOrderId(''); }}
-                  className={`p-2.5 rounded-lg border text-xs font-bold transition tactile-press ${
+                  className={`p-2 rounded-lg border text-xs font-bold transition tactile-press ${
                     invoiceMode === 'new'
                       ? 'bg-neutral-800 border-neutral-600 text-white shadow-sm'
                       : 'bg-[#181818] border-[#2c2c2c] text-neutral-400 hover:text-white hover:bg-[#222222]'
                   }`}
                 >
-                  ✏️ New Invoice
-                  <div className="text-[9px] font-normal opacity-80 mt-0.5">Fill items → Push to Sheets</div>
+                  ✏️ New
+                  <div className="text-[9px] font-normal opacity-80 mt-0.5">Custom Form</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => { setInvoiceMode('from-sheet'); fetchLiveOrders(); }}
-                  className={`p-2.5 rounded-lg border text-xs font-bold transition tactile-press ${
+                  className={`p-2 rounded-lg border text-xs font-bold transition tactile-press ${
                     invoiceMode === 'from-sheet'
                       ? 'bg-neutral-800 border-neutral-600 text-white shadow-sm'
                       : 'bg-[#181818] border-[#2c2c2c] text-neutral-400 hover:text-white hover:bg-[#222222]'
                   }`}
                 >
-                  📋 From Existing Order
-                  <div className="text-[9px] font-normal opacity-80 mt-0.5">Load from Sheets → PDF only</div>
+                  📋 Orders
+                  <div className="text-[9px] font-normal opacity-80 mt-0.5">From Sheet</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInvoiceMode('cloud')}
+                  className={`p-2 rounded-lg border text-xs font-bold transition tactile-press ${
+                    invoiceMode === 'cloud'
+                      ? 'bg-emerald-950/60 border-emerald-600 text-emerald-200 shadow-sm'
+                      : 'bg-[#181818] border-[#2c2c2c] text-neutral-400 hover:text-white hover:bg-[#222222]'
+                  }`}
+                >
+                  ☁️ Cloud / GST
+                  <div className="text-[9px] font-normal opacity-80 mt-0.5">{cloudInvoices.length} Invoices</div>
                 </button>
               </div>
             </CardContent>
           </Card>
+
+          {/* ── Load from Saved Cloud / GST Invoices (mode = cloud) ── */}
+          {invoiceMode === 'cloud' && (
+            <Card className="border border-emerald-800/40 bg-[#121a15]">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold flex items-center justify-between text-emerald-300">
+                  <span>☁️ Saved Cloud &amp; GST Invoices ({cloudInvoices.length})</span>
+                  <span className="text-[10px] text-neutral-400">Firebase Live</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-xs">
+                <input
+                  type="text"
+                  placeholder="Search invoice number, party, date..."
+                  value={cloudSearchTerm}
+                  onChange={e => setCloudSearchTerm(e.target.value)}
+                  className="w-full rounded-lg border border-emerald-800/40 bg-[#0a100d] p-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                />
+                <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1">
+                  {cloudInvoices
+                    .filter(inv => !cloudSearchTerm || `${inv.invoiceNo} ${inv.party} ${inv.date} ${inv.chocolateQuantity}`.toLowerCase().includes(cloudSearchTerm.toLowerCase()))
+                    .map(inv => (
+                      <div
+                        key={inv.invoiceNo}
+                        className="p-2.5 rounded-lg border border-[#23352b] bg-[#16231d] hover:border-emerald-500/50 transition flex items-center justify-between gap-2"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold font-mono text-emerald-300 text-xs">{inv.invoiceNo}</span>
+                            <span className="text-[10px] text-neutral-400">{inv.date}</span>
+                          </div>
+                          <p className="text-white font-medium text-[11px] truncate mt-0.5">{inv.party}</p>
+                          <div className="flex items-center gap-2 text-[10px] text-neutral-400 mt-0.5">
+                            <span className="text-emerald-400 font-semibold">₹{inv.taxableValue.toLocaleString('en-IN')} + GST ₹{(inv.totalGst ?? (inv.cgst + inv.sgst)).toLocaleString('en-IN')}</span>
+                            <span>•</span>
+                            <span className="truncate">{inv.chocolateQuantity}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleLoadFromCloudInvoice(inv)}
+                          className="px-2.5 py-1.5 rounded-md bg-emerald-600/30 hover:bg-emerald-600/60 text-emerald-200 text-[11px] font-semibold border border-emerald-500/30 transition tactile-press whitespace-nowrap"
+                        >
+                          Load in Studio →
+                        </button>
+                      </div>
+                    ))}
+                  {cloudInvoices.length === 0 && (
+                    <p className="text-neutral-500 text-center py-4">No cloud invoices found.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* ── Load from Existing Order (mode = from-sheet) ── */}
           {invoiceMode === 'from-sheet' && (
